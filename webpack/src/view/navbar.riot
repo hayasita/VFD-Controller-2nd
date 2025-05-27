@@ -1,0 +1,233 @@
+<navigation>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+
+    <a class="navbar-brand" href="#">{title}</a>
+<!--    <div class="container-fluid">-->
+
+    <div>
+      <span class="navbar-text">{timeDisplay}</span>
+    </div>
+
+    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="ナビゲーションの切替">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+      <!--
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">ホーム</a>
+        </li>
+      -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Language setting
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <select class="form-select form-select-sm"  name="select" onchange={ changeLanguage } id="localesSel">
+                <option value="ja">日本語</option>
+                <option value="en">English</option>
+              </select>
+            </li>
+          </ul>
+        </li>
+
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<script>
+//  import i18next from 'i18next'
+
+  export default{
+    onBeforeMount(props, state){
+      console.log("== Nav ==")
+      var vmUI = props.vmUI;
+      let obs = props.obs;
+
+
+      this.title = vmUI.getTitle();
+
+      // 時刻情報取得コールバック設定
+      vmUI.setTimeDataCallback(this.getTimeData.bind(this))
+      // 表示フォーマット初期値取得
+      this.dispFormat = vmUI.getDisplaySetting("dispFormat");
+      // LocaleId初期値取得
+      this.localesId = vmUI.getDisplaySetting("localesId");
+      console.log("this.localesId : ")
+      console.log(this.localesId);
+
+      this.changeLanguage = ((e) =>{
+        let element = document.getElementById('localesSel');
+        this.localesId = element.value
+        if(this.localesId == "ja"){
+          console.log("-jp");
+          this.localesIdDat = 0;
+        }
+        else if(this.localesId == "en"){
+          console.log("-en");
+          this.localesIdDat = 1;
+        }
+        else{
+          console.log("-other");
+          this.localesIdDat = 99;
+        }
+        vmUI.setting.setLanguage(this.localesId);     // 言語設定
+//        i18next.changeLanguage(this.localesId);     // setting.jsを呼べないか
+        obs.trigger('changeLanguage',this.localesId);
+        vmUI.submitDisplaySetting("localesId", this.localesIdDat,);  // LocaleId設定値送信
+        console.log(this.localesId);
+      })
+
+//      let language = document.getElementById('selectLanguage');
+//      console.log(language)
+ 
+
+      this.outputSelectedValueAndText = (obj, e) =>{
+//        let element = document.getElementById('sel');
+//        console.log(element.value);
+      }
+
+      // 接続エラー判定用ウオッチドッグタイマ設定
+      this.watchdogId = setInterval(this.addWatchdog,1000)
+      this.watchdogCount = 0;     // ウオッチドッグタイマ初期化
+      this.connectionError = 0;   // 接続エラー初期化
+
+      // 表示フォーマット初期値取得
+      this.dispFormat = vmUI.getDisplaySetting("dispFormat");
+      // 時刻表示12h/24h設定初期値取得
+      this.formatHour = vmUI.getDisplaySetting("formatHour")
+      // --- TimeDisplay Format 初期値取得・設定 ---
+      this.timeDisplayFormat = vmUI.getDisplaySetting("timeDisplayFormat");
+      // --- DateDisplay Format 初期値取得・設定 ---
+      this.dateDisplayFormat = vmUI.getDisplaySetting("dateDisplayFormat");
+    },
+    onMounted(props, state){
+      let vmUI = props.vmUI;
+      let obs = props.obs;
+      let _this = this
+
+      // localesドロップダウンリスト初期値設定
+      let localesDat = [
+        {"ID":0,"LOCALES":"ja","TITLE":"Japanese"},
+        {"ID":1,"LOCALES":"en","TITLE":"English"}
+      ]
+
+      var select = document.getElementById('localesSel');
+      select.options[this.localesId].selected = true;
+      // --- 表示フォーマット取得 ---
+      obs.on('dispFormat',function(code){
+        console.log("obs.dispFormat:"+code)
+        this.dispFormat = code;
+        //  _this.makeTimeDisplay();  // .bind(this)しない場合は_this でthisにアクセスする
+                                      // ここのthisはイベント発生元のthis
+        this.makeTimeDisplay();
+      }.bind(this))
+      // --- 時刻表示12h/24h設定取得 ---
+      obs.on('formatHour',function(code){
+        console.log("obs.formatHour:"+code)
+        this.formatHour = code;
+        this.makeTimeDisplay();
+      }.bind(this))
+      // --- TimeDisplay Format設定取得 ---
+      obs.on('timeDisplayFormat',function(code){
+        console.log("obs.timeDisplayFormat:"+code)
+        this.timeDisplayFormat = code;
+        this.makeTimeDisplay();
+      }.bind(this))
+      // --- DateDisplay Format設定取得 ---
+      obs.on('dateDisplayFormat',function(code){
+        console.log("obs.dateDisplayFormat:"+code)
+        this.dateDisplayFormat = code;
+        this.makeTimeDisplay();
+      }.bind(this))
+
+    },
+    // 時刻情報取得
+    getTimeData(timeData){
+//      console.log("-- navbar.tag.getTimeData --");
+//      console.log(timeData);
+      this.watchdogCount = 0;     // WatchDog Clear
+      this.connectionError = 0;   // 接続エラー初期化
+      this.year = timeData.year;
+      this.month = timeData.month;
+      this.date = timeData.date;
+      this.hour = timeData.hour;
+      this.min = timeData.min;
+      this.second = timeData.sec;
+      this.makeTimeDisplay();
+    },
+    makeTimeDisplay(){
+      if(!this.connectionError){
+        let timedata;
+        let datedata;
+        let hour,hourZp,minZp,secZp;
+        let year2Zp,yearZp,monthZp,dateZp;
+
+        if((this.formatHour == 0) && (this.hour > 12)){
+          hour = this.hour - 12;
+        }
+        else{
+          hour = this.hour;
+        }
+
+        hourZp  = String(hour).padStart(2, '0');
+        secZp = String(this.second).padStart(2, '0');
+        minZp = String(this.min).padStart(2, '0');
+        if(this.timeDisplayFormat == 1){        // hh.mm.ss
+          timedata = hourZp + ":" + minZp + ":" + secZp;
+        }
+        else if(this.timeDisplayFormat == 2){   // h.mm.ss
+//          timedata = hour + ":" + this.min + ":" + this.second;
+          timedata = hour + ":" + minZp + ":" + secZp;
+        }
+        else if(this.timeDisplayFormat == 3){   // mm.ss.hh
+          timedata = minZp + ":" + secZp + ":" + hourZp;
+        }
+
+        yearZp = String(this.year).padStart(2, '0');
+        year2Zp = String(this.year % 100).padStart(2, '0');
+        monthZp = String(this.month).padStart(2, '0');
+        dateZp = String(this.date).padStart(2, '0');
+        if(this.dateDisplayFormat == 1){        // yyyy.mm.dd
+          datedata = yearZp + "/" + monthZp + "/" + dateZp;
+        }
+        else if(this.dateDisplayFormat == 2){   // yy.mm.dd
+          datedata = year2Zp + "/" + monthZp + "/" + dateZp;
+        }
+        else if(this.dateDisplayFormat == 3){   // mm.dd.yyyy
+          datedata = monthZp + "/" + dateZp + "/" + yearZp;
+        }
+        else if(this.dateDisplayFormat == 4){   // mm.dd.yy
+          datedata = monthZp + "/" + dateZp + "/" + year2Zp;
+        }
+        else if(this.dateDisplayFormat == 5){   // dd.mm.yyyy
+          datedata = dateZp + "/" + monthZp + "/" + yearZp;
+        }
+        else if(this.dateDisplayFormat == 6){   // dd.mm.yy
+          datedata = dateZp + "/" + monthZp + "/" + year2Zp;
+        }
+
+        this.timeDisplay = datedata + " " + timedata;
+        this.watchdogCount = 0;
+        this.update();
+      }
+    },
+    // ウオッチドッグタイマ加算・接続エラー判定
+    addWatchdog(){
+      this.watchdogCount = this.watchdogCount + 1;
+      if(this.watchdogCount > 10){
+        this.connectionError = 1;
+        this.timeDisplay = "Connection Error!!"
+        this.update();
+//        console.log("WatchDog Error!!")
+      }
+    }
+  }
+
+</script>
+</navigation>

@@ -1,0 +1,62 @@
+
+プロセッサとしてESP32を使用して、フレームワークはArduinoを使用する。
+
+システムには、I2CインターフェースでEEPROMと環境センサが接続されている。
+I2Cバスに接続されているデバイスのアクセスは非同期なので、排他処理が必要になる。
+EEPROMにはパラメータと動作ログが記録される。これらは同時に複数のパラメータの値の変更やログの書き込みが発生するので、排他処理が必要になる。
+IOポートには複数のスイッチと、赤外線受信機、アナログセンサが接続される。
+
+システム全体はシステムコントローラが制御する。
+複数の動作モードを状況やパラメータによって遷移する。
+環境センサの値を定期的なタイミイングと任意のタイミングで読み込む。
+webサーバとwifi親機の機能を持ち、web経由でログの参照やパラメータの変更を行う。
+
+以上のシステムの要件を整理して、クラス設計をしてください。
+
+
+SystemController
+├── I2CBusManager（I2C排他制御） ※センサとEEPROM両方カバー
+│
+├── EepromManager（EEPROM読み書き・全体排他） 🔒 ← new mutex追加！
+│   ├── ParameterManager（パラメータ管理）
+│   └── LogManager（ログ管理）
+│
+├── EnvironmentSensor（I2CBusManager経由で排他）
+├── SwitchManager（スイッチ制御）
+├── IrReceiver（赤外線受信）
+├── AnalogSensorManager（アナログセンサ）
+├── WifiManager
+├── WebServerManager
+└── ModeManager
+
+src/
+├── I2CBusManager.h / .cpp
+├── EepromRawAccessor.h / .cpp
+├── EepromManager.h / .cpp
+├── ParameterStorage.h / .cpp
+├── ParameterManager.h / .cpp
+├── LogStorage.h / .cpp
+├── LogManager.h / .cpp
+├── EnvironmentSensor.h / .cpp
+└── SystemController.h / .cpp
+
+パラメータの仕様を拡張したい。
+各パラメータは、それぞれ以下の値を持つ。
+・初期値
+・最小値
+・最大値
+パラメータはオールクリアの操作ですべてのパラメータに初期値が設定される。
+パラメータの設定値が最小値、最大値の範囲外になると、範囲外エラーのログを残す。
+この機能を実現するのに、パラメータクラスを作成し、そのクラス内に
+・設定値
+・初期値
+・最小値
+・最大値
+と操作用のメソッドを持ち、このクラスのvectorをパラメータマネージャが管理する構成を考えた。
+この内容を確認し、必要があれば改善するか、代替案を出して。
+
+すぐに ビルドテスト用のPlatformIOプロジェクト用意 する？
+
+さらに ユニットテスト（GoogleTest）準備 する？
+
+機能追加（たとえばログのローテーション、自動バックアップとか）していく？

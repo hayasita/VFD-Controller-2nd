@@ -1,0 +1,235 @@
+<mytag>
+  <h1>{ state.message }</h1>
+  <h1>{ state.message2 }</h1>
+  <h1>{ state3}</h1>
+
+  <!-- ドロップダウンメニューをeachを使ったループで作成する。 -->
+  <div class ="form-group">
+    <label for="select1">Select:</label>
+    <select id="select1" class="form-control">
+      <option each={tz in this.tzlist}>{tz}</option>
+    </select>
+  </div>
+  <!-- -->
+  <hr>
+  <!-- javascriptのloopで3x3のボタンパネルを作成  -->
+  <div id="div1"></div>
+  <!-- -->
+  <hr>
+
+  <!-- BrDigボタン見本 -->
+  <table class="table">
+
+    <tr>
+      <th class="itemname-width">Display digit</th>
+      <th>Brightness setting</th>
+    </tr>
+
+    <tr>
+      <td>Dig.9</td>
+      <td><div class="input-group">
+        <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig9Minus" data-type="minus" data-field="brDig9Unit" pear-button="brDig9Plus" onclick={ () => brdig("brDig9Minus") }>-</button>
+        <input type="number" class="form-control input-sm no-spin" name="brightDig9" id="brDig9Unit" min="1" max="15" placeholder="1-15" value={brightDig9}>
+        <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig9Plus" data-type="plus" data-field="brDig9Unit" pear-button="brDig9Minus" onclick={ () => brdig("brDig9Plus") }>+</button>
+      </div></td>
+    </tr>
+
+  </table>
+  <!-- -->
+
+  <!-- javascriptのloopでボタンテーブルを作成 -->
+  <div id="brDigSetting"></div>
+  <!-- -->
+
+  <!-- ボタン見本 -->
+  <p>
+    <button type="button" class="btn btn-primary">Primary</button>
+    <button type="button" class="btn btn-secondary">Secondary</button>
+    <button type="button" class="btn btn-success">Success</button>
+    <button type="button" class="btn btn-danger">Danger</button>
+    <button type="button" class="btn btn-warning">Warning</button>
+    <button type="button" class="btn btn-info">Info</button>
+  </p>
+  <!-- -->
+
+  <!-- アコーディオン見本 -->
+  <div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Accordion Item #1
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingTwo">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Accordion Item #2
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingThree">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Accordion Item #3
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+  <!-- -->
+    
+  <!-- ボタンで表示非表示切替 -->
+  <p>
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+      Link with href
+    </a>
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+      Button with data-bs-target
+    </button>
+  </p>
+  <div class="collapse" id="collapseExample">
+    <div class="card card-body">
+      Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+    </div>
+  </div>
+  <!-- -->
+
+  <script>
+  import i18next from 'i18next';
+
+    export default {
+      state: {
+        message: 'hello there',
+        message2: 'hello there2'
+      },
+      state2: {
+        message: 'hello there'
+      },
+      onBeforeMount(props, state) {
+        // コンポーネントのマウント前
+        let vmUI = props.vmUI;
+//        this.state3 = props.vmUI.getTitle();
+//        i18next.changeLanguage('ja');
+        this.state3 = i18next.t('key2')
+
+        console.log('testtest')
+        console.log(this.state3)
+
+      // ----
+      // ドロップダウンメニューをeachを使ったループで作成する。
+        this.tzlist = ['1','2','3','4'];
+      // ----
+      },
+      onMounted(props, state){
+        let vmUI = props.vmUI;
+        
+        // ----
+        // javascriptのloopで3x3のボタンパネルを作成
+        const div1 = document.getElementById("div1");
+        for(let i=0; i<3; i++){
+          const newDiv = document.createElement("div");
+          for(let j=0; j<3; j++){
+            const newBtn = document.createElement("button");
+            newBtn.innerHTML = i * 3 + j + 1;
+            newBtn.onclick = () => {
+              console.log(`ボタン${newBtn.innerHTML}が押されました！`);
+            }
+            newDiv.appendChild(newBtn);
+          }
+          div1.appendChild(newDiv);
+        }
+        // ----
+
+        // ----
+        // javascriptのloopでボタンテーブルを作成
+        console.log("==== ボタン自動生成 ====");
+        const brDigSet = document.getElementById("brDigSetting");
+
+        const frag = document.createDocumentFragment();
+
+        const newTable = document.createElement("table");
+        newTable.id = 'table'
+
+        const newTr = document.createElement("tr");
+        const newTh1 = document.createElement("th");
+        newTh1.class = 'itemname-width';
+        newTh1.innerHTML = "Display digit"
+        newTr.appendChild(newTh1);
+        const newTh2 = document.createElement("th");
+        newTh2.innerHTML = "Brightness setting"
+        newTr.appendChild(newTh2);
+        newTable.appendChild(newTr);
+
+        for(let i=0; i<5; i++){
+          var btnum = i + 1;
+          const newTr = document.createElement("tr");
+          const newTdTitle = document.createElement("td");
+          newTdTitle.innerHTML = `Dig.${btnum}`;
+          newTr.appendChild(newTdTitle);
+
+          const newTd = document.createElement("td");
+          const newDiv = document.createElement("div");
+          newDiv.class = 'input-group';
+
+          const newBtn = document.createElement("button");
+          newBtn.type = 'button';
+          newBtn.class = 'btn btn-primary btn-dispconf-number';
+          newBtn.id = `brDig${btnum}Minus`;
+          newBtn.dataType = `minus`;                  // data-typeをdataTypeに変更。-は演算子として扱われるため。回避策要調査？
+          newBtn.dataField = `brDig${btnum}Unit`;     // data-field
+          newBtn.pearButton = `brDig${btnum}Plus`;    // pear-button
+          newBtn.onclick = () => {
+            brdig(`${newBtn.id}`);
+            console.log(`ボタン${newBtn.innerHTML}が押されました！`);
+          }
+          newBtn.innerHTML = "-";
+          console.log(newBtn);
+//          newDiv.innerHTML = "test";
+//          const text = document.createTextNode("test")
+
+          newDiv.appendChild(newBtn);
+          newTd.appendChild(newDiv);
+          newTr.appendChild(newTd);
+          frag.appendChild(newTr);
+        }
+        newTable.appendChild(frag);
+        brDigSet.appendChild(newTable);
+      },
+      // ----
+
+    }
+    // ボタンテーブルから参照される関数
+    function brdig(item){
+        console.log("brdig:");
+        console.log(item);
+        var obj = {
+            brightDig9 : 9 , brightDig8 : 8 , brightDig7 : 7 , brightDig6 : 6 , brightDig5 : 5 ,
+            brightDig4 : 4 , brightDig3 : 3 , brightDig2 : 2 , brightDig1 : 1
+        };
+        this.buttonSet(item);
+        var result = document.getElementById(item);
+        var datafieldName = result.getAttribute('data-field');
+        var input = document.getElementById(datafieldName);
+        var name = input.getAttribute('name');
+        var currentVal = parseInt(this[name]);
+//        console.log(name);
+//        console.log(obj[name]);
+        this.UI.dispBrDigSubmit(obj[name],currentVal);
+    }
+
+  </script>
+</mytag>

@@ -1,0 +1,1206 @@
+
+<timeconf>
+  <h1>時刻設定</h1>
+
+  <div class="row">
+    <div class="col-md-6">
+			<div class="card h-100">
+				<div class="card-header">
+					SNTP設定
+				</div>
+				<div class="card-body">
+
+					<h5 class="card-title">SNTP 使用</h5>
+					<p class="card-text">
+						<div class="col-sm-11 offset-sm-1">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox"
+								type="checkbox"
+								checked={ Timeconf_NtpUse_check }
+								onclick={ ntpUseToggle } />
+								{ tTimeconf_NtpUse_check }
+							</div>
+						</div>
+					</p>
+
+					<h5 class="card-title">{this.timezoneKey}</h5>
+					<p class="card-text">
+						<div class="col-sm-11 offset-sm-1">
+							<div>
+								<select class="form-select form-select-sm" aria-label="Time Zone Area" name="timeZoneDataArea" onchange={ changeTimeZoneAreaData } id="timeZoneDataArea" disabled="{!Timeconf_NtpUse_check}">
+								</select>
+							</div>
+							<div>
+								<select class="form-select form-select-sm" aria-label="Time Zone2" name="timeZoneData" onchange={ changeTimeZoneData } id="timeZoneData" disabled="{!Timeconf_NtpUse_check}">
+								</select>
+							</div>
+						</div>
+					</p>
+
+      		<h5 class="card-title">SNTP auto update time</h5>
+					<p class="card-text">
+						<div class="col-sm-11 offset-sm-1">
+						{ tStaConnectionSettingState }
+							<form onsubmit="{ ntpAutoUpdateSubmit }">
+<!--
+								<table class="table">
+									<tr>
+										<td><label for="ntp_up_hour" >hour</label></td>
+										<td>
+											<input type="number" class="form-control form-control-sm" name="ntpUpHour" min="0" max="23" placeholder="0-23" value={ntpUpHourVal} disabled="{!Timeconf_NtpUse_check}">
+										</td>
+										<td><label for="ntp_up_hour_" class="">0-23</label></td>
+									</tr>
+									<tr>
+										<td><label for="ntp_up_min" class="">min</label></td>
+										<td>
+												<input type="number" class="form-control form-control-sm" name="ntpUpMin" min="0" max="59" placeholder="0-59" value={ntpUpMinVal} disabled="{!Timeconf_NtpUse_check}">
+										</td>
+										<td><label for="ntp_up_min_" class="">0-59</label></td>
+									</tr>
+								</table>
+-->
+								<div class="mb-3">
+<!--									<label for="ntpUpTime" class="form-label">時刻</label>-->
+									<input type="time" class="form-control form-control-sm" id="ntpUpTime" name="ntpUpTime" value={ntpUpTimeVal} disabled="{!Timeconf_NtpUse_check}">
+								</div>
+
+								<div class="form-group row">
+									<div>
+										<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ ntpAutoUpdateSetting } disabled="{!Timeconf_NtpUse_check}">Setting</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</p>
+
+					<h5 class="card-title">SNTP manual connection</h5>
+					<p class="card-text">
+						<div class="col-sm-11 offset-sm-1">
+<!--
+							<div>
+								<label class="col-sm-2 col-form-label">Times of Day</label>
+								<label for="ntp_up_min_" class="col-10 col-form-label">{lastUpdateTime}</label>
+							</div>
+
+							<div>
+								<label class="col-sm-2 col-form-label">Retry</label>
+								<label for="ntp_up_min_" class="col-10 col-form-label">{lastUpdateRetry}</label>
+							</div>
+-->
+							<div>
+								<button type="submit" id="ntpConnectButton" class="btn btn-outline-primary btn-sm" onclick={ ntpConnect } disabled="{!Timeconf_NtpUse_check}">
+								<span class="spinner-border spinner-border-sm visually-hidden" role="status" aria-hidden="true"></span>
+								Connection
+								</button>
+							</div>
+						</div>
+					</p>
+
+					<h5 class="card-title">SNTP Log message</h5>
+					<p class="card-text">
+						<div class="col-sm-11 offset-sm-1">
+							<div id="logNtpSetting" style="overflow-y: scroll; height: 100px; border: 1px solid #ccc;padding: 10px;"></div>
+						</div>
+					</p>
+
+				</div>
+			</div>
+		</div>
+
+	  <div class="col-md-6">
+			<div class="card h-100">
+		    <div class="card-header">
+    			RTC設定
+    		</div>
+				<div class="card-body">
+					<h5 class="card-title">手動時刻設定</h5>
+					<p class="card-text">
+						<div class="col-sm-11 offset-sm-1">
+
+							<div class="">
+								{tRTCSetNTP}
+							</div>
+<!--
+							<div class="form-group row">
+								<label for="rtc_set_year" class="col-sm-4 col-form-label">year</label>
+								<div class="col-sm-4">
+									<input type="number" class="form-control form-control-sm" name="rtcYearVal" min="1990" max="2099" placeholder="1990-2099" value={rtcSetYear} disabled="{Timeconf_NtpUse_check}">
+								</div>
+								<label for="rtc_set_year_" class="col-sm-4 col-form-label">1990-2099</label>
+							</div>
+
+							<div class="form-group row">
+								<label for="rtc_set_mon" class="col-sm-4 col-form-label">month</label>
+								<div class="col-sm-4">
+									<input type="number" class="form-control form-control-sm" name="rtcMonVal" min="1" max="12" placeholder="1-12" value={rtcSetMonth} disabled="{Timeconf_NtpUse_check}">
+								</div>
+								<label for="rtc_set_mon_" class="col-sm-4 col-form-label">1-12</label>
+							</div>
+
+							<div class="form-group row">
+								<label for="rtc_set_day" class="col-sm-4 col-form-label">day</label>
+								<div class="col-sm-4">
+									<input type="number" class="form-control form-control-sm" name="rtcDayVal" min="1" max="31" placeholder="1-31" value={rtcSetDay} disabled="{Timeconf_NtpUse_check}">
+								</div>
+								<label for="rtc_set_day_" class="col-sm-4 col-form-label">1-31</label>
+							</div>
+
+							<div class="form-group row">
+								<label for="rtc_set_hour" class="col-sm-4 col-form-label">hour</label>
+								<div class="col-sm-4">
+									<input type="number" class="form-control form-control-sm" name="rtcHourVal" min="0" max="23" placeholder="0-23" value={rtcSetHour} disabled="{Timeconf_NtpUse_check}">
+								</div>
+								<label for="rtc_set_hour_" class="col-sm-4 col-form-label">0-23</label>
+							</div>
+
+							<div class="form-group row">
+								<label for="rtc_set_min" class="col-sm-4 col-form-label">min</label>
+								<div class="col-sm-4">
+									<input type="number" class="form-control form-control-sm" name="rtcMinVal" min="0" max="59" placeholder="0-59" value={rtcSetMin} disabled="{Timeconf_NtpUse_check}">
+								</div>
+								<label for="rtc_set_min_" class="col-sm-4 col-form-label">0-59</label>
+							</div>
+
+							<div class="form-group row">
+								<label for="rtc_set_sec" class="col-sm-4 col-form-label">sec</label>
+								<div class="col-sm-4">
+									<input type="number" class="form-control form-control-sm" name="rtcSecVal" min="0" max="59" placeholder="0-59" value={rtcSetSec} disabled="{Timeconf_NtpUse_check}">
+								</div>
+								<label for="rtc_set_sec_" class="col-sm-4 col-form-label">0-59</label>
+
+							</div>
+-->
+							<div class="mb-3">
+								<label for="dateInput1" class="form-label">日付</label>
+								<input type="date" class="form-control form-control-sm" id="dateInput1" name="rtcDateVal" disabled="{Timeconf_NtpUse_check}">
+							</div>
+							<div class="mb-3">
+								<label for="timeInput1" class="form-label">時刻</label>
+								<input type="time" class="form-control form-control-sm" id="timeInput1" name="rtcTimeVal" disabled="{Timeconf_NtpUse_check}">
+							</div>
+							
+
+							<div class="">
+								<div class="btn-group" role="group" aria-label="Basic example">
+									<button type="button" class="btn btn-outline-primary btn-sm" disabled="{Timeconf_NtpUse_check}" onclick={ () => setTime() }>ブラウザの時間をセットする</button>
+									<button type="button" class="btn btn-outline-primary btn-sm" disabled="{Timeconf_NtpUse_check}" onclick={ () => rtcSubmit() }>更新</button>
+								</div>
+							</div>
+						</div>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+<!--
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h1 class="text-center">時計設定1</h1>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="mb-3">
+              <label for="dateInput1" class="form-label">日付</label>
+              <input type="date" class="form-control" id="dateInput11">
+            </div>
+            <div class="mb-3">
+              <label for="timeInput1" class="form-label">時刻</label>
+              <input type="time" class="form-control" id="timeInput11">
+            </div>
+            <button type="submit" class="btn btn-primary">設定</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-dark text-light">
+          <h1 class="text-center">時計設定2</h1>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="mb-3">
+              <label for="dateInput2" class="form-label">日付</label>
+              <input type="date" class="form-control" id="dateInput2">
+            </div>
+            <div class="mb-3">
+              <label for="timeInput2" class="form-label">時刻</label>
+              <input type="time" class="form-control" id="timeInput2">
+            </div>
+            <button type="submit" class="btn btn-primary">設定</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+-->
+  <script>
+    import {vfdControllerUI} from '../viewmodel/vmapp.js'
+    import i18next from 'i18next'
+
+    export default {
+      onBeforeMount(props, state) {
+        console.log("timeconf.riot");
+        // 初期化
+        let vmUI = props.vmUI;
+
+        this.setLanguage("en");
+
+        this.timeZone = vmUI.model.timezone.timezoneList;
+        this.timeZoneArea = vmUI.model.timezoneArea.timezoneAreaList;
+
+        console.log(vmUI.model.timezone.timezoneList);
+        console.log(this.timeZone);
+        console.log(vmUI.model.timezoneArea);
+        console.log(this.timeZoneArea);
+
+				// Callback設定
+//        vmUI.setNtpLastUpdateTImeCallback(this.getNtpLastUpdateTIme.bind(this));		// 不要？
+        vmUI.updateSntpEventLogCallback(this.setEventLog.bind(this));
+				// SNTP 手動更新完了コールバック設定
+				vmUI.clearSntpSpinnerCallback(this.clearSntpSpinner.bind(this));
+        // NTP使用可否設定
+				if(vmUI.getClockSetting("ntpSet") == 1){
+						this.Timeconf_NtpUse_check ="checked";
+				}
+				else{
+					this.Timeconf_NtpUse_check ="";
+				}
+
+        this.tRTCSetNTP = this.setRtcSetNtpTxt(this.Timeconf_NtpUse_check);
+				this.setNtpUseTxt(this.Timeconf_NtpUse_check);
+
+        // TimeZone設定
+        console.log("TimeZone:");
+        this.timeZoneVal = vmUI.getClockSetting("timeZone");
+        this.tzId = vmUI.getClockSetting("timeZoneId");
+        this.tzAreaId = vmUI.getClockSetting("timeZoneAreaId");
+        console.log(this.timeZoneVal);
+        console.log(this.tzId);
+        console.log(this.tzAreaId);
+/*
+          // UTC差分時間設定
+          this.ntpDiffHourVal = vmUI.getClockSetting("diffUtcHour");
+          this.ntpDiffMinVal = vmUI.getClockSetting("diffUtcMin");
+*/
+        // NTP自動接続時刻設定
+        console.log("NTP auto-update time")
+
+				//ToDo SNTP auto update timeコメント表示初期化
+				var code = vmUI.getNetworkSetting("staAutoConnect");
+				this.makeSntpAutoUpdateComment(code);
+
+//        this.ntpUpHourVal = vmUI.getClockSetting("autoUpdateHour");
+//        this.ntpUpMinVal = vmUI.getClockSetting("autoUpdateMin");
+
+				this.ntpUpTimeVal = ('0' + (vmUI.getClockSetting("autoUpdateHour"))).slice(-2) + ":" + ('0' + (vmUI.getClockSetting("autoUpdateMin"))).slice(-2) ;
+				
+//          console.log(vmUI.getClockSetting("autoUpdateHour"))
+//          console.log(vmUI.getClockSetting("autoUpdateMin"))
+
+/*
+        // 前回自動接続時刻情報
+        this.lastUpdateTime = vmUI.getLastUpdateTime();
+        // 前回自動接続リトライ回数
+        this.lastUpdateRetry = vmUI.getClockSetting("lastUpdateRetry");		// 不要？
+*/
+        // NTP使用設定トグルスイッチ
+        this.ntpUseToggle = (e) => {
+          console.log("toggle click!");
+          console.log(this.Timeconf_NtpUse_check);
+
+          this.Timeconf_NtpUse_check = !this.Timeconf_NtpUse_check
+          this.tRTCSetNTP = this.setRtcSetNtpTxt(this.Timeconf_NtpUse_check);
+				this.setNtpUseTxt(this.Timeconf_NtpUse_check);
+
+          vmUI.timeConfNtpUsesubmit(this.Timeconf_NtpUse_check);
+          this.update()
+        }
+        // TimeZone設定
+        this.changeTimeZoneData = (e) =>{
+          console.log("TimeZone設定");
+          let dat = document.getElementById("timeZoneData").value;
+          if(dat != 0){
+            vmUI.submitDisplaySetting("timeZoneAreaId", this.tzAreaId,);									// タイムゾーンの地域設定値送信
+
+						let tzID = dat;
+						this.tzId = this.tzList.findIndex((tzList) => tzList.ID == tzID);							// タイムゾーンの都市名のインデックスを求める
+						vmUI.submitDisplaySetting("timeZoneId", this.tzId);														// タイムゾーンの都市名設定値送信
+
+						let tzTz = this.tzList[this.tzId].TZ;
+						let tzIndex = this.tzGmtList.findIndex((tzGmtList) => tzGmtList.TZ == tzTz);	// タイムゾーンのインデックスを求める
+            vmUI.submitDisplaySetting("timeZone", tzIndex);																// タイムゾーン設定値送信
+          }
+        }
+        // TimeZoneArea設定
+        // 設定値の送信はTimeZoneIdと同時に行うので、ここでは送信しない。
+        this.changeTimeZoneAreaData = (e) => {
+          let dat = document.getElementById("timeZoneDataArea").value;
+          this.tzAreaId = dat;
+
+          console.log("-- changeTimeZoneAreaData --")
+          console.log(dat)
+          console.log(this.timeZoneArea[dat].AREA);
+          // エリア別タイムゾーンリスト作成
+          this.makeTimeZoneList(dat);
+          // タイムゾーンドロップダウンリスト作成
+          this.setTimezoneList("timeZoneData",this.tzList,1);
+        }
+
+/*
+          this.ntpdiffSubmit = (e) => {
+            console.log("ntpdiffSubmit!");
+            e.preventDefault()
+            const ntpDiffHour = this.$('[name=ntpDiffHour]').value
+            const ntpDiffMin = this.$('[name=ntpDiffMin]').value
+            console.log({ ntpDiffHour, ntpDiffMin })
+            vmUI.ntpdiffSubmit(ntpDiffHour,ntpDiffMin)
+          }
+*/
+          this.ntpAutoUpdateSubmit = (e) => {
+            console.log("ntpAutoUpdateSubmit!");
+            e.preventDefault()
+      //      const ntpAutoUpdateHour = this.$('[name=ntpUpHour]').value
+      //      const ntpAutoUpdateMin = this.$('[name=ntpUpMin]').value
+      //    console.log(ntpAutoUpdateHour)
+      //    console.log(ntpAutoUpdateMin)
+      //      vmUI.ntpAutoUpdateSubmit(ntpAutoUpdateHour,ntpAutoUpdateMin)
+      //    console.log({ ntpAutoUpdateHour, ntpAutoUpdateMin })
+			//			let ntpUpTimeAry = this.ntpUpTimeVal.split(':');
+						let ntpUpTimeAry = this.$('[name=ntpUpTime').value.split(':');
+						console.log(ntpUpTimeAry);
+            vmUI.ntpAutoUpdateSubmit(ntpUpTimeAry[0],ntpUpTimeAry[1])
+          }
+
+          /*
+            NTPに接続して時刻を取得する
+          */
+          this.ntpConnect = (e) => {
+            console.log("ntpConnect")
+	          // ボタン内スピナー表示
+  	        var Button = document.getElementById('ntpConnectButton');
+    	      var spinner = Button.querySelector('.spinner-border');
+      	    Button.classList.add('disabled'); // ボタンを無効化する（オプション）
+        	  spinner.classList.remove('visually-hidden'); // スピナーを表示する
+						this.update();
+
+            vmUI.ntpConnect()
+          }
+          /*
+            RTC設定値にブラウザ時間を設定する
+          */
+          this.setTime = (e) => {
+            console.log("timeSet()")
+            let date = new Date();
+/*
+            this.$('[name=rtcYearVal]').value = date.getFullYear()
+            this.$('[name=rtcMonVal]').value = date.getMonth() + 1
+            this.$('[name=rtcDayVal]').value = date.getDate()
+            this.$('[name=rtcHourVal]').value = date.getHours()
+            this.$('[name=rtcMinVal]').value = date.getMinutes()
+            this.$('[name=rtcSecVal]').value = date.getSeconds()
+*/
+						this.$('[name=rtcDateVal').value = String(date.getFullYear()) + "-" + ('0' + (date.getMonth() + 1)).slice(-2) + "-" + String(date.getDate()) ;
+						let timeTmp;
+						timeTmp = ('0' + (date.getHours())).slice(-2) + ":" + ('0' + (date.getMinutes())).slice(-2) ;
+						console.log(timeTmp);
+						this.$('[name=rtcTimeVal').value = ('0' + (date.getHours())).slice(-2) + ":" + ('0' + (date.getMinutes())).slice(-2) ;
+            this.update()
+          }
+          /*
+            RTC設定値を送信する
+          */
+          this.rtcSubmit = (e) => {
+//            e.preventDefault()  // type="submit"時は必要
+            console.log("rtcSubmit()")
+/*
+            let rtcSetDataYear,rtcSetDataMon,rtcSetDataDay,rtcSetDataHour,rtcSetDataMin,rtcSetDataSec
+            rtcSetDataYear = this.$('[name=rtcYearVal]').value
+            rtcSetDataMon = this.$('[name=rtcMonVal]').value
+            rtcSetDataDay = this.$('[name=rtcDayVal]').value
+            rtcSetDataHour = this.$('[name=rtcHourVal]').value
+            rtcSetDataMin = this.$('[name=rtcMinVal]').value
+            rtcSetDataSec = this.$('[name=rtcSecVal]').value
+            console.log(rtcSetDataYear+"/"+rtcSetDataMon+"/"+rtcSetDataDay+" "+rtcSetDataHour+":"+rtcSetDataMin+":"+rtcSetDataSec)
+            vmUI.rtcDataSet(rtcSetDataYear,rtcSetDataMon,rtcSetDataDay,rtcSetDataHour,rtcSetDataMin,rtcSetDataSec)
+*/
+						console.log(this.$('[name=rtcDateVal').value);
+						console.log(this.$('[name=rtcTimeVal').value);
+						let rtcDateAry = this.$('[name=rtcDateVal').value.split('-');
+						let rtcTimeAry = this.$('[name=rtcTimeVal').value.split(':');
+						console.log(rtcDateAry);
+						console.log(rtcTimeAry);
+            vmUI.rtcDataSet(rtcDateAry[0],rtcDateAry[1],rtcDateAry[2],rtcTimeAry[0],rtcTimeAry[1],0);
+          }
+      },
+      onMounted(props, state){
+        let obs = props.obs;
+
+        // タイムゾーンエリア選択ドロップダウンリスト作成
+        console.log("-- Timezone menu make")
+
+        this.makeTimeZoneElement();     // タイムソーンドロップアウトリストの要素作成
+
+				// タイムゾーンデータの送信データ作成用リスト
+				console.log("-- Timezone AreaGMT List make")
+        this.tzGmtList = this.timeZone.filter(function (element) {
+          return element.AREA == "AreaGMT";
+        });
+        console.log(this.tzGmtList);
+
+        console.log("-- SNTP logArea Init --");
+        const logArea = document.getElementById("logNtpSetting");
+        const logMessage = "SNTP Logメッセージ"; // ログに表示するメッセージ
+        // ログ領域に新しいログメッセージを追加
+        logArea.innerHTML += logMessage + "<br>";
+        console.log(logArea.innerHTML);
+        // ログ領域を最下部にスクロールする
+        logArea.scrollTop = logArea.scrollHeight;
+
+				// STA自動接続有効・無効切替
+        obs.on('wifiStaAutoConnect',function(code){
+          console.log("obs wifiStaAutoConnect:"+code)
+					//ToDo SNTP auto update timeコメント表示追加
+					this.makeSntpAutoUpdateComment(code);
+					this.update();
+        }.bind(this))
+
+        // 言語切り替え
+        obs.on('changeLanguage',function(code){
+          this.language = code;
+          console.log("timeconf.riot:changeLanguage:"+code)
+              
+          //  _this.setLanguage(code);  // .bind(this)しない場合は_this でthisにアクセスする
+                                          // ここのthisはイベント発生元のthis
+          this.setLanguage(code);
+          this.update();
+          this.makeTimeZoneElement();     // タイムソーンドロップアウトリストの要素作成
+        }.bind(this))
+
+      },
+			makeSntpAutoUpdateComment(code){
+				if(code){
+					this.tStaConnectionSettingState = "";
+				}
+				else{
+					this.tStaConnectionSettingState = "STA自動接続がOFFとなっています。WiFi Station設定を確認してください。";
+				}
+			},
+			// 前回更新時刻	Log表示ができたので不要？
+/*			getNtpLastUpdateTIme(lastUpdateTime){	// 不要？
+				console.log("== getNtpLastUpdateTIme ==");
+				console.log(lastUpdateTime);
+        let getLastUpdateTime;
+				let tmp;
+        getLastUpdateTime = lastUpdateTime.Year + "/";
+				tmp = lastUpdateTime.Month;
+        getLastUpdateTime += tmp.toString().padStart(2, "0") + "/";
+				tmp = lastUpdateTime.Day;
+        getLastUpdateTime += tmp.toString().padStart(2, "0") + " ";
+				tmp = lastUpdateTime.Hour;
+        getLastUpdateTime += tmp.toString().padStart(2, "0") + ":";
+				tmp = lastUpdateTime.Min;
+        getLastUpdateTime += tmp.toString().padStart(2, "0");
+
+				this.lastUpdateTime = getLastUpdateTime;
+        this.update();
+
+			},
+*/
+      // タイムソーンドロップアウトリストの要素作成
+      makeTimeZoneElement(){
+        this.setTimezoneList("timeZoneDataArea",this.timeZoneArea,0);
+        // タイムゾーンエリア設定
+        var select = document.getElementById("timeZoneDataArea");
+        select.options[this.tzAreaId].selected = true;
+        // エリア別タイムゾーンリスト作成
+        this.makeTimeZoneList(this.tzAreaId);
+        // タイムゾーンドロップダウンリスト作成
+        this.setTimezoneList("timeZoneData",this.tzList,1);
+        // タイムゾーン設定
+        this.setTimezon(this.tzList);
+
+      },
+      // エリア別タイムゾーンリスト作成
+      makeTimeZoneList(dat){
+        var area = this.timeZoneArea[dat].AREA;
+        this.tzList = this.timeZone.filter(function (element) {
+          return element.AREA == area;
+        });
+//        console.log(this.tzList);
+      },
+      // タイムゾーン設定
+      setTimezon(datalist){
+				console.log("-- タイムゾーン設定 --")
+        var select = document.getElementById("timeZoneData");
+				select.options[this.tzId].selected = true;
+      },
+      // タイムゾーン/エリア選択ドロップダウンリスト作成
+      setTimezoneList(id, datalist,header){
+        if(header==1){
+          datalist.unshift({"ID":"0","TZ":"","AREA":"","TITLE":"this.tzTopKey"})
+        }
+//				console.log(datalist);
+        var select = document.getElementById(id);
+        while (select.firstChild) { // 子ノードoptionを全て削除
+          select.removeChild(select.firstChild);
+        }
+        for(let i=0; i<datalist.length; i++){
+          var option = document.createElement("option");
+          option.text = eval("{"+datalist[i].TITLE+"}");
+        //    console.log(datalist[i])
+        //    console.log(option.text)
+          option.value = datalist[i].ID;
+          select.appendChild(option);
+        }
+      },
+      // SntpSettingLog 取得・表示
+      setEventLog(logMessage){
+        console.log("-- setEventLog");
+        console.log(logMessage);
+        const logArea = document.getElementById("logNtpSetting");
+        // ログ領域にログメッセージを設定
+        logArea.innerHTML = logMessage;
+        // ログ領域を最下部にスクロールする
+        logArea.scrollTop = logArea.scrollHeight;
+      },
+			// SNTP使用スイッチON/OFF表示作成
+			setNtpUseTxt(check){
+				if(check){
+					this.tTimeconf_NtpUse_check = "ON";
+				}
+				else{
+					this.tTimeconf_NtpUse_check = "OFF";
+				}
+			},
+			//SNTP Connection Button spinner clear
+			clearSntpSpinner(){
+        // ボタン内スピナー削除
+        var Button = document.getElementById('ntpConnectButton');
+        var spinner = Button.querySelector('.spinner-border');
+        spinner.classList.add('visually-hidden'); // スピナーを非表示にする
+        Button.classList.remove('disabled'); // ボタンを再度有効化する（オプション）
+        this.update();
+			},
+			// RTC設定コメント作成
+			setRtcSetNtpTxt(ntpuse){
+        let rtn
+            if(ntpuse){
+             rtn = "SNTP使用時は、SNTPの時刻が自動的に設定されます。"
+            }
+            else{
+             rtn = ""
+            }
+        return rtn;
+    	},
+      // 言語設定
+      setLanguage(code){
+        console.log("setLanguage")
+        this.timezoneKey = i18next.t('timeConf.timezoneKey');
+
+        this.tzTopKey = i18next.t('timeConf.tzTopKey');
+
+        this.tzAreaAfrica = i18next.t('timeConf.tzAreaAfrica');
+        this.tzAreaAmerica = i18next.t('timeConf.tzAreaAmerica');
+        this.tzAreaAntarctica = i18next.t('timeConf.tzAreaAntarctica');
+        this.tzAreaArctic = i18next.t('timeConf.tzAreaArctic');
+        this.tzAreaAsia = i18next.t('timeConf.tzAreaAsia');
+        this.tzAreaAtlantic = i18next.t('timeConf.tzAreaAtlantic');
+        this.tzAreaAustralia = i18next.t('timeConf.tzAreaAustralia');
+        this.tzAreaEurope = i18next.t('timeConf.tzAreaEurope');
+        this.tzAreaIndian = i18next.t('timeConf.tzAreaIndian');
+        this.tzAreaPacific = i18next.t('timeConf.tzAreaPacific');
+        this.tzAreaGMT = i18next.t('timeConf.tzAreaGMT');
+
+        this.tzUTC = i18next.t('timeConf.tzUTC');
+        this.tzJapan = i18next.t('timeConf.tzJapan');
+        this.tzIndia = i18next.t('timeConf.tzIndia');
+        this.tzHawai = i18next.t('timeConf.tzHawaii');
+
+// Africa
+				this.tzAbidjan = i18next.t('timeConf.tzAbidjan');
+				this.tzAccra = i18next.t('timeConf.tzAccra');
+				this.tzBamako = i18next.t('timeConf.tzBamako');
+				this.tzBanjul = i18next.t('timeConf.tzBanjul');
+				this.tzBissau = i18next.t('timeConf.tzBissau');
+				this.tzConakry = i18next.t('timeConf.tzConakry');
+				this.tzDakar = i18next.t('timeConf.tzDakar');
+				this.tzFreetown = i18next.t('timeConf.tzFreetown');
+				this.tzLome = i18next.t('timeConf.tzLome');
+				this.tzMonrovia = i18next.t('timeConf.tzMonrovia');
+				this.tzNouakchott = i18next.t('timeConf.tzNouakchott');
+				this.tzOuagadougou = i18next.t('timeConf.tzOuagadougou');
+				this.tzSao_Tome = i18next.t('timeConf.tzSao_Tome');
+				this.tzCasablanca = i18next.t('timeConf.tzCasablanca');
+				this.tzEl_Aaiun = i18next.t('timeConf.tzEl_Aaiun');
+				this.tzAlgiers = i18next.t('timeConf.tzAlgiers');
+				this.tzCeuta = i18next.t('timeConf.tzCeuta');
+				this.tzCeutaSummer = i18next.t('timeConf.tzCeutaSummer');
+				this.tzTunis = i18next.t('timeConf.tzTunis');
+				this.tzBangui = i18next.t('timeConf.tzBangui');
+				this.tzBrazzaville = i18next.t('timeConf.tzBrazzaville');
+				this.tzDouala = i18next.t('timeConf.tzDouala');
+				this.tzKinshasa = i18next.t('timeConf.tzKinshasa');
+				this.tzLagos = i18next.t('timeConf.tzLagos');
+				this.tzLibreville = i18next.t('timeConf.tzLibreville');
+				this.tzLuanda = i18next.t('timeConf.tzLuanda');
+				this.tzMalabo = i18next.t('timeConf.tzMalabo');
+				this.tzNdjamena = i18next.t('timeConf.tzNdjamena');
+				this.tzNiamey = i18next.t('timeConf.tzNiamey');
+				this.tzPorto_Novo = i18next.t('timeConf.tzPorto_Novo');
+				this.tzWindhoek = i18next.t('timeConf.tzWindhoek');
+				this.tzWindhoekSummer = i18next.t('timeConf.tzWindhoekSummer');
+				this.tzBlantyre = i18next.t('timeConf.tzBlantyre');
+				this.tzBujumbura = i18next.t('timeConf.tzBujumbura');
+				this.tzGaborone = i18next.t('timeConf.tzGaborone');
+				this.tzHarare = i18next.t('timeConf.tzHarare');
+				this.tzKigali = i18next.t('timeConf.tzKigali');
+				this.tzLubumbashi = i18next.t('timeConf.tzLubumbashi');
+				this.tzLusaka = i18next.t('timeConf.tzLusaka');
+				this.tzMaputo = i18next.t('timeConf.tzMaputo');
+				this.tzCairo = i18next.t('timeConf.tzCairo');
+				this.tzTripoli = i18next.t('timeConf.tzTripoli');
+				this.tzJohannesburg = i18next.t('timeConf.tzJohannesburg');
+				this.tzMaseru = i18next.t('timeConf.tzMaseru');
+				this.tzMbabane = i18next.t('timeConf.tzMbabane');
+				this.tzAddis_Ababa = i18next.t('timeConf.tzAddis_Ababa');
+				this.tzAsmera = i18next.t('timeConf.tzAsmera');
+				this.tzDar_es_Salaam = i18next.t('timeConf.tzDar_es_Salaam');
+				this.tzDjibouti = i18next.t('timeConf.tzDjibouti');
+				this.tzKampala = i18next.t('timeConf.tzKampala');
+				this.tzKhartoum = i18next.t('timeConf.tzKhartoum');
+				this.tzMogadishu = i18next.t('timeConf.tzMogadishu');
+				this.tzNairobi = i18next.t('timeConf.tzNairobi');
+
+// America
+				this.tzAdak = i18next.t('timeConf.tzAdak');
+				this.tzAnchorage = i18next.t('timeConf.tzAnchorage');
+				this.tzAnchorageSummer = i18next.t('timeConf.tzAnchorageSummer');
+				this.tzJuneau = i18next.t('timeConf.tzJuneau');
+				this.tzJuneauSummer = i18next.t('timeConf.tzJuneauSummer');
+				this.tzNome = i18next.t('timeConf.tzNome');
+				this.tzNomeSummer = i18next.t('timeConf.tzNomeSummer');
+				this.tzYakutat = i18next.t('timeConf.tzYakutat');
+				this.tzYakutatSummer = i18next.t('timeConf.tzYakutatSummer');
+				this.tzDawson = i18next.t('timeConf.tzDawson');
+				this.tzDawsonSummer = i18next.t('timeConf.tzDawsonSummer');
+				this.tzLos_Angeles = i18next.t('timeConf.tzLos_Angeles');
+				this.tzLos_AngelesSummer = i18next.t('timeConf.tzLos_AngelesSummer');
+				this.tzTijuana = i18next.t('timeConf.tzTijuana');
+				this.tzTijuanaSummer = i18next.t('timeConf.tzTijuanaSummer');
+				this.tzVancouver = i18next.t('timeConf.tzVancouver');
+				this.tzVancouverSummer = i18next.t('timeConf.tzVancouverSummer');
+				this.tzWhitehorse = i18next.t('timeConf.tzWhitehorse');
+				this.tzWhitehorseSummer = i18next.t('timeConf.tzWhitehorseSummer');
+				this.tzBoise = i18next.t('timeConf.tzBoise');
+				this.tzBoiseSummer = i18next.t('timeConf.tzBoiseSummer');
+				this.tzChihuahua = i18next.t('timeConf.tzChihuahua');
+				this.tzChihuahuaSummer = i18next.t('timeConf.tzChihuahuaSummer');
+				this.tzDawson_Creek = i18next.t('timeConf.tzDawson_Creek');
+				this.tzDenver = i18next.t('timeConf.tzDenver');
+				this.tzDenverSummer = i18next.t('timeConf.tzDenverSummer');
+				this.tzEdmonton = i18next.t('timeConf.tzEdmonton');
+				this.tzEdmontonSummer = i18next.t('timeConf.tzEdmontonSummer');
+				this.tzHermosillo = i18next.t('timeConf.tzHermosillo');
+				this.tzInuvik = i18next.t('timeConf.tzInuvik');
+				this.tzInuvikSummer = i18next.t('timeConf.tzInuvikSummer');
+				this.tzMazatlan = i18next.t('timeConf.tzMazatlan');
+				this.tzMazatlanSummer = i18next.t('timeConf.tzMazatlanSummer');
+				this.tzPhoenix = i18next.t('timeConf.tzPhoenix');
+				this.tzShiprock = i18next.t('timeConf.tzShiprock');
+				this.tzShiprockSummer = i18next.t('timeConf.tzShiprockSummer');
+				this.tzYellowknife = i18next.t('timeConf.tzYellowknife');
+				this.tzYellowknifeSummer = i18next.t('timeConf.tzYellowknifeSummer');
+				this.tzBelize = i18next.t('timeConf.tzBelize');
+				this.tzCancun = i18next.t('timeConf.tzCancun');
+				this.tzCancunSummer = i18next.t('timeConf.tzCancunSummer');
+				this.tzChicago = i18next.t('timeConf.tzChicago');
+				this.tzChicagoSummer = i18next.t('timeConf.tzChicagoSummer');
+				this.tzCosta_Rica = i18next.t('timeConf.tzCosta_Rica');
+				this.tzEl_Salvador = i18next.t('timeConf.tzEl_Salvador');
+				this.tzGuatemala = i18next.t('timeConf.tzGuatemala');
+				this.tzIndiana_Knox = i18next.t('timeConf.tzIndiana_Knox');
+				this.tzIndiana_KnoxSummer = i18next.t('timeConf.tzIndiana_KnoxSummer');
+				this.tzManagua = i18next.t('timeConf.tzManagua');
+				this.tzMenominee = i18next.t('timeConf.tzMenominee');
+				this.tzMenomineeSummer = i18next.t('timeConf.tzMenomineeSummer');
+				this.tzMerida = i18next.t('timeConf.tzMerida');
+				this.tzMeridaSummer = i18next.t('timeConf.tzMeridaSummer');
+				this.tzMexico_City = i18next.t('timeConf.tzMexico_City');
+				this.tzMexico_CitySummer = i18next.t('timeConf.tzMexico_CitySummer');
+				this.tzMonterrey = i18next.t('timeConf.tzMonterrey');
+				this.tzMonterreySummer = i18next.t('timeConf.tzMonterreySummer');
+				this.tzRainy_River = i18next.t('timeConf.tzRainy_River');
+				this.tzRainy_RiverSummer = i18next.t('timeConf.tzRainy_RiverSummer');
+				this.tzRankin_Inlet = i18next.t('timeConf.tzRankin_Inlet');
+				this.tzRankin_InletSummer = i18next.t('timeConf.tzRankin_InletSummer');
+				this.tzRegina = i18next.t('timeConf.tzRegina');
+				this.tzTegucigalpa = i18next.t('timeConf.tzTegucigalpa');
+				this.tzWinnipeg = i18next.t('timeConf.tzWinnipeg');
+				this.tzWinnipegSummer = i18next.t('timeConf.tzWinnipegSummer');
+				this.tzBogota = i18next.t('timeConf.tzBogota');
+				this.tzHavana = i18next.t('timeConf.tzHavana');
+				this.tzHavanaSummer = i18next.t('timeConf.tzHavanaSummer');
+				this.tzGuayaquil = i18next.t('timeConf.tzGuayaquil');
+				this.tzCayman = i18next.t('timeConf.tzCayman');
+				this.tzDetroit = i18next.t('timeConf.tzDetroit');
+				this.tzDetroitSummer = i18next.t('timeConf.tzDetroitSummer');
+				this.tzGrand_Turk = i18next.t('timeConf.tzGrand_Turk');
+				this.tzGrand_TurkSummer = i18next.t('timeConf.tzGrand_TurkSummer');
+				this.tzIndianapolis = i18next.t('timeConf.tzIndianapolis');
+				this.tzIndianapolisSummer = i18next.t('timeConf.tzIndianapolisSummer');
+				this.tzIqaluit = i18next.t('timeConf.tzIqaluit');
+				this.tzIqaluitSummer = i18next.t('timeConf.tzIqaluitSummer');
+				this.tzJamaica = i18next.t('timeConf.tzJamaica');
+				this.tzLouisville = i18next.t('timeConf.tzLouisville');
+				this.tzLouisvilleSummer = i18next.t('timeConf.tzLouisvilleSummer');
+				this.tzMontreal = i18next.t('timeConf.tzMontreal');
+				this.tzMontrealSummer = i18next.t('timeConf.tzMontrealSummer');
+				this.tzNassau = i18next.t('timeConf.tzNassau');
+				this.tzNassauSummer = i18next.t('timeConf.tzNassauSummer');
+				this.tzNew_York = i18next.t('timeConf.tzNew_York');
+				this.tzNew_YorkSummer = i18next.t('timeConf.tzNew_YorkSummer');
+				this.tzNipigon = i18next.t('timeConf.tzNipigon');
+				this.tzNipigonSummer = i18next.t('timeConf.tzNipigonSummer');
+				this.tzPanama = i18next.t('timeConf.tzPanama');
+				this.tzPangnirtung = i18next.t('timeConf.tzPangnirtung');
+				this.tzPangnirtungSummer = i18next.t('timeConf.tzPangnirtungSummer');
+				this.tzResolute = i18next.t('timeConf.tzResolute');
+				this.tzThunder_Bay = i18next.t('timeConf.tzThunder_Bay');
+				this.tzThunder_BaySummer = i18next.t('timeConf.tzThunder_BaySummer');
+				this.tzToronto = i18next.t('timeConf.tzToronto');
+				this.tzTorontoSummer = i18next.t('timeConf.tzTorontoSummer');
+				this.tzLima = i18next.t('timeConf.tzLima');
+				this.tzCaracas = i18next.t('timeConf.tzCaracas');
+				this.tzBoa_Vista = i18next.t('timeConf.tzBoa_Vista');
+				this.tzCampo_Grande = i18next.t('timeConf.tzCampo_Grande');
+				this.tzCampo_GrandeSummer = i18next.t('timeConf.tzCampo_GrandeSummer');
+				this.tzCuiaba = i18next.t('timeConf.tzCuiaba');
+				this.tzCuiabaSummer = i18next.t('timeConf.tzCuiabaSummer');
+				this.tzEirunepe = i18next.t('timeConf.tzEirunepe');
+				this.tzManaus = i18next.t('timeConf.tzManaus');
+				this.tzPorto_Velho = i18next.t('timeConf.tzPorto_Velho');
+				this.tzRio_Branco = i18next.t('timeConf.tzRio_Branco');
+				this.tzAnguilla = i18next.t('timeConf.tzAnguilla');
+				this.tzAntigua = i18next.t('timeConf.tzAntigua');
+				this.tzAruba = i18next.t('timeConf.tzAruba');
+				this.tzBarbados = i18next.t('timeConf.tzBarbados');
+				this.tzBlanc_Sablon = i18next.t('timeConf.tzBlanc_Sablon');
+				this.tzCuracao = i18next.t('timeConf.tzCuracao');
+				this.tzDominica = i18next.t('timeConf.tzDominica');
+				this.tzGlace_Bay = i18next.t('timeConf.tzGlace_Bay');
+				this.tzGlace_BaySummer = i18next.t('timeConf.tzGlace_BaySummer');
+				this.tzGoose_Bay = i18next.t('timeConf.tzGoose_Bay');
+				this.tzGoose_BaySummer = i18next.t('timeConf.tzGoose_BaySummer');
+				this.tzGrenada = i18next.t('timeConf.tzGrenada');
+				this.tzGuadeloupe = i18next.t('timeConf.tzGuadeloupe');
+				this.tzHalifax = i18next.t('timeConf.tzHalifax');
+				this.tzHalifaxSummer = i18next.t('timeConf.tzHalifaxSummer');
+				this.tzMarigot = i18next.t('timeConf.tzMarigot');
+				this.tzMartinique = i18next.t('timeConf.tzMartinique');
+				this.tzMoncton = i18next.t('timeConf.tzMoncton');
+				this.tzMonctonSummer = i18next.t('timeConf.tzMonctonSummer');
+				this.tzMontserrat = i18next.t('timeConf.tzMontserrat');
+				this.tzPuerto_Rico = i18next.t('timeConf.tzPuerto_Rico');
+				this.tzSt_Kitts = i18next.t('timeConf.tzSt_Kitts');
+				this.tzSt_Lucia = i18next.t('timeConf.tzSt_Lucia');
+				this.tzSt_Thomas = i18next.t('timeConf.tzSt_Thomas');
+				this.tzSt_Vincent = i18next.t('timeConf.tzSt_Vincent');
+				this.tzThule = i18next.t('timeConf.tzThule');
+				this.tzThuleSummer = i18next.t('timeConf.tzThuleSummer');
+				this.tzTortola = i18next.t('timeConf.tzTortola');
+				this.tzLa_Paz = i18next.t('timeConf.tzLa_Paz');
+				this.tzSantiago = i18next.t('timeConf.tzSantiago');
+				this.tzSantiagoSummer = i18next.t('timeConf.tzSantiagoSummer');
+				this.tzGuyana = i18next.t('timeConf.tzGuyana');
+				this.tzAsuncion = i18next.t('timeConf.tzAsuncion');
+				this.tzAsuncionSummer = i18next.t('timeConf.tzAsuncionSummer');
+				this.tzSt_Johns = i18next.t('timeConf.tzSt_Johns');
+				this.tzSt_JohnsSummer = i18next.t('timeConf.tzSt_JohnsSummer');
+				this.tzBuenos_Aires = i18next.t('timeConf.tzBuenos_Aires');
+				this.tzCatamarca = i18next.t('timeConf.tzCatamarca');
+				this.tzCordoba = i18next.t('timeConf.tzCordoba');
+				this.tzJujuy = i18next.t('timeConf.tzJujuy');
+				this.tzMendoza = i18next.t('timeConf.tzMendoza');
+				this.tzAraguaina = i18next.t('timeConf.tzAraguaina');
+				this.tzBahia = i18next.t('timeConf.tzBahia');
+				this.tzBelem = i18next.t('timeConf.tzBelem');
+				this.tzFortaleza = i18next.t('timeConf.tzFortaleza');
+				this.tzMaceio = i18next.t('timeConf.tzMaceio');
+				this.tzRecife = i18next.t('timeConf.tzRecife');
+				this.tzSantarem = i18next.t('timeConf.tzSantarem');
+				this.tzSao_Paulo = i18next.t('timeConf.tzSao_Paulo');
+				this.tzSao_PauloSummer = i18next.t('timeConf.tzSao_PauloSummer');
+				this.tzCayenne = i18next.t('timeConf.tzCayenne');
+				this.tzMiquelon = i18next.t('timeConf.tzMiquelon');
+				this.tzMiquelonSummer = i18next.t('timeConf.tzMiquelonSummer');
+				this.tzParamaribo = i18next.t('timeConf.tzParamaribo');
+				this.tzMontevido = i18next.t('timeConf.tzMontevido');
+				this.tzMontevidoSummer = i18next.t('timeConf.tzMontevidoSummer');
+				this.tzGodthab = i18next.t('timeConf.tzGodthab');
+				this.tzGodthabSummer = i18next.t('timeConf.tzGodthabSummer');
+				this.tzNoronha = i18next.t('timeConf.tzNoronha');
+				this.tzScoresbysund = i18next.t('timeConf.tzScoresbysund');
+				this.tzScoresbysundSummer = i18next.t('timeConf.tzScoresbysundSummer');
+				this.tzDanmarkshavn = i18next.t('timeConf.tzDanmarkshavn');
+
+// Antarctica
+				this.tzPalmerStation = i18next.t('timeConf.tzPalmerStation');
+				this.tzPalmerStationSummer = i18next.t('timeConf.tzPalmerStationSummer');
+				this.tzRotheraResearchStation = i18next.t('timeConf.tzRotheraResearchStation');
+				this.tzShowaStation = i18next.t('timeConf.tzShowaStation');
+				this.tzMawsonStation = i18next.t('timeConf.tzMawsonStation');
+				this.tzVostokStation = i18next.t('timeConf.tzVostokStation');
+				this.tzDavisStation = i18next.t('timeConf.tzDavisStation');
+				this.tzCaseyStation = i18next.t('timeConf.tzCaseyStation');
+				this.tzMcMurdoStation = i18next.t('timeConf.tzMcMurdoStation');
+				this.tzMcMurdoStationSummer = i18next.t('timeConf.tzMcMurdoStationSummer');
+
+// Arctic
+				this.tzLongyearbyen = i18next.t('timeConf.tzLongyearbyen');
+				this.tzLongyearbyenSummer = i18next.t('timeConf.tzLongyearbyenSummer');
+
+// Asia
+				this.tzAmman = i18next.t('timeConf.tzAmman');
+				this.tzAmmanSummer = i18next.t('timeConf.tzAmmanSummer');
+				this.tzBeirut = i18next.t('timeConf.tzBeirut');
+				this.tzBeirutSummer = i18next.t('timeConf.tzBeirutSummer');
+				this.tzDamascus = i18next.t('timeConf.tzDamascus');
+				this.tzDamascusSummer = i18next.t('timeConf.tzDamascusSummer');
+				this.tzGaza = i18next.t('timeConf.tzGaza');
+				this.tzNicosia = i18next.t('timeConf.tzNicosia');
+				this.tzNicosiaSummer = i18next.t('timeConf.tzNicosiaSummer');
+				this.tzJerusalem = i18next.t('timeConf.tzJerusalem');
+				this.tzAden = i18next.t('timeConf.tzAden');
+				this.tzBaghdad = i18next.t('timeConf.tzBaghdad');
+				this.tzBahrain = i18next.t('timeConf.tzBahrain');
+				this.tzKuwait = i18next.t('timeConf.tzKuwait');
+				this.tzQatar = i18next.t('timeConf.tzQatar');
+				this.tzRiyadh = i18next.t('timeConf.tzRiyadh');
+				this.tzTehran = i18next.t('timeConf.tzTehran');
+				this.tzYerevan = i18next.t('timeConf.tzYerevan');
+				this.tzYerevanSummer = i18next.t('timeConf.tzYerevanSummer');
+				this.tzBaku = i18next.t('timeConf.tzBaku');
+				this.tzBakuSummer = i18next.t('timeConf.tzBakuSummer');
+				this.tzTbilisi = i18next.t('timeConf.tzTbilisi');
+				this.tzDubai = i18next.t('timeConf.tzDubai');
+				this.tzMuscat = i18next.t('timeConf.tzMuscat');
+				this.tzKabul = i18next.t('timeConf.tzKabul');
+				this.tzKarachi = i18next.t('timeConf.tzKarachi');
+				this.tzDushanbe = i18next.t('timeConf.tzDushanbe');
+				this.tzAshgabat = i18next.t('timeConf.tzAshgabat');
+				this.tzSamarkand = i18next.t('timeConf.tzSamarkand');
+				this.tzTashkent = i18next.t('timeConf.tzTashkent');
+				this.tzAqtau = i18next.t('timeConf.tzAqtau');
+				this.tzAqtobe = i18next.t('timeConf.tzAqtobe');
+				this.tzOral = i18next.t('timeConf.tzOral');
+				this.tzYekaterinbufg = i18next.t('timeConf.tzYekaterinbufg');
+				this.tzYekaterinbufgSummer = i18next.t('timeConf.tzYekaterinbufgSummer');
+				this.tzCalcutta = i18next.t('timeConf.tzCalcutta');
+				this.tzColombo = i18next.t('timeConf.tzColombo');
+				this.tzKatmandu = i18next.t('timeConf.tzKatmandu');
+				this.tzDhaka = i18next.t('timeConf.tzDhaka');
+				this.tzThimphu = i18next.t('timeConf.tzThimphu');
+				this.tzAlmaty = i18next.t('timeConf.tzAlmaty');
+				this.tzQyzylorda = i18next.t('timeConf.tzQyzylorda');
+				this.tzBishkek = i18next.t('timeConf.tzBishkek');
+				this.tzNovosibirsk = i18next.t('timeConf.tzNovosibirsk');
+				this.tzNovosibirskSummer = i18next.t('timeConf.tzNovosibirskSummer');
+				this.tzOmsk = i18next.t('timeConf.tzOmsk');
+				this.tzOmskSummer = i18next.t('timeConf.tzOmskSummer');
+				this.tzRangoon = i18next.t('timeConf.tzRangoon');
+				this.tzHovd = i18next.t('timeConf.tzHovd');
+				this.tzBangkok = i18next.t('timeConf.tzBangkok');
+				this.tzPhnom_Penh = i18next.t('timeConf.tzPhnom_Penh');
+				this.tzSaigon = i18next.t('timeConf.tzSaigon');
+				this.tzVientiane = i18next.t('timeConf.tzVientiane');
+				this.tzKrasnoyarsk = i18next.t('timeConf.tzKrasnoyarsk');
+				this.tzKrasnoyarskSummer = i18next.t('timeConf.tzKrasnoyarskSummer');
+				this.tzJakarta = i18next.t('timeConf.tzJakarta');
+				this.tzPontianak = i18next.t('timeConf.tzPontianak');
+				this.tzBrunei = i18next.t('timeConf.tzBrunei');
+				this.tzChoibalsan = i18next.t('timeConf.tzChoibalsan');
+				this.tzMakassar = i18next.t('timeConf.tzMakassar');
+				this.tzBeijing = i18next.t('timeConf.tzBeijing');
+				this.tzChongqing = i18next.t('timeConf.tzChongqing');
+				this.tzHarbin = i18next.t('timeConf.tzHarbin');
+				this.tzKashgar = i18next.t('timeConf.tzKashgar');
+				this.tzMacau = i18next.t('timeConf.tzMacau');
+				this.tzShanghai = i18next.t('timeConf.tzShanghai');
+				this.tzTaipei = i18next.t('timeConf.tzTaipei');
+				this.tzUrumqi = i18next.t('timeConf.tzUrumqi');
+				this.tzHong_Kong = i18next.t('timeConf.tzHong_Kong');
+				this.tzIrkutsk = i18next.t('timeConf.tzIrkutsk');
+				this.tzIrkutskSummer = i18next.t('timeConf.tzIrkutskSummer');
+				this.tzKuala_Lumpur = i18next.t('timeConf.tzKuala_Lumpur');
+				this.tzKuching = i18next.t('timeConf.tzKuching');
+				this.tzManila = i18next.t('timeConf.tzManila');
+				this.tzSingapore = i18next.t('timeConf.tzSingapore');
+				this.tzUlaanbaatar = i18next.t('timeConf.tzUlaanbaatar');
+				this.tzJayapura = i18next.t('timeConf.tzJayapura');
+				this.tzOsaka = i18next.t('timeConf.tzOsaka');
+				this.tzSapporo = i18next.t('timeConf.tzSapporo');
+				this.tzTokyo = i18next.t('timeConf.tzTokyo');
+				this.tzPyongyang = i18next.t('timeConf.tzPyongyang');
+				this.tzSeoul = i18next.t('timeConf.tzSeoul');
+				this.tzDili = i18next.t('timeConf.tzDili');
+				this.tzYakutsk = i18next.t('timeConf.tzYakutsk');
+				this.tzYakutskSummer = i18next.t('timeConf.tzYakutskSummer');
+				this.tzSakhalin = i18next.t('timeConf.tzSakhalin');
+				this.tzSakhalinSummer = i18next.t('timeConf.tzSakhalinSummer');
+				this.tzVladivostok = i18next.t('timeConf.tzVladivostok');
+				this.tzVladivostokSummer = i18next.t('timeConf.tzVladivostokSummer');
+				this.tzAnadyr = i18next.t('timeConf.tzAnadyr');
+				this.tzAnadyrSummer = i18next.t('timeConf.tzAnadyrSummer');
+				this.tzKamchatka = i18next.t('timeConf.tzKamchatka');
+				this.tzKamchatkaSummer = i18next.t('timeConf.tzKamchatkaSummer');
+				this.tzMagadan = i18next.t('timeConf.tzMagadan');
+				this.tzMagadanSummer = i18next.t('timeConf.tzMagadanSummer');
+
+// Atlantic
+				this.tzBermuda = i18next.t('timeConf.tzBermuda');
+				this.tzBermudaSummer = i18next.t('timeConf.tzBermudaSummer');
+				this.tzStanley = i18next.t('timeConf.tzStanley');
+				this.tzStanleySummer = i18next.t('timeConf.tzStanleySummer');
+				this.tzAzores = i18next.t('timeConf.tzAzores');
+				this.tzAzoresSummer = i18next.t('timeConf.tzAzoresSummer');
+				this.tzCape_Verde = i18next.t('timeConf.tzCape_Verde');
+				this.tzReykjavik = i18next.t('timeConf.tzReykjavik');
+				this.tzSt_Helena = i18next.t('timeConf.tzSt_Helena');
+				this.tzCanary = i18next.t('timeConf.tzCanary');
+				this.tzCanarySummer = i18next.t('timeConf.tzCanarySummer');
+				this.tzFaeroe = i18next.t('timeConf.tzFaeroe');
+				this.tzFaeroeSummer = i18next.t('timeConf.tzFaeroeSummer');
+				this.tzMadeira = i18next.t('timeConf.tzMadeira');
+				this.tzMadeiraSummer = i18next.t('timeConf.tzMadeiraSummer');
+
+// Australia
+				this.tzPerth = i18next.t('timeConf.tzPerth');
+				this.tzEucla = i18next.t('timeConf.tzEucla');
+				this.tzAdelaide = i18next.t('timeConf.tzAdelaide');
+				this.tzAdelaideSummer = i18next.t('timeConf.tzAdelaideSummer');
+				this.tzDarwin = i18next.t('timeConf.tzDarwin');
+				this.tzBrisbane = i18next.t('timeConf.tzBrisbane');
+				this.tzCurrie = i18next.t('timeConf.tzCurrie');
+				this.tzCurrieSummer = i18next.t('timeConf.tzCurrieSummer');
+				this.tzHobart = i18next.t('timeConf.tzHobart');
+				this.tzHobartSummer = i18next.t('timeConf.tzHobartSummer');
+				this.tzLindeman = i18next.t('timeConf.tzLindeman');
+				this.tzMelbourne = i18next.t('timeConf.tzMelbourne');
+				this.tzMelbourneSummer = i18next.t('timeConf.tzMelbourneSummer');
+				this.tzSydney = i18next.t('timeConf.tzSydney');
+				this.tzSydneySummer = i18next.t('timeConf.tzSydneySummer');
+				this.tzLord_Howe = i18next.t('timeConf.tzLord_Howe');
+				this.tzLord_HoweSummer = i18next.t('timeConf.tzLord_HoweSummer');
+
+// Europe
+				this.tzDublin = i18next.t('timeConf.tzDublin');
+				this.tzGuernsey = i18next.t('timeConf.tzGuernsey');
+				this.tzIsle_of_Man = i18next.t('timeConf.tzIsle_of_Man');
+				this.tzJersey = i18next.t('timeConf.tzJersey');
+				this.tzLondon = i18next.t('timeConf.tzLondon');
+				this.tzLisbon = i18next.t('timeConf.tzLisbon');
+				this.tzLisbonSummer = i18next.t('timeConf.tzLisbonSummer');
+				this.tzAmsterdam = i18next.t('timeConf.tzAmsterdam');
+				this.tzAmsterdamSummer = i18next.t('timeConf.tzAmsterdamSummer');
+				this.tzAndorra = i18next.t('timeConf.tzAndorra');
+				this.tzAndorraSummer = i18next.t('timeConf.tzAndorraSummer');
+				this.tzBelgrade = i18next.t('timeConf.tzBelgrade');
+				this.tzBelgradeSummer = i18next.t('timeConf.tzBelgradeSummer');
+				this.tzBerlin = i18next.t('timeConf.tzBerlin');
+				this.tzBerlinSummer = i18next.t('timeConf.tzBerlinSummer');
+				this.tzBratislava = i18next.t('timeConf.tzBratislava');
+				this.tzBratislavaSummer = i18next.t('timeConf.tzBratislavaSummer');
+				this.tzBrussels = i18next.t('timeConf.tzBrussels');
+				this.tzBrusselsSummer = i18next.t('timeConf.tzBrusselsSummer');
+				this.tzBudapest = i18next.t('timeConf.tzBudapest');
+				this.tzBudapestSummer = i18next.t('timeConf.tzBudapestSummer');
+				this.tzCopenhagen = i18next.t('timeConf.tzCopenhagen');
+				this.tzCopenhagenSummer = i18next.t('timeConf.tzCopenhagenSummer');
+				this.tzGibraltar = i18next.t('timeConf.tzGibraltar');
+				this.tzGibraltarSummer = i18next.t('timeConf.tzGibraltarSummer');
+				this.tzLjubljana = i18next.t('timeConf.tzLjubljana');
+				this.tzLjubljanaSummer = i18next.t('timeConf.tzLjubljanaSummer');
+				this.tzLuxembourg = i18next.t('timeConf.tzLuxembourg');
+				this.tzLuxembourgSummer = i18next.t('timeConf.tzLuxembourgSummer');
+				this.tzMadrid = i18next.t('timeConf.tzMadrid');
+				this.tzMadridSummer = i18next.t('timeConf.tzMadridSummer');
+				this.tzMalta = i18next.t('timeConf.tzMalta');
+				this.tzMaltaSummer = i18next.t('timeConf.tzMaltaSummer');
+				this.tzMonaco = i18next.t('timeConf.tzMonaco');
+				this.tzMonacoSummer = i18next.t('timeConf.tzMonacoSummer');
+				this.tzOslo = i18next.t('timeConf.tzOslo');
+				this.tzOsloSummer = i18next.t('timeConf.tzOsloSummer');
+				this.tzParis = i18next.t('timeConf.tzParis');
+				this.tzParisSummer = i18next.t('timeConf.tzParisSummer');
+				this.tzPodgorica = i18next.t('timeConf.tzPodgorica');
+				this.tzPodgoricaSummer = i18next.t('timeConf.tzPodgoricaSummer');
+				this.tzPrague = i18next.t('timeConf.tzPrague');
+				this.tzPragueSummer = i18next.t('timeConf.tzPragueSummer');
+				this.tzRome = i18next.t('timeConf.tzRome');
+				this.tzRomeSummer = i18next.t('timeConf.tzRomeSummer');
+				this.tzSan_Marino = i18next.t('timeConf.tzSan_Marino');
+				this.tzSan_MarinoSummer = i18next.t('timeConf.tzSan_MarinoSummer');
+				this.tzSarajevo = i18next.t('timeConf.tzSarajevo');
+				this.tzSarajevoSummer = i18next.t('timeConf.tzSarajevoSummer');
+				this.tzSkopje = i18next.t('timeConf.tzSkopje');
+				this.tzSkopjeSummer = i18next.t('timeConf.tzSkopjeSummer');
+				this.tzStockholm = i18next.t('timeConf.tzStockholm');
+				this.tzStockholmSummer = i18next.t('timeConf.tzStockholmSummer');
+				this.tzTirane = i18next.t('timeConf.tzTirane');
+				this.tzTiraneSummer = i18next.t('timeConf.tzTiraneSummer');
+				this.tzVaduz = i18next.t('timeConf.tzVaduz');
+				this.tzVaduzSummer = i18next.t('timeConf.tzVaduzSummer');
+				this.tzVatican = i18next.t('timeConf.tzVatican');
+				this.tzVaticanSummer = i18next.t('timeConf.tzVaticanSummer');
+				this.tzVienna = i18next.t('timeConf.tzVienna');
+				this.tzViennaSummer = i18next.t('timeConf.tzViennaSummer');
+				this.tzWarsaw = i18next.t('timeConf.tzWarsaw');
+				this.tzWarsawSummer = i18next.t('timeConf.tzWarsawSummer');
+				this.tzZagreb = i18next.t('timeConf.tzZagreb');
+				this.tzZagrebSummer = i18next.t('timeConf.tzZagrebSummer');
+				this.tzZurich = i18next.t('timeConf.tzZurich');
+				this.tzZurichSummer = i18next.t('timeConf.tzZurichSummer');
+				this.tzAthens = i18next.t('timeConf.tzAthens');
+				this.tzAthensSummer = i18next.t('timeConf.tzAthensSummer');
+				this.tzBucharest = i18next.t('timeConf.tzBucharest');
+				this.tzBucharestSummer = i18next.t('timeConf.tzBucharestSummer');
+				this.tzChisinau = i18next.t('timeConf.tzChisinau');
+				this.tzChisinauSummer = i18next.t('timeConf.tzChisinauSummer');
+				this.tzHelsinki = i18next.t('timeConf.tzHelsinki');
+				this.tzHelsinkiSummer = i18next.t('timeConf.tzHelsinkiSummer');
+				this.tzIstanbul = i18next.t('timeConf.tzIstanbul');
+				this.tzIstanbulSummer = i18next.t('timeConf.tzIstanbulSummer');
+				this.tzKaliningrad = i18next.t('timeConf.tzKaliningrad');
+				this.tzKaliningradSummer = i18next.t('timeConf.tzKaliningradSummer');
+				this.tzKiev = i18next.t('timeConf.tzKiev');
+				this.tzKievSummer = i18next.t('timeConf.tzKievSummer');
+				this.tzMariehamn = i18next.t('timeConf.tzMariehamn');
+				this.tzMariehamnSummer = i18next.t('timeConf.tzMariehamnSummer');
+				this.tzMinsk = i18next.t('timeConf.tzMinsk');
+				this.tzMinskSummer = i18next.t('timeConf.tzMinskSummer');
+				this.tzRiga = i18next.t('timeConf.tzRiga');
+				this.tzRigaSummer = i18next.t('timeConf.tzRigaSummer');
+				this.tzSimferopol = i18next.t('timeConf.tzSimferopol');
+				this.tzSimferopolSummer = i18next.t('timeConf.tzSimferopolSummer');
+				this.tzSofia = i18next.t('timeConf.tzSofia');
+				this.tzSofiaSummer = i18next.t('timeConf.tzSofiaSummer');
+				this.tzTallinn = i18next.t('timeConf.tzTallinn');
+				this.tzTallinnSummer = i18next.t('timeConf.tzTallinnSummer');
+				this.tzUzhgorod = i18next.t('timeConf.tzUzhgorod');
+				this.tzUzhgorodSummer = i18next.t('timeConf.tzUzhgorodSummer');
+				this.tzVilnius = i18next.t('timeConf.tzVilnius');
+				this.tzVilniusSummer = i18next.t('timeConf.tzVilniusSummer');
+				this.tzZaporozhye = i18next.t('timeConf.tzZaporozhye');
+				this.tzZaporozhyeSummer = i18next.t('timeConf.tzZaporozhyeSummer');
+				this.tzMoscow = i18next.t('timeConf.tzMoscow');
+				this.tzMoscowSummer = i18next.t('timeConf.tzMoscowSummer');
+				this.tzSamara = i18next.t('timeConf.tzSamara');
+				this.tzSamaraSummer = i18next.t('timeConf.tzSamaraSummer');
+				this.tzVolgograd = i18next.t('timeConf.tzVolgograd');
+				this.tzVolgogradSummer = i18next.t('timeConf.tzVolgogradSummer');
+
+// Indian
+				this.tzAntananarivo = i18next.t('timeConf.tzAntananarivo');
+				this.tzComoro = i18next.t('timeConf.tzComoro');
+				this.tzMayotte = i18next.t('timeConf.tzMayotte');
+				this.tzMauritius = i18next.t('timeConf.tzMauritius');
+				this.tzReunion = i18next.t('timeConf.tzReunion');
+				this.tzMahe = i18next.t('timeConf.tzMahe');
+				this.tzMaldives = i18next.t('timeConf.tzMaldives');
+				this.tzKerguelen = i18next.t('timeConf.tzKerguelen');
+				this.tzChagos = i18next.t('timeConf.tzChagos');
+				this.tzCocos = i18next.t('timeConf.tzCocos');
+				this.tzChristmas = i18next.t('timeConf.tzChristmas');
+
+// Pacific
+				this.tzNiue = i18next.t('timeConf.tzNiue');
+				this.tzApia = i18next.t('timeConf.tzApia');
+				this.tzMidway = i18next.t('timeConf.tzMidway');
+				this.tzPago_pago = i18next.t('timeConf.tzPago_pago');
+				this.tzRarotonga = i18next.t('timeConf.tzRarotonga');
+				this.tzHonolulu = i18next.t('timeConf.tzHonolulu');
+				this.tzJohnston = i18next.t('timeConf.tzJohnston');
+				this.tzTahiti = i18next.t('timeConf.tzTahiti');
+				this.tzFakaofo = i18next.t('timeConf.tzFakaofo');
+				this.tzMarquesas = i18next.t('timeConf.tzMarquesas');
+				this.tzGambier = i18next.t('timeConf.tzGambier');
+				this.tzPitcairn = i18next.t('timeConf.tzPitcairn');
+				this.tzEaster = i18next.t('timeConf.tzEaster');
+				this.tzEasterSummer = i18next.t('timeConf.tzEasterSummer');
+				this.tzGalapagos = i18next.t('timeConf.tzGalapagos');
+				this.tzPalau = i18next.t('timeConf.tzPalau');
+				this.tzGuam = i18next.t('timeConf.tzGuam');
+				this.tzSaipan = i18next.t('timeConf.tzSaipan');
+				this.tzTruk = i18next.t('timeConf.tzTruk');
+				this.tzPort_Moresby = i18next.t('timeConf.tzPort_Moresby');
+				this.tzKosrae = i18next.t('timeConf.tzKosrae');
+				this.tzNoumea = i18next.t('timeConf.tzNoumea');
+				this.tzPonape = i18next.t('timeConf.tzPonape');
+				this.tzGuadalcanal = i18next.t('timeConf.tzGuadalcanal');
+				this.tzEfate = i18next.t('timeConf.tzEfate');
+				this.tzNorfolk = i18next.t('timeConf.tzNorfolk');
+				this.tzFiji = i18next.t('timeConf.tzFiji');
+				this.tzTarawa = i18next.t('timeConf.tzTarawa');
+				this.tzKwajalein = i18next.t('timeConf.tzKwajalein');
+				this.tzMajuro = i18next.t('timeConf.tzMajuro');
+				this.tzNauru = i18next.t('timeConf.tzNauru');
+				this.tzAuckland = i18next.t('timeConf.tzAuckland');
+				this.tzAucklandSummer = i18next.t('timeConf.tzAucklandSummer');
+				this.tzFunafuti = i18next.t('timeConf.tzFunafuti');
+				this.tzWake = i18next.t('timeConf.tzWake');
+				this.tzWallis = i18next.t('timeConf.tzWallis');
+				this.tzEnderbury = i18next.t('timeConf.tzEnderbury');
+				this.tzTongatapu = i18next.t('timeConf.tzTongatapu');
+				this.tzKiritimati = i18next.t('timeConf.tzKiritimati');
+
+// AreaGMT
+				this.tzGMTm1200 = i18next.t('timeConf.tzGMTm1200');
+				this.tzGMTm1100 = i18next.t('timeConf.tzGMTm1100');
+				this.tzGMTm1000 = i18next.t('timeConf.tzGMTm1000');
+				this.tzGMTm0930 = i18next.t('timeConf.tzGMTm0930');
+				this.tzGMTm0900 = i18next.t('timeConf.tzGMTm0900');
+				this.tzGMTm0800 = i18next.t('timeConf.tzGMTm0800');
+				this.tzGMTm0700 = i18next.t('timeConf.tzGMTm0700');
+				this.tzGMTm0600 = i18next.t('timeConf.tzGMTm0600');
+				this.tzGMTm0500 = i18next.t('timeConf.tzGMTm0500');
+				this.tzGMTm0400 = i18next.t('timeConf.tzGMTm0400');
+				this.tzGMTm0330 = i18next.t('timeConf.tzGMTm0330');
+				this.tzGMTm0300 = i18next.t('timeConf.tzGMTm0300');
+				this.tzGMTm0200 = i18next.t('timeConf.tzGMTm0200');
+				this.tzGMTm0100 = i18next.t('timeConf.tzGMTm0100');
+				this.tzGMTp0000 = i18next.t('timeConf.tzGMTp0000');
+				this.tzGMTp0100 = i18next.t('timeConf.tzGMTp0100');
+				this.tzGMTp0200 = i18next.t('timeConf.tzGMTp0200');
+				this.tzGMTp0300 = i18next.t('timeConf.tzGMTp0300');
+				this.tzGMTp0330 = i18next.t('timeConf.tzGMTp0330');
+				this.tzGMTp0400 = i18next.t('timeConf.tzGMTp0400');
+				this.tzGMTp0430 = i18next.t('timeConf.tzGMTp0430');
+				this.tzGMTp0500 = i18next.t('timeConf.tzGMTp0500');
+				this.tzGMTp0530 = i18next.t('timeConf.tzGMTp0530');
+				this.tzGMTp0545 = i18next.t('timeConf.tzGMTp0545');
+				this.tzGMTp0600 = i18next.t('timeConf.tzGMTp0600');
+				this.tzGMTp0630 = i18next.t('timeConf.tzGMTp0630');
+				this.tzGMTp0700 = i18next.t('timeConf.tzGMTp0700');
+				this.tzGMTp0800 = i18next.t('timeConf.tzGMTp0800');
+				this.tzGMTp0830 = i18next.t('timeConf.tzGMTp0830');
+				this.tzGMTp0845 = i18next.t('timeConf.tzGMTp0845');
+				this.tzGMTp0900 = i18next.t('timeConf.tzGMTp0900');
+				this.tzGMTp0930 = i18next.t('timeConf.tzGMTp0930');
+				this.tzGMTp1000 = i18next.t('timeConf.tzGMTp1000');
+				this.tzGMTp1030 = i18next.t('timeConf.tzGMTp1030');
+				this.tzGMTp1100 = i18next.t('timeConf.tzGMTp1100');
+				this.tzGMTp1200 = i18next.t('timeConf.tzGMTp1200');
+				this.tzGMTp1245 = i18next.t('timeConf.tzGMTp1245');
+				this.tzGMTp1300 = i18next.t('timeConf.tzGMTp1300');
+				this.tzGMTp1400 = i18next.t('timeConf.tzGMTp1400');
+      }
+
+    }
+        
+  </script>
+
+</timeconf>

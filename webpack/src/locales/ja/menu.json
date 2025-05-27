@@ -1,0 +1,13 @@
+{
+  "main.dashbord":"ダッシュボード",
+
+  "timeConf.timezoneKey":"タイムゾーン",
+  "timeConf.tzTopKey":"選択してください",
+
+  "wifiConf.stationListTopKey":"WiFiStation 設定消去",
+  
+  "key":"世界よこんにちは!",
+  "key2":"しあわせ?"
+
+  
+}

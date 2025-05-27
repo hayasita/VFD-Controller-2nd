@@ -1,0 +1,149 @@
+<appmain>
+  <style>
+    .container-fluid {
+      width: 100%;
+    }
+    .tab-pane{
+      margin-top: 10px;
+    }
+  </style>
+
+  <div id="navigation"></div>
+
+  <div>
+    <ul class="nav nav-tabs" id="myTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">{dashbordKey}</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="tab2" aria-selected="false">TimeConf</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab" aria-controls="tab3" aria-selected="false">DispConf</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab" aria-controls="tab4" aria-selected="false">WiFiConf</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab5-tab" data-bs-toggle="tab" data-bs-target="#tab5" type="button" role="tab" aria-controls="tab5" aria-selected="false">DeviceConf</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab6-tab" data-bs-toggle="tab" data-bs-target="#tab6" type="button" role="tab" aria-controls="tab6" aria-selected="false">SensorConf</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="container-fluid py-1">
+    <div class="tab-content mt-3" id="myTabContent">
+      <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+        <div id="dashbord"></div>
+      </div>
+      <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+        <div id="timeconf"></div>
+      </div>
+      <div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+        <div id="dispconf"></div>
+      </div>
+      <div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">
+        <div id="wificonf"></div>
+      </div>
+      <div class="tab-pane fade" id="tab5" role="tabpanel" aria-labelledby="tab5-tab">
+        <div id="deviceconf"></div>
+      </div>
+      <div class="tab-pane fade" id="tab6" role="tabpanel" aria-labelledby="tab6-tab">
+        <div id="mytag"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 60px;"></div>   <!-- フッターと重なる部分を空白で埋める。 -->
+
+  <div id = Footer></div>
+
+  <script>
+    import '@riotjs/hot-reload'
+    import {component} from 'riot'
+    import i18next from 'i18next'
+    import navigation from './navbar.riot'
+    import dashbord from './dashbord.riot'
+    import timeconf from './timeconf.riot'
+    import dispconf from './dispconf.riot'
+    import wificonf from './wificonf.riot'
+    import deviceconf from './deviceconf.riot'
+    import mytag from './my-tag.riot'
+    import Footer from './footer.riot'
+
+    export default{
+      onBeforeMount(props, state){
+        let vmUI = props.vmUI;
+        let obs = props.obs;
+
+        console.log("appmain.onBeforeMount")
+        console.log(props)
+
+        this.dashbord = "-Dashbord"
+        this.setLanguage(0);
+        this.language = "test"
+
+        this.changeTab = (item,e) =>{
+          console.log("changeTab:" + item);
+          vmUI.submitChangeTab(item);
+          obs.trigger('changeTab',item);
+        }
+//        this.setLanguage();
+      },
+      onMounted(props, state){
+        let vmUI = props.vmUI;
+        let obs = props.obs;
+
+        let _this = this
+        console.log("onMounted")
+        console.log(this)
+
+        obs.on('changeLanguage',function(code){
+          this.language = code;
+          console.log("changeLanguage:"+code)
+              
+          //  _this.setLanguage(code);  // .bind(this)しない場合は_this でthisにアクセスする
+                                          // ここのthisはイベント発生元のthis
+          this.setLanguage(code);
+          this.update();
+        }.bind(this))
+
+        component(navigation)(document.getElementById('navigation'), {vmUI,obs})
+        component(dashbord)(document.getElementById('dashbord'), {vmUI,obs})
+        component(timeconf)(document.getElementById('timeconf'), {vmUI,obs})
+        component(dispconf)(document.getElementById('dispconf'), {vmUI,obs})
+        component(wificonf)(document.getElementById('wificonf'), {vmUI,obs})
+        component(deviceconf)(document.getElementById('deviceconf'), {vmUI,obs})
+        component(mytag)(document.getElementById('mytag'), {vmUI,obs})
+        component(Footer)(document.getElementById('Footer'), {vmUI,obs})
+
+        // タブ切替処理
+        document.addEventListener("DOMContentLoaded", function() {
+          const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+          tabs.forEach(tab => {
+            tab.addEventListener("click", function(event) {
+              event.preventDefault();
+              const target = document.querySelector(tab.getAttribute("data-bs-target"));
+              if (!target.classList.contains("show")) {
+                const activeTab = document.querySelector(".tab-pane.show.active");
+                if (activeTab) {
+                  activeTab.classList.remove("show", "active");
+                  target.classList.add("show", "active");
+                }
+              }
+            });
+          });
+        });
+
+        vmUI.submitChangeTab("dashbord");
+      },
+      setLanguage(code){
+        console.log("setLanguage")
+        this.dashbordKey = i18next.t('main.dashbord')
+      }
+    }
+
+  </script>
+</appmain>

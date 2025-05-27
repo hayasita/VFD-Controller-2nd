@@ -1,0 +1,13 @@
+<mxfile host="65bd71144e">
+    <diagram id="rbQJyQDMEqsoIs-0aeVv" name="ページ1">
+        <mxGraphModel dx="844" dy="893" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="3" value="classDiagram&#xa;Class01 &lt;|-- AveryLongClass : Cool&#xa;Class03 *-- Class04&#xa;Class05 o-- Class06&#xa;Class07 .. Class08&#xa;Class09 --&gt; C2 : Where am i?&#xa;Class09 --* C3&#xa;Class09 --|&gt; Class07&#xa;Class07 : equals()&#xa;Class07 : Object[] elementData&#xa;Class01 : size()&#xa;Class01 : int chimp&#xa;Class01 : int gorilla&#xa;Class08 &lt;--&gt; C2: Cool label" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;theme=default;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="710" width="400" height="300" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

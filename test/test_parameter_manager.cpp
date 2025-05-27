@@ -1,0 +1,154 @@
+#include <gtest/gtest.h>
+#include "./mock/DummyLogManager.h"
+#include "./mock/DummyEepromManager.h"
+//#include "./mock/I2CBusManager.h"  // モックのI2CBusManagerをインクルード
+#include "../src/ParameterManager.h"  // ←実際のヘッダに合わせてパスを調整してね！
+
+class ParameterManagerTest : public ::testing::Test {
+protected:
+  DummyEepromManager eepromManager;
+  DummyLogManager logManager;
+  ParameterManager paramManager;
+  
+  void SetUp() override {
+    logManager.begin(eepromManager);
+    paramManager.begin(eepromManager, logManager);
+    paramManager.setupParameter(0, 10, 0, 100);  // 初期値10, 0〜100
+    paramManager.setParameter(0, 5); // 初期値10, 0〜100
+  }
+
+};
+
+TEST_F(ParameterManagerTest, FirstTest) {
+  int value = 10;
+  EXPECT_EQ(value, 10);  // 初期値ロード確認
+}
+
+TEST_F(ParameterManagerTest, LoadDefaultValues) {
+  paramManager.clearAllParameters();
+  int value = paramManager.getParameter(0);
+  EXPECT_EQ(value, 10);  // 初期値ロード確認
+}
+
+TEST_F(ParameterManagerTest, SetParameterWithinRange) {
+  bool result = paramManager.setParameter(0, 50);
+  EXPECT_TRUE(result);
+  int value = paramManager.getParameter(0);
+  EXPECT_EQ(value, 50);
+}
+
+TEST_F(ParameterManagerTest, SetParameterOutOfRangeLow) {
+  bool result = paramManager.setParameter(0, -10);
+  EXPECT_FALSE(result);
+  EXPECT_NE(std::string::npos, logManager.lastMessage.find("out of range")); // ログに"範囲外"が記録されること
+}
+
+TEST_F(ParameterManagerTest, SetParameterOutOfRangeHigh) {
+  bool result = paramManager.setParameter(0, 200);
+  EXPECT_FALSE(result);
+  EXPECT_NE(std::string::npos, logManager.lastMessage.find("out of range")); // ログに"範囲外"が記録されること
+}
+
+/**
+ * @brief EEPROM読み込み範囲外時、デフォルト値が設定されることを確認する
+ */
+TEST_F(ParameterManagerTest, SetupParameter_LoadFails_UseDefault) {
+  static constexpr int PARAM_START_ADDR = 0;  // パラメータの開始アドレス
+  int value = 101;
+  uint8_t index = 0;
+  eepromManager.writeBytes(PARAM_START_ADDR + index * sizeof(int), &value, sizeof(int)); // MockEEPROMに書き込む
+  ASSERT_TRUE(paramManager.setupParameter(0, 42, 0, 100));
+  EXPECT_EQ(paramManager.getParameter(0), 42);
+}
+
+/**
+* @brief EEPROMから正常に読み込めた場合、その値が使用されることを確認する
+*/
+TEST_F(ParameterManagerTest, SetupParameter_LoadSucceeds_WithinRange) {
+  // 事前にMockEEPROMに値を書き込んでおく
+  static constexpr int PARAM_START_ADDR = 0;  // パラメータの開始アドレス
+  int value = 55;
+  uint8_t index = 1;
+  eepromManager.writeBytes(PARAM_START_ADDR + index * sizeof(int), &value, sizeof(int)); // MockEEPROMに書き込む
+  ASSERT_TRUE(paramManager.setupParameter(1, 42, 0, 100));
+  EXPECT_EQ(paramManager.getParameter(1), 55);
+}
+
+/**
+* @brief setParameterで正常な範囲の値を設定できることを確認する
+*/
+TEST_F(ParameterManagerTest, SetParameter_Success) {
+  paramManager.setupParameter(2, 0, -10, 10);
+  ASSERT_TRUE(paramManager.setParameter(0, 5));
+  EXPECT_EQ(paramManager.getParameter(0), 5);
+}
+
+/**
+* @brief 下限未満の値を設定しようとしたとき、エラーになることを確認する
+*/
+TEST_F(ParameterManagerTest, SetParameter_OutOfRange_Low) {
+  paramManager.setupParameter(3, 0, 0, 10);
+  ASSERT_FALSE(paramManager.setParameter(3, -1)); // 低すぎる
+  EXPECT_EQ(paramManager.getParameter(3), 0);      // 変更されていない
+}
+
+/**
+* @brief 上限を超える値を設定しようとしたとき、エラーになることを確認する
+*/
+TEST_F(ParameterManagerTest, SetParameter_OutOfRange_High) {
+  paramManager.setupParameter(4, 0, 0, 10);
+  ASSERT_FALSE(paramManager.setParameter(4, 11)); // 高すぎる
+  EXPECT_EQ(paramManager.getParameter(4), 0);     // 変更されていない
+}
+
+/**
+* @brief setParameterで値を変更した際、コールバックが呼び出されることを確認する
+*/
+TEST_F(ParameterManagerTest, CallbackIsInvokedOnSetParameter) {
+  bool callbackCalled = false;
+  uint8_t callbackIndex = 255;
+  int callbackValue = -1;
+
+  // コールバックを登録してパラメータセット
+  paramManager.setupParameter(5, 0, 0, 10, [&](uint8_t index, int newValue) {
+      callbackCalled = true;
+      callbackIndex = index;
+      callbackValue = newValue;
+  });
+
+  ASSERT_TRUE(paramManager.setParameter(5, 7));
+
+  // コールバックが呼び出されたことを確認
+  EXPECT_TRUE(callbackCalled);
+  EXPECT_EQ(callbackIndex, 5);
+  EXPECT_EQ(callbackValue, 7);
+}
+
+/**
+* @brief clearAllParametersを呼び出した際、コールバックが呼び出されることを確認する
+*/
+TEST_F(ParameterManagerTest, CallbackIsInvokedOnClearAllParameters) {
+  bool callbackCalled = false;
+  uint8_t callbackIndex = 255;
+  int callbackValue = -1;
+
+  // コールバックを登録してパラメータセット
+  paramManager.setupParameter(6, 5, 0, 10, [&](uint8_t index, int newValue) {
+      callbackCalled = true;
+      callbackIndex = index;
+      callbackValue = newValue;
+  });
+
+  // 値を初期値とは違うものにセットしておく
+  paramManager.setParameter(6, 8);
+  EXPECT_EQ(paramManager.getParameter(6), 8);
+
+  callbackCalled = false; // リセットしてからclear
+
+  // clearAllParametersを呼び出すと、デフォルトに戻りコールバックが呼び出される
+  paramManager.clearAllParameters();
+
+  EXPECT_TRUE(callbackCalled);
+  EXPECT_EQ(callbackIndex, 6);
+  EXPECT_EQ(callbackValue, 5); // デフォルト値
+}

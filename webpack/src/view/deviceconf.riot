@@ -1,0 +1,321 @@
+<deviceconf>
+<h1>デバイス設定</h1>
+
+<div class="row">
+  <div class="col-md-6">
+	<div class="card h-100">
+		<div class="card-header">
+			システム設定
+		</div>
+    <div class="card-body">
+
+      <p class="card-text">
+      <div class="col-sm-11 offset-sm-1">
+      	  <div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox"
+								type="checkbox"
+								checked={ systemConrtolePermissionCheck }
+								onclick={ systemConrtolePermissionToggle } />
+								{ tTimeconf_NtpUse_check }
+                
+					</div>
+          <div>
+          
+          </div>
+
+      <table class="table">
+        <tr>
+          <td class="itemname-width">WiFi切断</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ logoff } disabled="{!systemConrtolePermissionCheck}">Execute Action</button>
+          <!--
+            <button type="button" class="btn btn-primary btn-sm">Small button</button>
+            <input class="btn btn-primary btn-sm" type="reset" value="Reset">
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ ntpAutoUpdateSetting } disabled="{!Timeconf_NtpUse_check}">Setting</button>
+          -->
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">再起動</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ reboot } disabled="{!systemConrtolePermissionCheck}">Execute Action</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">EEROM 初期化</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{!systemConrtolePermissionCheck}">Execute Action</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">内部情報初期化</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ nvsClear } disabled="{!systemConrtolePermissionCheck}">Execute Action</button>
+          </div></td>
+        </tr>
+      </table>
+      </div>
+      </p>
+    </div>
+  </div>
+  </div>
+
+  <div class="col-md-6">
+	<div class="card h-100">
+		<div class="card-header">
+			デバイス状態
+		</div>
+    <div class="card-body">
+      <h5 class="card-title">i2c接続デバイス</h5>
+      <p class="card-text">
+      <div class="col-sm-11 offset-sm-1">
+      <table class="table">
+        <tr>
+          <td class="itemname-width">WiFi切断</td>
+          <td><div>
+            <button type="button" class="btn btn-primary btn-sm">Small button</button>
+            <input class="btn btn-primary btn-sm" type="reset" value="Reset">
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ ntpAutoUpdateSetting } disabled="{!Timeconf_NtpUse_check}">Setting</button>
+
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">再起動</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{Timeconf_NtpUse_check}">Setting</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">EEROM 初期化</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{Timeconf_NtpUse_check}">Setting</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">内部情報初期化</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{Timeconf_NtpUse_check}">Setting</button>
+          </div></td>
+        </tr>
+      </table>
+      </div>
+      </p>
+            <h5 class="card-title">DC-DCコンバータ</h5>
+
+    </div>
+  </div>
+  </div>
+
+</div>
+
+  <div class="card">
+		<div class="card-header">
+			IR機能設定
+		</div>
+    <div class="card-body">
+					<h5 class="card-title">赤外線リモコン 使用</h5>
+					<p class="card-text">
+						<div class="col-sm-11 offset-sm-1">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox"
+								type="checkbox"
+								checked={ Timeconf_NtpUse_check }
+								onclick={ ntpUseToggle } />
+								{ tTimeconf_NtpUse_check }
+							</div>
+						</div>
+					</p>
+
+      <h5 class="card-title">受信データ</h5>
+      <p class="card-text">
+				<div class="col-sm-11 offset-sm-1">
+					<div id="logNtpSetting" style="overflow-y: scroll; height: 100px; border: 1px solid #ccc;padding: 10px;"></div>
+				</div>
+      </p>
+
+      <h5 class="card-title">機能設定</h5>
+      <p class="card-text">
+      <div class="col-sm-11 offset-sm-1">
+
+      <button type="submit" id="ssidSubmit" class="btn btn-outline-primary btn-sm" style="margin-top: 5px;" onclick={ wifiSetting }">
+        <span class="spinner-border spinner-border-sm visually-hidden" role="status" aria-hidden="true"></span>
+        Data Scan
+      </button>
+
+      <table class="table">
+        <tr>
+        <td>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+          <label class="form-check-label" for="flexRadioDefault1">
+            表示切替
+          </label>
+        </div>
+        </td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{Timeconf_NtpUse_check}">Setting</button>
+          </div></td>
+        </tr>
+        <tr>
+
+
+          <td class="itemname-width">表示切替</td>
+          <td><div>
+            <button type="button" class="btn btn-primary btn-sm">Small button</button>
+            <input class="btn btn-primary btn-sm" type="reset" value="Reset">
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ ntpAutoUpdateSetting } disabled="{!Timeconf_NtpUse_check}">Setting</button>
+
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">再起動</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{Timeconf_NtpUse_check}">Setting</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">EEROM 初期化</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{Timeconf_NtpUse_check}">Setting</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">内部情報初期化</td>
+          <td><div>
+						<button class="btn btn-outline-primary btn-sm" value="Setting" onclick={ eeromClear } disabled="{Timeconf_NtpUse_check}">Setting</button>
+          </div></td>
+        </tr>
+      </table>
+      </div>
+      </p>
+
+      <p>
+      <!-- ラジオボタン -->
+      <div id="irSetRadioButton"></div>
+      </p>
+
+    </div>
+  </div>
+
+  <script>
+    export default {
+      onBeforeMount(props, state) {
+        console.log("deviceconf.riot");
+        // 初期化
+        let vmUI = props.vmUI;
+
+        this.setLanguage("en");
+
+
+        this.systemConrtolePermissionCheck ="";   // システム設定操作許可トグルスイッチ初期値設定
+
+        // システム設定操作許可トグルスイッチ操作
+        this.systemConrtolePermissionToggle = (e) => {
+          this.systemConrtolePermissionCheck = !this.systemConrtolePermissionCheck
+          this.update()
+        }
+
+
+      },
+      onMounted(props, state){
+        let obs = props.obs;
+
+        // IR Sensor ラジオボタン設定
+        // irTextの個数ラジオボタンを作成する。
+        const irHead = ["#","First","IR Data"];
+        // inputの内容、IRDataを含んだオブジェクトに拡張する。起動時にデータを受け取る。
+        // IRData,labelはwebsocketで送られてきたデータに更新する。
+        let irDataObj = [
+          {name:"Mode",label:"Test-1",IRData:"Data-1"},
+          {name:"Set",label:"Test-2",IRData:"Data-2"},
+          {name:"Clear",label:"Test-3",IRData:"Data-3"},
+          {name:"Reset",label:"Test-4",IRData:"Data-4"}
+        ];
+        const irSet = document.getElementById("irSetRadioButton");
+        const irTableMake = document.createElement("table");
+        irTableMake.classname = "table";
+
+        // table header 作成
+        const irTableThead = document.createElement("thead");
+        const TheadTr = document.createElement("tr");
+        let num = irHead.length;
+        for(let i=0;i<num;i++){
+          const TheadTh = document.createElement("th");
+          TheadTh.scope = "col";
+          TheadTh.innerHTML = irHead[i];
+          TheadTr.appendChild(TheadTh);
+        }
+        irTableThead.appendChild(TheadTr);
+        irTableMake.appendChild(irTableThead);
+
+        // Table本体作成
+        const newtbody = document.createElement("tbody");
+        num = irDataObj.length;
+        for(let i=0;i<num;i++){
+          const newTr = document.createElement("tr");
+          const newTd1 = document.createElement("td");
+          const newTd2 = document.createElement("td");
+          const newTd3 = document.createElement("td");
+          // ラジオボタン
+          const newDiv = document.createElement("div");
+          newDiv.className = "form-check";
+          const newRadio = document.createElement("input");
+          newRadio.className = "form-check-input";
+          newRadio.type = "radio";
+          newRadio.name = "irSetRadioDefault";
+          newRadio.id = "irSetButton" + i;
+          newRadio.value = "irSetButton" + i;
+
+          //ラジオボタンラベル
+          const newLabel = document.createElement("label");
+          newLabel.innerHTML = irDataObj[i].name;
+          newLabel.htmlFor = newRadio.id;
+
+          newDiv.appendChild(newRadio);
+          newDiv.appendChild(newLabel);
+          newTd1.appendChild(newDiv);
+
+          // input
+          const newInput = document.createElement("input");
+          newInput.type = "text";
+          newInput.value = irDataObj[i].label;
+          newTd2.appendChild(newInput);
+
+          // 登録IRデータ表示
+          const newIrData = document.createElement("label");
+          newIrData.innerHTML = irDataObj[i].IRData;
+
+          newTd3.appendChild(newIrData);
+
+          // テーブルデータ構成
+          newTr.appendChild(newTd1);
+          newTr.appendChild(newTd2);
+          newTr.appendChild(newTd3);
+          newtbody.appendChild(newTr);
+
+        }
+        irTableMake.appendChild(newtbody);
+        irSet.appendChild(irTableMake);
+
+        // 言語切り替え
+        obs.on('changeLanguage',function(code){
+          this.language = code;
+          console.log("deviceconf.riot:changeLanguage:"+code)
+              
+          //  _this.setLanguage(code);  // .bind(this)しない場合は_this でthisにアクセスする
+                                          // ここのthisはイベント発生元のthis
+          this.setLanguage(code);
+          this.update();
+        }.bind(this))
+    	},
+      // 言語設定
+      setLanguage(code){
+        console.log("setLanguage")
+        this.tTimeconf_NtpUse_check = "操作許可";
+      }
+    }
+
+  </script>
+
+
+</deviceconf>

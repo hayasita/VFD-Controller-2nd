@@ -1,0 +1,404 @@
+/**
+ * @file monitor.cpp
+ * @author hayasita04@gmail.com
+ * @brief シリアルモニタ処理
+ * @version 0.1
+ * @date 2024-02-28
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
+
+#include <iostream>
+#include <algorithm>
+#include <sstream>
+#include <iomanip>
+#include <cstdint>
+
+#include "SerialCommandProcessor.h"
+
+#ifdef UNIT_TEST
+#else
+#include "LittleFS.h"
+#include <FS.h>
+#include <esp_task_wdt.h>
+#endif
+//#include "jsdata.h"
+#include "Config.h"
+#include "ver.h"
+
+/**
+ * @brief Destroy the Serial Monitor I O:: Serial Monitor I O object
+ * 
+ */
+MonitorDeviseIo::~MonitorDeviseIo() {}
+
+/**
+ * @brief Construct a new Serial Monitor:: Serial Monitor object
+ * 
+ * @param pMonitorDeviseIo 
+ */
+/*
+ SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo* pMonitorDeviseIo, I2CBusManager& busManager, EepromManager& eepromManager){
+  monitorIo_ = pMonitorDeviseIo;
+  i2cBus = &busManager;
+  eeprom = &eepromManager;
+  init();
+}
+*/
+SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, EepromManager& eepromManager){
+  monitorIo_ = &MonitorDeviseIo;
+  i2cBus = &busManager;
+  eeprom = &eepromManager;
+  init();
+}
+
+void SerialCommandProcessor::init(void)
+{
+//  std::cout << "SerialCommandProcessor::init";
+  codeArray.clear();    // コマンド実行テーブルクリア
+  codeArray.push_back({"help"       ,[this](){return opecodeHelp(command);}    ,"Help\tDisplays help information for the command."});
+  codeArray.push_back({"ls"         ,[this](){return opecodels(command);}  ,"ls path"});
+  codeArray.push_back({"datalist"   ,[this](){return opecodedatalist(command);}  ,"datalist\tDisplays Matrix data file list."});
+  codeArray.push_back({"env"        ,[this](){return opecodeenv(command);}  ,"env\tconfig data list."});
+  codeArray.push_back({"ver"        ,[this](){return opecodeVer(command);}  ,"ver\tVersion."});
+  codeArray.push_back({"command2"   ,[this](){return dummyExec(command);}  ,"command Help."});
+
+  codeArray.push_back({"eepromdump" ,[this](){ return opecodeEepromDump(command); }, "eepromdump\tEEPROM Data dump."});
+  codeArray.push_back({"i2cscan"    ,[this](){ return opecodeI2CScan(command); }, "i2cscan\tI2C Bus Device Scan."});
+
+  return;
+}
+
+/**
+ * @brief シリアルモニタ実行
+ * 
+ * @return true コマンド実行成功
+ * @return false コマンド実行失敗
+ */
+bool SerialCommandProcessor::exec(void)
+{
+  std::string commandBuf;
+//  std::vector<std::string> command;     // シリアルモニタコマンド
+  bool ret = true;
+
+  try {
+    commandBuf = monitorIo_->rsv();
+
+    if(commandBuf.size() > 0){
+      commandBuf.erase(std::remove(commandBuf.begin(), commandBuf.end(), '\r'), commandBuf.end());    // CRを取り除く
+      commandBuf.erase(std::remove(commandBuf.begin(), commandBuf.end(), '\n'), commandBuf.end());    // LFを取り除く
+    }
+    if(commandBuf.size() > 0){
+      command = splitCommand(commandBuf);   // コマンドをトークンごとに分割
+  /*      
+      for (const auto &str : command) {
+        std::cout << str << std::endl;
+      }
+  */
+      std::vector<codeTbl>::iterator itr = std::find_if(codeArray.begin(),codeArray.end(),[&](codeTbl &c) {   // コマンド実行テーブル検索
+        return(c.code == command[0]);
+      });
+      if(itr != codeArray.end()){
+  /*
+        std::cout << "テーブル検索成功\n";
+        std::cout << (*itr).code << ":" << command[0] << ":\n";
+        for (char c : command[0]) {
+        // 1文字ごとのASCIIコードを出力
+          std::cout << (int)c << "\n";
+        }
+  */
+        ret = (*itr).execCode();    // コマンド実行
+      }
+      else{
+        // テーブル検索失敗
+        std::cout << "テーブル検索失敗";
+        monitorIo_->send(command[0] + ": command not found.\n");
+        ret = false;
+      }
+    }
+
+  } catch(const std::exception& e) {
+    monitorIo_->send(std::string("Exception: ") + e.what());
+    ret = false;
+  } catch(...) {
+    monitorIo_->send("Unknown exception occurred.\n");
+    ret = false;
+  }
+
+  return ret;
+}
+
+/**
+ * @brief コマンド分割
+ * 入力されたコマンドを半角スペースで分割して、std::vectorに格納する。
+ * 
+ * @param commandBuf 入力コマンド
+ * @return std::vector<std::string> 分割したコマンド
+ */
+std::vector<std::string> SerialCommandProcessor::splitCommand(const std::string &commandBuf)    // コマンド分割
+{
+  std::istringstream iss(commandBuf);
+  std::string token;
+  std::vector<std::string> result;
+
+  while (std::getline(iss, token, ' ')) {
+    if(token.size() != 0){
+      result.push_back(token);
+    }
+  }
+/*
+  for (const auto &str : result) {
+    std::cout << str << std::endl;
+  }
+*/
+  return result;
+}
+
+
+bool SerialCommandProcessor::dummyExec(std::vector<std::string> command)
+{
+  std::cout << "SerialCommandProcessor::dummyExec\n";
+  monitorIo_->send("dummyExec\n");
+  return true;
+}
+
+/**
+ * @brief Helpコマンド処理
+ * 
+ * @param command 
+ * @return true 
+ * @return false 
+ */
+bool SerialCommandProcessor::opecodeHelp(std::vector<std::string> command)   // help
+{
+//  monitorIo_->send("help\n");
+
+  for (auto it = codeArray.begin(); it != codeArray.end(); ++it) {
+    std::cout << it->help << "\n";
+  }
+
+  return true;
+}
+
+#ifndef UNIT_TEST
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels)
+{
+  Serial.printf("Listing directory: %s\n", dirname);
+
+  File root = fs.open(dirname);
+  if(!root){
+    Serial.println("Failed to open directory");
+    return;
+  }
+  if(!root.isDirectory()){
+    Serial.println("Not a directory");
+    return;
+  }
+
+  File file = root.openNextFile();
+  while(file){
+    esp_task_wdt_reset();  // ウォッチドッグをリセット
+    if(file.isDirectory()){
+      Serial.print("  DIR : ");
+      Serial.print (file.name());
+      time_t t= file.getLastWrite();
+      struct tm * tmstruct = localtime(&t);
+      Serial.printf("  LAST WRITE: %d-%02d-%02d %02d:%02d:%02d\n",(tmstruct->tm_year)+1900,( tmstruct->tm_mon)+1, tmstruct->tm_mday,tmstruct->tm_hour , tmstruct->tm_min, tmstruct->tm_sec);
+      if(levels){
+        listDir(fs, file.path(), levels -1);
+      }
+    } else {
+      Serial.print("  FILE: ");
+      Serial.print(file.name());
+      Serial.print("  SIZE: ");
+      Serial.print(file.size());
+      time_t t= file.getLastWrite();
+      struct tm * tmstruct = localtime(&t);
+      Serial.printf("  LAST WRITE: %d-%02d-%02d %02d:%02d:%02d\n",(tmstruct->tm_year)+1900,( tmstruct->tm_mon)+1, tmstruct->tm_mday,tmstruct->tm_hour , tmstruct->tm_min, tmstruct->tm_sec);
+    }
+    file = root.openNextFile();
+  }
+
+  return;
+}
+#endif
+
+bool SerialCommandProcessor::opecodels(std::vector<std::string> command_)     // ls
+{
+  monitorIo_->send("opecodels\n");
+#ifndef UNIT_TEST
+
+  for (const auto &str : command) {
+    std::cout << str << std::endl;
+  }
+  if(command.size() > 1){
+    listDir(LittleFS, command[1].c_str(), 0);
+  }
+  else{
+    listDir(LittleFS, "/", 0);
+  }
+#endif
+
+  return true;
+}
+
+bool SerialCommandProcessor::opecodedatalist(std::vector<std::string> command)   // datalist
+{
+
+//  std::for_each(jsData.dataFilePath.begin(), jsData.dataFilePath.end(), [](std::string x) {
+//    Serial.println(x.c_str());
+//  });
+
+  return true;
+}
+
+/**
+ * @brief 設定値表示
+ * 
+ * @param command 
+ * @return true 
+ * @return false 
+ */
+bool SerialCommandProcessor::opecodeenv(std::vector<std::string> command)
+{
+  monitorIo_->send("opecodeenv\n");
+//  Serial.printf("glowInTheBright: %d\n", jsData.glowInTheBright);
+//  Serial.printf("rotatePosition: %d\n", jsData.rotatePosition);
+//  Serial.printf("dotColor: %d\n", jsData.dotColor);
+//  Serial.printf("showSampleData: %d\n", jsData.showSampleData);
+//  Serial.printf("dataNumber: %d\n", jsData.getDataNumber());
+
+  return true;
+}
+
+bool SerialCommandProcessor::opecodeVer(std::vector<std::string> command)        // バージョン表示
+{
+  monitorIo_->send("opecodeVer\n");
+ 
+  // SW_VERSIONはver.hで定義されているバージョン文字列
+  std::ostringstream oss;
+  oss << "Version: " << SW_VERSION << "\n";
+  std::string versionStr = oss.str();
+  monitorIo_->send(versionStr);         // バージョン情報を送信
+
+  // ESP32のボード情報を表示
+  uint8_t mac[6] = {0,0,0,0,0,0};
+  uint32_t chipId = 0;
+
+  #ifndef UNIT_TEST
+  esp_read_mac(mac, ESP_MAC_WIFI_STA);
+
+  for(int i=0; i<17; i=i+8) {
+    chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+  }
+  #endif
+
+  std::ostringstream ossMac;
+  ossMac << "MAC Address: "
+        << std::uppercase << std::hex << std::setfill('0')
+        << std::setw(2) << static_cast<int>(mac[0]) << ":"
+        << std::setw(2) << static_cast<int>(mac[1]) << ":"
+        << std::setw(2) << static_cast<int>(mac[2]) << ":"
+        << std::setw(2) << static_cast<int>(mac[3]) << ":"
+        << std::setw(2) << static_cast<int>(mac[4]) << ":"
+        << std::setw(2) << static_cast<int>(mac[5]) << "\n";
+  std::string macStr = ossMac.str();
+  monitorIo_->send(macStr);
+
+  std::ostringstream ossChip;
+  ossChip << "M5Stack Serial Number: "
+          << std::uppercase << std::hex << std::setw(8) << std::setfill('0') << chipId << "\n";
+  std::string chipIdStr = ossChip.str();
+  monitorIo_->send(chipIdStr);
+
+  return true;
+}
+
+// 0xで始まる場合は16進数、それ以外は10進数で変換する関数
+int parseStringToInt(const std::string& str) {
+    int value = 0;
+    std::istringstream iss(str);
+    if (str.size() > 2 && (str[0] == '0') && (str[1] == 'x' || str[1] == 'X')) {
+        iss >> std::hex >> value;
+    } else {
+        iss >> std::dec >> value;
+    }
+    return value;
+}
+
+bool SerialCommandProcessor::opecodeEepromDump(std::vector<std::string> command) {
+  uint16_t startAddress = 0;
+  uint16_t datalen = 0x200; // デフォルト
+//  monitorIo_->send("opecodeEepromDump\n");
+
+  // 引数チェック
+  if(command.size() > 1) {
+    int tmp = parseStringToInt(command[1]);
+    if(tmp < 0 || tmp > EEPROM_MAX_ADDRESS) {
+      monitorIo_->send("開始アドレスが不正です\n");
+      return false;
+    }
+    startAddress = static_cast<uint16_t>(tmp);
+  }
+  if(command.size() > 2) {
+    int tmp = parseStringToInt(command[2]);
+    if(tmp <= 0 || tmp > (EEPROM_MAX_ADDRESS - startAddress + 1)) {
+      monitorIo_->send("ダンプ長が不正です\n");
+      return false;
+    }
+    datalen = static_cast<uint16_t>(tmp);
+  }
+
+  // 16バイト単位に調整
+  startAddress = (startAddress / 16) * 16;
+  datalen = ((datalen + 15) / 16) * 16;
+
+  // 上限チェック
+  if(startAddress + datalen - 1 > EEPROM_MAX_ADDRESS) {
+    datalen = EEPROM_MAX_ADDRESS - startAddress + 1;
+  }
+
+  if(eeprom) {
+    while(datalen > 0) {
+      uint16_t chunkSize = (datalen > 0x100) ? 0x100 : datalen;
+      std::string dump = eeprom->dumpEepromData(startAddress, chunkSize);
+      startAddress += chunkSize;
+      datalen -= chunkSize;
+      if(dump.empty()) {
+        monitorIo_->send("EEPROMダンプ失敗\n");
+        return false;
+      }
+      monitorIo_->send(dump);
+    }
+    return true;
+  }
+  monitorIo_->send("EEPROM未初期化\n");
+  return false;
+}
+
+bool SerialCommandProcessor::opecodeI2CScan(std::vector<std::string> command) {
+  // SystemControllerなどからI2CBusManagerの参照をもらう必要あり
+  if(i2cBus) {
+    std::vector<uint8_t> found = i2cBus->scanI2CBus();
+    monitorIo_->send("Scanning...\n");
+    for(auto addr : found) {
+      monitorIo_->send("Found device at 0x" + toHex(addr) + "\n");
+    }
+    if(found.empty()) {
+      monitorIo_->send("No I2C devices found.\n");
+    }
+    else {
+      monitorIo_->send("I2C scan complete.\n");
+    }
+    return true;
+  }
+  monitorIo_->send("I2Cバス未初期化\n");
+  return false;
+}
+
+std::string SerialCommandProcessor::toHex(uint8_t value) const {
+  std::ostringstream oss;
+  oss << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(value);
+  return oss.str();
+}

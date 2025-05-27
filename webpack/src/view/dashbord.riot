@@ -1,0 +1,334 @@
+<dashbord>
+  <h1>Dash Bord</h1>
+
+<!--
+    <div style="text-align:center;"><b>Sensor graph</b></div>
+    <div>
+
+      <canvas id="myChart" width="600" height="400"></canvas>
+
+    </div>
+    <br><br>
+
+    <template>
+      <canvas id="chart"></canvas>
+    </template>
+-->
+
+  <div class="card">
+		<div class="card-header">
+			Graph
+		</div>
+    <div class="card-body">
+      <h5 class="card-title">Chart</h5>
+      <p class="card-text">
+        <div style="width: 100%;"><canvas id="sensorChart"></canvas></div>
+        <div style="width: 100%;"><canvas id="dcdcChart"></canvas></div>
+      </p>
+    </div>
+  </div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card h-100">
+			<div class="card-header">
+				ネットワーク接続設定
+			</div>
+      <div class="card-body">
+
+        <h5 class="card-title">Current Settings</h5>
+        <p class="card-text">
+          <div class="col-sm-11 offset-sm-1">
+          <table class="table">
+            <tr>
+              <td>STAモード SSID</td>
+              <td>{ stamodeSsid }</td>
+            </tr>
+            <tr>
+              <td>STAモード IP Adress</td>
+              <td>{ stamodeIp }</td>
+            </tr>
+            <tr>
+              <td>APモード SSID</td>
+              <td>{ apmodeSsid }</td>
+            </tr>
+            <tr>
+              <td>APモード IP Adress</td>
+              <td>{ apmodeIp }</td>
+            </tr>
+          </table>
+          </div>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card h-100">
+			<div class="card-header">
+				WiFi Station 設定
+			</div>
+      <div class="card-body">
+        <h2 class="card-title">センサ情報</h2>
+        <div class="col-sm-9 offset-sm-1">
+          <table class="table">
+            <tr each={senser in this.sensorList}><td>{senser.name}</td><td id={senser.data}></td></tr>
+          </table>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="col-md-12">
+  <div class="card h-100">
+    <div class="card-header">
+      Log message
+    </div>
+    <div class="card-body">
+      <div id="logAll" style="overflow-y: scroll; height: 200px; border: 1px solid #ccc;padding: 10px;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-12">
+  <div class="card h-100">
+    <div class="card-header">
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">センサ情報</h2>
+      <div class="col-1"></div>
+      <div class="col-7">
+        <div id="sensorDataTable"></div>
+      </div>
+      <div class="col-7">
+      </div>      
+      <a href="./setting.js">setting.js</a><br>
+      <a href="./_setting.js">_setting.js</a><br>
+      <a href="./setting.json">setting.json</a><br>
+    </div>
+  </div>
+</div>
+
+  <script>
+  import '../../node_modules/resize-observer-polyfill/dist/ResizeObserver.global.js';
+  import Chart from 'chart.js/auto';
+
+  export default {
+    onBeforeMount(props, state) {
+    // 初期化
+      let vmUI = props.vmUI;
+
+      // -- センサー情報取得コールバック設定 --
+      vmUI.setSensorDataCallback(this.getSensorData.bind(this));
+      // -- DashBord EventLog 更新コールバック設定 --
+      vmUI.updateDashBordEventLogCallback(this.setEventLog.bind(this));
+
+      // -- ネットワーク情報取得 --
+      this.stamodeSsid = vmUI.getNetworkSetting("stamodeSSID");
+      this.stamodeIp = vmUI.getNetworkSetting("stamodeIP");
+      this.apmodeSsid = vmUI.getNetworkSetting("atmodeSSID");
+      this.apmodeIp = vmUI.getNetworkSetting("atmodeIP");
+
+      // -- センサ表示フォーマットデータ取得 --
+      this.sensorList = vmUI.getSensorFormat();
+      //this.sensorList = vmUI.model.sensorList;  //setting.js出作成する。
+
+    },
+    onMounted(props, state){
+      let vmUI = props.vmUI;
+
+      console.log("-- logArea Init --");
+      const logArea = document.getElementById("logAll");
+      const logMessage = "ログメッセージ"; // ログに表示するメッセージ
+      // ログ領域に新しいログメッセージを追加
+      logArea.innerHTML += logMessage + "<br>";
+      console.log(logArea.innerHTML);
+      // ログ領域を最下部にスクロールする
+      logArea.scrollTop = logArea.scrollHeight;
+
+      this.graphData = {
+//        labels: [1,2,3],  // X軸のデータ (時間)
+        labels: [],  // X軸のデータ (時間)
+        datasets: [{
+              label: "Temp",
+//              data: [1,2,3], // Y軸のデータ(センシング結果)
+              data: [], // Y軸のデータ(センシング結果)
+              fill: false,
+              borderColor : "rgba(254,97,132,0.8)",
+              backgroundColor : "rgba(254,97,132,0.5)",
+        },
+        {
+              label: "Humidity",
+//              data: [4,5,6], // Y軸のデータ(センシング結果)
+              data: [], // Y軸のデータ(センシング結果)
+              fill: false,
+              borderColor : "rgba(0,0,254,0.8)",
+              backgroundColor : "rgba(0,0,254,0.5)",
+        }]
+      };
+      this.graphOptions = {
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {beginAtZero:true}
+          }]
+        }
+      };
+
+      this.chart = new Chart(
+        document.getElementById('sensorChart'),
+        {
+          type: 'line',
+          data: this.graphData,
+          options: this.graphOptions
+        }
+      );
+
+      // DCDC Graph
+      this.dcdcGraphData = {
+//        labels: [1,2,3],  // X軸のデータ (時間)
+        labels: [],  // X軸のデータ (時間)
+        datasets: [{
+              label: "DCDC Fdb",
+//              data: [1,2,3], // Y軸のデータ(センシング結果)
+              data: [], // Y軸のデータ(センシング結果)
+              fill: false,
+              borderColor : "rgba(0, 128, 128)",     // ティール (Teal)
+              backgroundColor : "rgb(0, 128, 128, 0.2)",
+        },
+        {
+              label: "DCDC Trg",
+//              data: [4,5,6], // Y軸のデータ(センシング結果)
+              data: [], // Y軸のデータ(センシング結果)
+              fill: false,
+              borderColor : "rgba(244, 164, 96)",    // サンド (Sand)
+              backgroundColor : "rgb(244, 164, 96, 0.2)",
+        },
+        {
+              label: "ilumi1",
+//              data: [7,8,9], // Y軸のデータ(センシング結果)
+              data: [], // Y軸のデータ(センシング結果)
+              fill: false,
+              borderColor : "rgba(112, 128, 144)",   // スレートグレー (Slate Gray)
+              backgroundColor : "rgb(112, 128, 144, 0.2)",
+        },
+        {
+              label: "ilumi2",
+//              data: [10,11,12], // Y軸のデータ(センシング結果)
+              data: [], // Y軸のデータ(センシング結果)
+              fill: false,
+              borderColor : "rgb(128, 128, 0)",           // オリーブ (Olive)
+              backgroundColor : "rgba(128, 128, 0, 0.2)",
+        },
+        {
+              label: "ilumi3",
+//              data: [13,14,15], // Y軸のデータ(センシング結果)
+              data: [], // Y軸のデータ(センシング結果)
+              fill: false,
+              borderColor : "rgb(128, 0, 0)",    // マルーン (Maroon)
+              backgroundColor : "rgba(128, 0, 0, 0.2)",
+/*        },
+        {
+          borderColor : "rgb(0, 255, 255)",    // アクア (Aqua)
+          backgroundColor : "rgba(0, 255, 255, 0.2)",
+        },
+        {
+          borderColor : "rgb(224, 176, 255)",    // モーブ (Mauve)
+          backgroundColor : "rgba(224, 176, 255, 0.2)",
+        },
+        {
+          borderColor : "rgb(255, 127, 80)",    // コーラル (Coral)
+          backgroundColor : "rgba(255, 127, 80, 0.2)",
+        },
+        {
+          borderColor : "rgb(50, 205, 50)",    // ライム (Lime)
+          backgroundColor : "rgba(50, 205, 50, 0.2)",
+        },
+        {
+          borderColor : "rgb(192, 192, 192)",    // シルバー (Silver)
+          backgroundColor : "rgba(192, 192, 192, 0.2)",
+*/
+        }]
+      };
+      this.dcdcGraphOptions = {
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            ticks: {beginAtZero:true}
+          }]
+        }
+      };
+
+      this.dcdcChart = new Chart(
+        document.getElementById('dcdcChart'),
+        {
+          type: 'line',
+          data: this.dcdcGraphData,
+          options: this.dcdcGraphOptions
+        }
+      );
+
+      // -- センサデータ --
+      console.log("-- センサデータ --");
+
+      for(let i=0; i<6; i++){
+        document.getElementById(this.sensorList[i].data).innerHTML =  (i+2) * (10**this.sensorList[i].index);
+      }
+      
+    },
+      // WiFi EventLog 取得・表示
+      setEventLog(logMessage){
+        console.log("-- setEventLog");
+        console.log(logMessage);
+        const logArea = document.getElementById("logAll");
+        // ログ領域にログメッセージを設定
+        logArea.innerHTML = logMessage;
+        // ログ領域を最下部にスクロールする
+        logArea.scrollTop = logArea.scrollHeight;
+      },
+    getSensorData(sensorData){
+//        console.log("-- dashbord.tag.getSensorData --");
+//        console.log(sensorData);
+      let chartdat = [];
+        
+      for(let i=0; i<this.sensorList.length ; i++){
+        let data = sensorData.sensor[i].data * (10**this.sensorList[i].index);
+        document.getElementById(this.sensorList[i].data).innerHTML =  data.toPrecision(this.sensorList[i].toPrecision);
+        chartdat[i] = data.toPrecision(this.sensorList[i].toPrecision);
+      }
+
+      let Time = new Date().toLocaleTimeString();
+      this.graphData.labels.push(Time);
+      this.graphData.datasets[0].data.push(chartdat[0]);
+      this.graphData.datasets[1].data.push(chartdat[1]);
+      if(this.graphData.labels.length > 100){
+        this.graphData.labels.shift();
+        this.graphData.datasets[0].data.shift();
+        this.graphData.datasets[1].data.shift();
+      }
+      this.chart.update();
+
+      this.dcdcGraphData.labels.push(Time);
+      this.dcdcGraphData.datasets[0].data.push(chartdat[4]);
+      this.dcdcGraphData.datasets[1].data.push(chartdat[5]);
+      this.dcdcGraphData.datasets[2].data.push(chartdat[3]);
+      this.dcdcGraphData.datasets[3].data.push(chartdat[6]);
+      this.dcdcGraphData.datasets[4].data.push(chartdat[7]);
+      if(this.dcdcGraphData.labels.length > 100){
+        this.dcdcGraphData.labels.shift();
+        this.dcdcGraphData.datasets[0].data.shift();
+        this.dcdcGraphData.datasets[1].data.shift();
+        this.dcdcGraphData.datasets[2].data.shift();
+        this.dcdcGraphData.datasets[3].data.shift();
+        this.dcdcGraphData.datasets[4].data.shift();
+      }
+      this.dcdcChart.update();
+
+    }
+  }
+
+  </script>
+
+</dashbord>

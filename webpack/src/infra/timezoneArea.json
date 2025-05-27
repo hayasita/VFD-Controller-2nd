@@ -1,0 +1,15 @@
+{
+  "timezoneAreaList" : [
+    {"ID": 0, "AREA":"Africa",      "TITLE": "this.tzAreaAfrica"},
+    {"ID": 1, "AREA":"America",     "TITLE": "this.tzAreaAmerica"},
+    {"ID": 2, "AREA":"Antarctica",  "TITLE": "this.tzAreaAntarctica"},
+    {"ID": 3, "AREA":"Arctic",      "TITLE": "this.tzAreaArctic"},
+    {"ID": 4, "AREA":"Asia",        "TITLE": "this.tzAreaAsia"},
+    {"ID": 5, "AREA":"Atlantic",     "TITLE": "this.tzAreaAtlantic"},
+    {"ID": 6, "AREA":"Australia",   "TITLE": "this.tzAreaAustralia"},
+    {"ID": 7, "AREA":"Europe",      "TITLE": "this.tzAreaEurope"},
+    {"ID": 8, "AREA":"Indian",      "TITLE": "this.tzAreaIndian"},
+    {"ID": 9, "AREA":"Pacific",     "TITLE": "this.tzAreaPacific"},
+    {"ID":10, "AREA":"AreaGMT",     "TITLE": "this.tzAreaGMT"}
+  ]
+}

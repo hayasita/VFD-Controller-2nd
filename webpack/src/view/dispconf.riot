@@ -1,0 +1,532 @@
+<dispconf>
+<!-- <div class="container"> -->
+<h1>表示設定</h1>
+
+<div class="row">
+  <div class="col-md-6">
+	<div class="card h-100">
+		<div class="card-header">
+			表示フォーマット
+		</div>
+    <div class="card-body">
+
+      <h5 class="card-title">表示フォーマット</h5>
+      <p class="card-text">
+      <div class="col-sm-11 offset-sm-1">
+      <table class="table">
+        <tr>
+          <td class="itemname-width">Display Format</td>
+          <td><div class="input-group">
+            <button type="button" class="btn btn-primary btn-dispconf-number" id="dispFormatMinus" data-type="minus" data-field="dispFormatUnit" pear-button="dispFormatPlus" onclick={ dispFormatSet.bind(this,"dispFormatMinus") }>-</button>
+            <input type="number" class="form-control input-sm no-spin" name="dispFormat" id="dispFormatUnit" min="0" max="9" placeholder="0-9" value={dispFormat}>
+            <button type="button" class="btn btn-primary btn-dispconf-number" id="dispFormatPlus" data-type="plus" data-field="dispFormatUnit" pear-button="dispFormatMinus" onclick={ dispFormatSet.bind(this,"dispFormatPlus") }>+</button>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">TimeDisplay Format</td>
+          <td><div>
+            <select class="form-select form-select-sm" aria-label="Set TimeDisplay Format" name="timeDisplayFormat" onchange={ changeTimeDisplayFormat } id="timeDisplayFormat">
+              <option value="1">hh.mm.ss</option>
+              <option value="2"> h.mm.ss</option>
+              <option value="3">mm.ss.hh</option>
+            </select>
+          </div></td>
+        </tr>
+        <tr>
+          <td class="itemname-width">DateDisplay Format</td>
+          <td><div>
+            <select class="form-select form-select-sm" aria-label="Set DateDateDisplay Format" name="dateDisplayFormat" onchange={ changeDateDisplayFormat } id="dateDisplayFormat">
+              <option value="1">yyyy.mm.dd</option>
+              <option value="2">yy.mm.dd</option>
+              <option value="3">mm.dd.yyyy</option>
+              <option value="4">mm.dd.yy</option>
+              <option value="5">dd.mm.yyyy</option>
+              <option value="6">dd.mm.yy</option>
+            </select>
+          </div></td>
+        </tr>
+      </table>
+      </div>
+      </p>
+      
+      <h5 class="card-title">時刻表示</h5>
+      <p class="card-text">
+        <div class="col-sm-11 offset-sm-1">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="TimeFormat" checked={ !dispTimeFormatCheck } onclick={ timeFormatradio.bind(this,"dispTimeFormatRadio12") } name="flexRadioDefault" id="flexRadioDefault1">
+            <label class="form-check-label" for="flexRadioDefault1">
+            12 time indication
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="TimeFormat" checked={ dispTimeFormatCheck } onclick={ timeFormatradio.bind(this,"dispTimeFormatRadio24") } name="flexRadioDefault" id="flexRadioDefault2">
+            <label class="form-check-label" for="flexRadioDefault2">
+            24 time indication
+            </label>
+          </div>
+        </div>
+      </p>
+
+    </div>
+  </div>
+    </div>
+
+  <div class="col-md-6">
+	<div class="card h-100">
+		<div class="card-header">
+			表示効果
+		</div>
+    <div class="card-body">
+      <h5 class="card-title">アニメーション動作</h5>
+      <p class="card-text">
+        <div class="col-sm-11 offset-sm-1">
+          <select class="form-select form-select-sm"  name="displayEffect" onchange={ changeDisplayEffect } id="displayEffect">
+            <option value="0">通常</option>
+            <option value="1">シャッフル（各桁同時）</option>
+            <option value="2">シャッフル（各桁順番）</option>
+            <option value="3">シャッフル（全桁同時）</option>
+          </select>
+        </div>
+      </p>
+
+      <h5 class="card-title">クロスフェード時間</h5>
+      <p class="card-text">
+      <div class="col-sm-11 offset-sm-1">
+      <table class="table">
+        <tr>
+          <td class="itemname-width">Fade time</td>
+          <td><div class="input-group">
+            <button type="button" class="btn btn-primary btn-dispconf-number" id="fadeTimeMinus" data-type="minus" data-field="fadeTimeUnit" pear-button="fadeTimePlus" onclick={ setFadeTime.bind(this,"fadeTimeMinus") }>-</button>
+            <input type="number" class="form-control input-sm no-spin" name="fadeTime" id="fadeTimeUnit" min="0" max="9" placeholder="0-9" value={fadeTime}>
+            <button type="button" class="btn btn-primary btn-dispconf-number" id="fadeTimePlus" data-type="plus" data-field="fadeTimeUnit" pear-button="fadeTimeMinus" onclick={ setFadeTime.bind(this,"fadeTimePlus") }>+</button>
+          </div></td>
+        </tr>
+      </table>
+      </div>
+      </p>
+
+    </div>
+  </div>
+</div>
+</div>
+
+  <div class="card">
+		<div class="card-header">
+			表示輝度設定
+		</div>
+    <div class="card-body">
+      <h5 class="card-title">Display Brightness</h5>
+      <p class="card-text">
+
+      <div class="col-sm-11 offset-sm-1">
+        Bright : <span id="glowInTheBrightId">5</span>
+        <input type="range" class="form-range" id="glowInTheBrighttmp" min="50" max="100" step="1" value={glowBright} onchange={ glowChange.bind(this,"glowInTheBrightSet") }>
+        Dark : <span id="glowInTheDarkId">5</span>
+        <input type="range" class="form-range" id="glowInTheDarktmp" min="50" max="100" step="1" value={glowDark} onchange={ glowChange.bind(this,"glowInTheDarkSet") }>
+      </div>
+
+      <div class="col-sm-11 offset-sm-1">
+
+      <button type="button" class="btn btn-outline-secondary btm-sm" data-bs-toggle="collapse" data-bs-target="#collapseBrDig" aria-expanded="false" aria-controls="collapseBrDig">
+        各桁の個別輝度設定
+      </button>
+      <div class="collapse" id="collapseBrDig">
+        <div class="card card-body">
+
+          <table class="table">
+
+            <tr>
+              <th class="itemname-width">Display digit</th>
+              <th>Brightness setting</th>
+            </tr>
+
+            <tr>
+              <td>Dig.9</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig9Minus" data-type="minus" data-field="brDig9Unit" pear-button="brDig9Plus" onclick={ brdig.bind(this,"brDig9Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig9" id="brDig9Unit" min="1" max="15" placeholder="1-15" value={brightDig9}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig9Plus" data-type="plus" data-field="brDig9Unit" pear-button="brDig9Minus" onclick={ brdig.bind(this,"brDig9Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.8</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig8Minus" data-type="minus" data-field="brDig8Unit" pear-button="brDig8Plus" onclick={ brdig.bind(this,"brDig8Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig8" id="brDig8Unit" min="1" max="15" placeholder="1-15" value={brightDig8}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig8Plus" data-type="plus" data-field="brDig8Unit" pear-button="brDig8Minus" onclick={ brdig.bind(this,"brDig8Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.7</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig7Minus" data-type="minus" data-field="brDig7Unit" pear-button="brDig7Plus" onclick={ brdig.bind(this,"brDig7Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig7" id="brDig7Unit" min="1" max="15" placeholder="1-15" value={brightDig7}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig7Plus" data-type="plus" data-field="brDig7Unit" pear-button="brDig7Minus" onclick={ brdig.bind(this,"brDig7Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.6</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig6Minus" data-type="minus" data-field="brDig6Unit" pear-button="brDig6Plus" onclick={ brdig.bind(this,"brDig6Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig6" id="brDig6Unit" min="1" max="15" placeholder="1-15" value={brightDig6}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig6Plus" data-type="plus" data-field="brDig6Unit" pear-button="brDig6Minus" onclick={ brdig.bind(this,"brDig6Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.5</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig5Minus" data-type="minus" data-field="brDig5Unit" pear-button="brDig5Plus" onclick={ brdig.bind(this,"brDig5Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig5" id="brDig5Unit" min="1" max="15" placeholder="1-15" value={brightDig5}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig5Plus" data-type="plus" data-field="brDig5Unit" pear-button="brDig5Minus" onclick={ brdig.bind(this,"brDig5Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.4</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig4Minus" data-type="minus" data-field="brDig4Unit" pear-button="brDig4Plus" onclick={ brdig.bind(this,"brDig4Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig4" id="brDig4Unit" min="1" max="15" placeholder="1-15" value={brightDig4}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig4Plus" data-type="plus" data-field="brDig4Unit" pear-button="brDig4Minus" onclick={ brdig.bind(this,"brDig4Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.3</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig3Minus" data-type="minus" data-field="brDig3Unit" pear-button="brDig3Plus" onclick={ brdig.bind(this,"brDig3Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig3" id="brDig3Unit" min="1" max="15" placeholder="1-15" value={brightDig3}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig3Plus" data-type="plus" data-field="brDig3Unit" pear-button="brDig3Minus" onclick={ brdig.bind(this,"brDig3Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.2</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig2Minus" data-type="minus" data-field="brDig2Unit" pear-button="brDig2Plus" onclick={ brdig.bind(this,"brDig2Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig2" id="brDig2Unit" min="1" max="15" placeholder="1-15" value={brightDig2}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig2Plus" data-type="plus" data-field="brDig2Unit" pear-button="brDig2Minus" onclick={ brdig.bind(this,"brDig2Plus") }>+</button>
+              </div></td>
+            </tr>
+
+            <tr>
+              <td>Dig.1</td>
+              <td><div class="input-group">
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig1Minus" data-type="minus" data-field="brDig1Unit" pear-button="brDig1Plus" onclick={ brdig.bind(this,"brDig1Minus") }>-</button>
+                <input type="number" class="form-control input-sm no-spin" name="brightDig1" id="brDig1Unit" min="1" max="15" placeholder="1-15" value={brightDig1}>
+                <button type="button" class="btn btn-primary btn-dispconf-number" id="brDig1Plus" data-type="plus" data-field="brDig1Unit" pear-button="brDig1Minus" onclick={ brdig.bind(this,"brDig1Plus") }>+</button>
+              </div></td>
+            </tr>
+
+          </table>
+
+          <div class="col-sm-4 offset-sm-8">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-outline-primary " onclick={ writeBrSetting }>保存</button>
+              <button type="button" class="btn btn-outline-primary " onclick={ resetBrSetting }>リセット</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      </div>
+ 
+      </p>
+    </div>
+  </div>
+<!-- </div> -->
+  <script>
+    import {vfdControllerUI} from '../viewmodel/vmapp.js'
+
+    export default{
+      onBeforeMount(props, state) {
+        let vmUI = props.vmUI;
+        let obs = props.obs;
+
+        // 表示フォーマット初期値取得
+        this.dispFormat = vmUI.getDisplaySetting("dispFormat");
+        // 表示フォーマット設定処理
+        this.dispFormatSet = (item,e) =>{
+          this.buttonSet(item);
+          obs.trigger('dispFormat',this.dispFormat);
+          vmUI.submitDisplaySetting("dispFormat" ,this.dispFormat)
+        }
+
+        // 時刻表示12h/24h設定初期値取得
+        if(vmUI.getDisplaySetting("formatHour") == 1){
+          this.dispTimeFormatCheck = true;
+        }
+        else{
+          this.dispTimeFormatCheck = false;
+        }
+        // --- TimeDisplay Format 設定処理 ---
+        this.changeTimeDisplayFormat = (e) =>{
+          let dat = document.getElementById("timeDisplayFormat").value;
+          obs.trigger('timeDisplayFormat',dat);
+          vmUI.submitDisplaySetting("timeDisplayFormat", dat,);  // 設定値送信
+        }
+        // --- DateDisplay Format 設定処理 ---
+        this.changeDateDisplayFormat = (e) =>{
+          let dat = document.getElementById("dateDisplayFormat").value;
+          obs.trigger('dateDisplayFormat',dat);
+          vmUI.submitDisplaySetting("dateDisplayFormat", dat);  // 設定値送信
+        }
+        // 時刻表示12/24hラジオボタン設定処理
+        this.timeFormatradio = (item,e) =>{
+          console.log("12/24時刻表示ラジオボタン設定")
+          console.log(item);
+          console.log(this.dispTimeFormatCheck);
+          let dat;
+          if(item == "dispTimeFormatRadio24"){
+            dat = "1";
+          }
+          else if(item == "dispTimeFormatRadio12"){
+            dat = "0";
+          }
+          console.log(dat);
+          obs.trigger('formatHour',dat);
+          vmUI.submitDisplaySetting("formatHour", dat,)
+        }
+
+        // 表示効果設定処理
+        this.changeDisplayEffect = (e) =>{
+          let dat = document.getElementById("displayEffect").value;
+          vmUI.submitDisplaySetting("displayEffect", dat);  // 設定値送信
+        }
+
+        // クロスフェード時間初期値取得
+        this.fadeTime = vmUI.getDisplaySetting("fadeTime");
+        // クロスフェード時間数値設定処理
+        this.setFadeTime = (item, e) =>{
+          this.buttonSet(item);
+          vmUI.submitDisplaySetting("fadeTime", this.fadeTime);
+        }
+
+        // 表示輝度設定スライダー値設定初期値取得
+        this.glowBright = vmUI.getDisplaySetting("glowInTheBright");
+        this.glowDark = vmUI.getDisplaySetting("glowInTheDark");
+        // 表示輝度設定スライダー値設定処理
+        this.glowChange = (item,e) =>{   // このタイミングでeerom書き込み
+          vmUI.setDisplaySetting(item, 1);
+          vmUI.submitDisplaySetting(item, 1);
+        }
+
+        // 各桁表示輝度初期値取得
+        this.resetDispDigBtn(vmUI,"brDigtmp");
+
+        // 各桁輝度変更処理
+        this.brdig = (item,e) =>{
+          var obj = {
+              brightDig9 : 9 , brightDig8 : 8 , brightDig7 : 7 , brightDig6 : 6 , brightDig5 : 5 ,
+              brightDig4 : 4 , brightDig3 : 3 , brightDig2 : 2 , brightDig1 : 1
+          };
+          this.buttonSet(item);
+          var result = document.getElementById(item);
+          var datafieldName = result.getAttribute('data-field');
+          var input = document.getElementById(datafieldName);
+          var name = input.getAttribute('name');
+          var currentVal = parseInt(this[name]);
+//          console.log(name);
+//          console.log(obj[name]);
+          vmUI.dispBrDigSubmit(obj[name],currentVal);
+        }
+        // 各桁輝度設定処理
+        this.writeBrSetting = (e) =>{
+          console.log("writeBrSetting");
+          vmUI.writeBrSetting();
+        }
+        // 各桁輝度設定リセット処理
+        this.resetBrSetting = (e) => {
+          console.log("resetBrSetting");
+          this.resetDispDigBtn(vmUI,"brDig");
+          this.update();
+          this.resetBrButton();
+          vmUI.resetBrSetting();
+        }
+
+        console.log("dispConf");
+      },
+      onMounted(props, state){
+//        console.log("== onMounted START ==")
+        let vmUI = props.vmUI;
+        let obs = props.obs;
+        let _this = this
+
+        // --- タブ切替時未確定ボタンリセット ---
+        obs.on('changeTab',function(code){
+         console.log("changeTab:"+code)
+          //  _this.setLanguage(code);  // .bind(this)しない場合は_this でthisにアクセスする
+                                          // ここのthisはイベント発生元のthis
+          console.log("obs:resetBrSetting");
+          this.resetDispDigBtn(vmUI,"brDig");
+          this.update();
+          this.resetBrButton();
+          vmUI.resetBrSetting();
+        }.bind(this))
+
+        // --- ＋－ボタン表示初期化 ---
+        this.resetDispFormatButton(); // 表示フォーマット設定ボタンリセット
+        this.resetFadeTimeButton();   // クロスフェード時間設定ボタンリセット
+        this.resetBrButton();         // 輝度設定ボタンリセット
+
+        // --- TimeDisplay Format 初期値取得・設定 ---
+        document.getElementById("timeDisplayFormat").value = vmUI.getDisplaySetting("timeDisplayFormat");
+
+        // --- DateDisplay Format 初期値取得・設定 ---
+        document.getElementById("dateDisplayFormat").value = vmUI.getDisplaySetting("dateDisplayFormat");
+
+        // --- 表示効果初期値取得・設定 ---
+        document.getElementById("displayEffect").value = vmUI.getDisplaySetting("displayEffect");
+
+        // --- 表示輝度設定スライダー処理設定 ---
+        var rangeValue = function (elem, target) {
+          return function(evt){
+            target.innerHTML = elem.value;  // 設定値表示
+            console.log(target.id);
+            console.log(elem.value);
+            console.log(elem.id);
+            vmUI.setDisplaySetting(elem.id, elem.value);      // 設定値記憶
+            vmUI.submitDisplaySetting(elem.id, elem.value);   // 設定値送信
+          }
+        }
+        // --- 表示輝度設定スライダーイベント設定 ---
+        var sliderelem1 = document.getElementById('glowInTheBrighttmp');
+        var slidertarget1 = document.getElementById('glowInTheBrightId');
+        sliderelem1.addEventListener('input', rangeValue(sliderelem1, slidertarget1));
+        var sliderelem2 = document.getElementById('glowInTheDarktmp');
+        var slidertarget2 = document.getElementById('glowInTheDarkId');
+        sliderelem2.addEventListener('input', rangeValue(sliderelem2, slidertarget2));
+        // --- 表示輝度設定スライダー設定値初期値表示 ---
+        slidertarget1.innerHTML = vmUI.getDisplaySetting("glowInTheBrighttmp");    // 初期値設定
+        slidertarget2.innerHTML = vmUI.getDisplaySetting("glowInTheDarktmp");      // 初期値設定
+        // ---  ---
+//        console.log("== onMounted END ==")
+      },
+      // 各桁の個別輝度設定値取得
+      resetDispDigBtn(vmUI,item){
+        this.brightDig9 = vmUI.getDisplaySetting(item,9);
+        this.brightDig8 = vmUI.getDisplaySetting(item,8);
+        this.brightDig7 = vmUI.getDisplaySetting(item,7);
+        this.brightDig6 = vmUI.getDisplaySetting(item,6);
+        this.brightDig5 = vmUI.getDisplaySetting(item,5);
+        this.brightDig4 = vmUI.getDisplaySetting(item,4);
+        this.brightDig3 = vmUI.getDisplaySetting(item,3);
+        this.brightDig2 = vmUI.getDisplaySetting(item,2);
+        this.brightDig1 = vmUI.getDisplaySetting(item,1);
+      },
+      // ボタン設定処理
+      buttonSet(item){
+        console.log("-buttonSet-");
+        console.log("item:"+item);
+
+        var result = document.getElementById(item);
+        var datafieldName = result.getAttribute('data-field');
+        var type = result.getAttribute('data-type');
+
+        console.log("result:"+result);
+        console.log("datafieldName:"+datafieldName);
+        console.log("type:"+type);
+
+        var input = document.getElementById(datafieldName);
+        var num = parseInt(input.value);
+        var minVal = parseInt(input.getAttribute('min'));
+        var maxVal = parseInt(input.getAttribute('max'));
+        var name = input.getAttribute('name');
+        
+        console.log("input:"+input);
+        console.log("num:"+num);
+        console.log("minVal:"+minVal);
+        console.log("maxVal:"+maxVal);
+        console.log("name:"+name);
+        console.log("this[name]:"+this[name]);
+
+        var currentVal = parseInt(this[name]);
+        console.log("currentVal:"+currentVal);
+        if(!isNaN(currentVal)){
+          if(type == "minus"){
+            if(currentVal > minVal){
+              this[name] = currentVal - 1;
+            }
+            if(parseInt(this[name]) == minVal){
+              result.setAttribute("disabled", true);
+            }
+          }
+          if(type == "plus"){
+            if(currentVal < maxVal){
+              this[name] = currentVal + 1;
+            }
+            if(parseInt(this[name]) == maxVal){
+              result.setAttribute("disabled", true);
+            }
+          }
+          if((this[name] < maxVal) && (this[name] > minVal)){
+            var pear = result.getAttribute('pear-button');
+            var tmp = document.getElementById(pear);
+            tmp.removeAttribute("disabled");
+          }
+        }
+        console.log(this.fadeTime);
+        this.update();
+      },
+      // 表示フォーマット設定ボタンリセット
+      resetDispFormatButton(){
+        this.buttonDisReset('dispFormatMinus');
+        this.buttonDisReset('fadeTimePlus');
+      },
+      // クロスフェード時間設定ボタンリセット
+      resetFadeTimeButton(){
+        this.buttonDisReset('fadeTimeMinus');
+        this.buttonDisReset('dispFormatPlus');
+      },
+      // 各桁表示輝度設定ボタンリセット
+      resetBrButton(){        
+        const button = ['brDig1Minus','brDig1Plus','brDig2Minus','brDig2Plus',
+        'brDig3Minus','brDig3Plus','brDig4Minus','brDig4Plus',
+        'brDig5Minus','brDig5Plus','brDig6Minus','brDig6Plus',
+        'brDig7Minus','brDig7Plus','brDig8Minus','brDig8Plus',
+        'brDig9Minus','brDig9Plus'];
+
+        for(const elem of button){
+//          console.log(elem);
+          this.buttonDisReset(elem);
+        }
+      },
+      // ボタン表示状態リセット
+      buttonDisReset(item){   // ボタンの表示状態を値に合わせてリセットする。
+//        console.log("buttonDisReset:"+item);
+        var result = document.getElementById(item);
+        var datafieldName = result.getAttribute('data-field');
+        var type = result.getAttribute('data-type');
+        var input = document.getElementById(datafieldName);
+        var name = input.getAttribute('name');
+        var currentVal = parseInt(this[name]);
+        var minVal = parseInt(input.getAttribute('min'));
+        var maxVal = parseInt(input.getAttribute('max'));
+
+        if(type == "minus"){
+          if(currentVal == minVal){
+            result.setAttribute("disabled", true);
+          }
+          else{
+            result.removeAttribute("disabled");
+          }
+        }
+        if(type == "plus"){
+          if(currentVal == maxVal){
+            result.setAttribute("disabled", true);
+          }
+          else{
+            result.removeAttribute("disabled");
+          }
+        }
+
+      },
+    }
+
+  </script>
+
+</dispconf>

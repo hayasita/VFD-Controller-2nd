@@ -1,0 +1,23 @@
+// MockLogManager.h
+#pragma once
+#include "LogManager.h"
+#include <string>
+#include <vector>
+
+class MockLogManager : public LogManager {
+public:
+    std::vector<std::string> logs;
+
+    void writeLog(const char* message) override {
+        logs.emplace_back(message);
+    }
+
+    bool containsLog(const std::string& keyword) {
+        for (const auto& log : logs) {
+            if (log.find(keyword) != std::string::npos) {
+                return true;
+            }
+        }
+        return false;
+    }
+};

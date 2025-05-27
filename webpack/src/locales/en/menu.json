@@ -1,0 +1,14 @@
+{
+  "main.dashbord":"Dashbord",
+
+    "key":"hello world!!",
+  "key2":"Happy?",
+
+
+  "timeConf.timezoneKey":"TimeZone",
+  "timeConf.tzTopKey":"Please select",
+
+  "wifiConf.stationListTopKey":"WiFiStation Erace"
+
+
+}

@@ -1,0 +1,19 @@
+#ifndef DUMMY_LOG_MANAGER_H
+#define DUMMY_LOG_MANAGER_H
+/*
+#include <iostream>  // 標準出力用
+#include "../../src/LogManager.h"  // 実際の LogManager クラスのヘッダーファイルをインクルード
+
+class DummyLogManager : public LogManager {
+public:
+  std::string lastMessage;  // 追加
+
+  void writeLog(const char* message) override {
+    // モックのログ出力処理を実装（テスト用のダミー実装）
+    std::cout << (message) << std::endl;  // 標準出力にログを出力
+    lastMessage = message;  // ログメッセージを保存
+    return;  // 任意の戻り値
+  }
+};
+*/
+#endif
