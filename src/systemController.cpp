@@ -11,7 +11,8 @@ SystemController::SystemController()
 */
 SystemController::SystemController()
   : realMonitorDeviseIo(),
-    serialCommandProcessor(realMonitorDeviseIo, i2cBus, eepromManager)
+    serialCommandProcessor(realMonitorDeviseIo, i2cBus, eepromManager),
+    wiFiManager(&wifiReal)  // WiFi接続管理の初期化
 {
 }
 
@@ -64,6 +65,14 @@ void SystemController::begin() {
 
   wiFiManager.onDisconnected([this]() {
     webServerManager.end();    // 切断時にサーバ停止（WebSocket含む）
+  });
+
+  timeManager.onSntpSync([this]() {
+    Serial.println("SNTP sync completed");
+//    timeManager.updateRTCFromSystemTime();  // SNTP同期後にRTC更新
+//    updateClockDisplay();  // OLEDに時刻表示
+    wiFiManager.sntpCompleted = true;           // SNTP同期完了フラグ設定
+
   });
 
   /*

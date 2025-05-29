@@ -204,8 +204,15 @@ TimeManager* TimeManager::s_instance = nullptr;
 void TimeManager::SntpTimeSyncNotificationCallback(struct timeval *tv) {
   Serial.println("SNTP time sync completed");
 
+  if(s_instance && s_instance->sntpSyncCallback) {
+    s_instance->sntpSyncCallback();
+  }
+
   if (s_instance) s_instance->updateRTCFromSystemTime();  // RTCに時刻を設定
 
   return;
 }
 
+void TimeManager::onSntpSync(std::function<void()> callback) {
+  sntpSyncCallback = callback;
+}

@@ -10,6 +10,7 @@
 #include "DisplayManager.h"       // OLED表示クラス
 #include "RTCManager.h"
 #include "TimeManager.h"        // 時間管理クラス
+#include "WiFiManagerReal.h"          // WiFi接続管理クラス（実機用）
 #include "WiFiManager.h"       // WiFi接続管理クラス
 #include "WebServerManager.h"  // Webサーバ管理クラス
 #include "TerminalInputManager.h" // 端子入力管理クラス
@@ -38,6 +39,7 @@ private:
   DisplayManager display;        // OLED表示管理
   RTCManager rtcManager;        // RTC管理
   TimeManager timeManager;      // 時間管理
+  WiFi_real wifiReal;       // WiFi接続管理（実機用） 
   WiFiManager wiFiManager;                      // WiFi接続管理
   WebServerManager webServerManager;            // Webサーバ管理
   TerminalInputManager terminalInputManager;    // 端子入力管理

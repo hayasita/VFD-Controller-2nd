@@ -22,7 +22,10 @@ public:
     static void setInstance(TimeManager* inst); // インスタンス設定
     static void SntpTimeSyncNotificationCallback(struct timeval *tv);   // SNTP同期完了コールバック
 
+    void onSntpSync(std::function<void()> callback);    // SNTP同期完了コールバック関数を設定
 private:
     RTCManager* rtc = nullptr;
     static TimeManager* s_instance; // シングルトンインスタンス
+
+    std::function<void()> sntpSyncCallback; // SNTP同期完了コールバック関数
 };

@@ -145,8 +145,8 @@ void WebServerManager::handleCommand(AsyncWebSocketClient* client, JsonDocument&
   if (cmd == "wifiReconnect") {
     if (wifiManager) {
       // ここでは仮SSID/PASS使用（実際には引数として受け取る方がよい）
-      bool result = wifiManager->connect("your-ssid", "your-password");
-      client->text(String("{\"status\":\"") + (result ? "connected" : "failed") + "\"}");
+//      bool result = wifiManager->connect("your-ssid", "your-password");
+//      client->text(String("{\"status\":\"") + (result ? "connected" : "failed") + "\"}");
     } else {
       client->text("{\"error\":\"WiFiManager not available\"}");
     }
