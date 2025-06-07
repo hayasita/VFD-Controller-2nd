@@ -8,7 +8,9 @@
 
 class WebServerManager {
   public:
-    void begin(ParameterManager* parameterManager, JsonCommandProcessor* commandProcessor);
+    WebServerManager(ParameterManager* parameterManager, JsonCommandProcessor* commandProcessor, WiFiManager* wifiManager);
+//    void begin(ParameterManager* parameterManager, JsonCommandProcessor* commandProcessor, WiFiManager* wifiManager);
+    void begin();
     void end();
     void update();
     void setupRoutes();
@@ -21,10 +23,10 @@ class WebServerManager {
     size_t getWebSocketClientCount();
 
   private:
-    AsyncWebServer server{80};
-    AsyncWebSocket ws{"/ws"};
+    AsyncWebServer server;
+    AsyncWebSocket ws;
     AsyncWebSocketClient* lastClient = nullptr;
-    JsonCommandProcessor* commandProcessor = nullptr;
+    JsonCommandProcessor* jsonCommandProcessor = nullptr;
     ParameterManager* parameterManager = nullptr;
     WiFiManager* wifiManager = nullptr;
     bool running = false;

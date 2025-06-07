@@ -1,12 +1,23 @@
 #include "WebServerManager.h"
 #include <LittleFS.h>  // SPIFFSの代替。LittleFSを使う場合。
 
+WebServerManager::WebServerManager(ParameterManager* param, JsonCommandProcessor* json, WiFiManager* wifi)
+  : parameterManager(param),      // パラメータ管理クラスのインスタンスを設定
+    jsonCommandProcessor(json),   // JSONコマンドプロセッサのインスタンスを設定
+    wifiManager(wifi),            // WiFiManagerのインスタンスを設定
+    server(80),                   // ポート80でAsyncWebServerを初期化
+    ws("/ws")                     // WebSocketのルートを設定
+{
+
+  return;
+}
 // サーバー起動処理
-void WebServerManager::begin(ParameterManager* pm, JsonCommandProcessor* cp) {
+//void WebServerManager::begin(ParameterManager* pm, JsonCommandProcessor* jcp, WiFiManager* wifiManager) {
+void WebServerManager::begin() {
   if (running) return;  // すでに開始していればスキップ
 
-  parameterManager = pm;
-  commandProcessor = cp;
+//  parameterManager = pm;
+//  jsonCommandProcessor = jcp;
   
   // LittleFS のマウント確認
   if (!LittleFS.begin()) {
@@ -27,7 +38,7 @@ void WebServerManager::begin(ParameterManager* pm, JsonCommandProcessor* cp) {
   server.addHandler(&ws);
 
     // JSONコマンドプロセッサ初期化
-  commandProcessor->begin(parameterManager, [this](const String& response) {
+  jsonCommandProcessor->begin(parameterManager, [this](const String& response) {
     // WebSocketクライアントに送信
     if (lastClient && lastClient->canSend()) {
       lastClient->text(response);
@@ -118,7 +129,7 @@ void WebServerManager::onWebSocketEvent(AsyncWebSocket *server,
       lastClient = client;
 
       // JsonCommandProcessor にコマンド処理を委譲
-      commandProcessor->processCommand(jsonString);
+      jsonCommandProcessor->processCommand(jsonString);
     }
   } else if (type == WS_EVT_CONNECT) {
     Serial.println("WebSocket client connected");

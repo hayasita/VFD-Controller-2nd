@@ -46,10 +46,12 @@ MonitorDeviseIo::~MonitorDeviseIo() {}
   init();
 }
 */
-SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, EepromManager& eepromManager){
-  monitorIo_ = &MonitorDeviseIo;
-  i2cBus = &busManager;
-  eeprom = &eepromManager;
+SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, EepromManager& eepromManager, WiFiManager& wifiManager)
+  : monitorIo_(&MonitorDeviseIo),   // シリアル入出力処理ポインタを設定
+    i2cBus(&busManager),            // I2CBusManagerの参照を設定
+    eeprom(&eepromManager),         // EepromManagerの参照を設定
+    wiFiManager(&wifiManager)       // WiFiManagerの参照を設定
+{
   init();
 }
 
@@ -66,6 +68,7 @@ void SerialCommandProcessor::init(void)
 
   codeArray.push_back({"eepromdump" ,[this](){ return opecodeEepromDump(command); }, "eepromdump\tEEPROM Data dump."});
   codeArray.push_back({"i2cscan"    ,[this](){ return opecodeI2CScan(command); }, "i2cscan\tI2C Bus Device Scan."});
+  codeArray.push_back({"wifiscan"    ,[this](){ return opecodeWiFiScan(command); }, "wifiscan\tWiFi Station SSID Scan."});
 
   return;
 }
@@ -401,4 +404,29 @@ std::string SerialCommandProcessor::toHex(uint8_t value) const {
   std::ostringstream oss;
   oss << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(value);
   return oss.str();
+}
+
+bool SerialCommandProcessor::opecodeWiFiScan(std::vector<std::string> command) {
+//  if(wiFiManager) {
+  if(wiFiManager && !(wiFiManager->checkWifiScanCallback())) { // WiFiManagerが初期化されていて、スキャンコールバックが設定されていない場合
+    monitorIo_->send("opecodeWiFiScan\n");
+    wiFiManager->setWifiScanCallback([this](std::string /*scanResult*/) {
+      std::string result = wiFiManager->getWiFiScanResultString();
+//      std::string result = wiFiManager->getWiFiScanResultJson();
+      if(monitorIo_) {
+        monitorIo_->send(result);
+      }
+    });
+    // WiFiManagerのスキャン機能を呼び出す
+    wiFiManager->wifiScanRequest();
+  }
+  else if(wiFiManager && wiFiManager->checkWifiScanCallback()) { // スキャンコールバックが設定されている場合
+    monitorIo_->send("WiFiスキャンが既に実行中です。\n");
+  }
+  else {
+    monitorIo_->send("WiFiManagerが初期化されていません。\n");
+  }
+  // 仮の実装
+  // 必要に応じてWiFiManager等を呼び出してください
+  return true;
 }

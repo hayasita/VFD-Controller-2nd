@@ -40,6 +40,7 @@ class WiFi_{
     virtual std::string _softAPIP(void) = 0;
     virtual std::string _staIP(void) = 0;
     virtual std::string _staSSID(void) = 0;
+    virtual std::string _staSSID(int8_t) = 0;
     virtual bool _MDNS_begin(const char* hostName) = 0;
 
     virtual std::string _getSsid(void) = 0;
@@ -51,6 +52,11 @@ class WiFi_{
     virtual void _websocketSend(std::string sendData) = 0;
 
     virtual void _startWebserver(void) = 0;
+
+    virtual int16_t _scanNetworks(bool async = false) = 0;
+    virtual int16_t _scanComplete(void) = 0;
+    virtual int32_t _staRSSI(int8_t networkItem) = 0;        // WiFi.RSSI呼び出し
+    virtual int8_t _encryptionType(int8_t networkItem) = 0; // WiFi.encryptionType呼び出し
 };
 
 /**
@@ -127,13 +133,23 @@ class WiFiManager{
 
     bool staDisconnection(void);        // STA切断
 
-    void update(); // 状態確認用
-    bool isConnected() const;
-    void disconnect();
-    void onConnected(std::function<void()> callback);
-    void onDisconnected(std::function<void()> callback);
+    void update();                                        // 状態確認用
+    bool isConnected() const;                             // 接続状態取得
+    void disconnect();                                    // 切断処理
+    void onConnected(std::function<void()> callback);     // 接続時コールバック関数設定
+    void onDisconnected(std::function<void()> callback);  // 切断時コールバック関数設定
 
     bool sntpCompleted;                 // SNTP同期完了フラグ
+
+//    void wifiScanSta(void);                                   // WiFiスキャン
+//    void wifiScanRequest(std::function<void(int)> callback);  // WiFiスキャン要求
+    void wifiScanRequest(void);  // WiFiスキャン要求
+    bool wifiScanResult(void);                                  // WiFiスキャン完了
+    std::string getWiFiScanResultString(void);                  // スキャン結果をstringで取得
+    std::string getWiFiScanResultJson(void);                    // スキャン結果をstring(JSON)で取得
+    void setWifiScanCallback(std::function<void(std::string)> callback); // WiFiスキャンコールバック関数設定
+    bool checkWifiScanCallback(void) const; // WiFiスキャンコールバック関数が設定されているか確認
+
   private:
     WiFi_ *pWiFi_  = nullptr;           // WiFi制御用ポインタ
     unsigned long timetmp;              // 処理経過時間tmp
@@ -188,10 +204,20 @@ class WiFiManager{
     bool apDisconnection(void);         // AP切断
 //    bool staDisconnection(void);        // STA切断
 
-    mutable std::mutex mutex;
-    std::function<void()> connectedCallback;
-    std::function<void()> disconnectedCallback;
-    bool wasConnected = false;
+    mutable std::mutex mutex;                   // スレッドセーフのためのミューテックス
+    std::function<void()> connectedCallback;    // 接続時のコールバック関数
+    std::function<void()> disconnectedCallback; // 切断時のコールバック関数
+    bool wasConnected = false;                  // 前回の接続状態を保持するフラグ
+
+    std::function<void(std::string)> wifiScanCallback = nullptr; // スキャン完了時コールバック
+    std::string resultScanSsid;                     // スキャンSSID
+    bool wifiScanInProgress = false;            // WiFiスキャン進行中フラグ
+    struct WifiScanResultData {   // WiFiスキャン結果構造体
+      std::string ssid;             // SSID
+      int8_t encryptionType;        // 暗号化タイプ
+      int32_t rssi;                 // RSSI
+    } ; 
+    std::vector<WifiScanResultData> wifiScanResultData; // WiFiスキャン結果
 };
 
 #undef GLOBAL

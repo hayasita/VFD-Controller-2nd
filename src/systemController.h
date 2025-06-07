@@ -31,25 +31,25 @@ public:
   void update();
 
 private:
-  I2CBusManager i2cBus;          // I2Cバス管理
-  EepromManager eepromManager;   // EEPROM管理
-  ParameterManager paramManager; // パラメータ管理
-  LogManager logManager;         // ログ管理
-  EnvironmentSensor envSensor;   // 環境センサ管理
-  DisplayManager display;        // OLED表示管理
-  RTCManager rtcManager;        // RTC管理
-  TimeManager timeManager;      // 時間管理
-  WiFi_real wifiReal;       // WiFi接続管理（実機用） 
+  I2CBusManager i2cBus;           // I2Cバス管理
+  EepromManager eepromManager;    // EEPROM管理
+  ParameterManager paramManager;  // パラメータ管理
+  LogManager logManager;          // ログ管理
+  EnvironmentSensor envSensor;    // 環境センサ管理
+  DisplayManager display;         // OLED表示管理
+  RTCManager rtcManager;          // RTC管理
+  TimeManager timeManager;        // 時間管理
+  WiFi_real wifiReal;             // WiFi接続管理（実機用） 
   WiFiManager wiFiManager;                      // WiFi接続管理
   WebServerManager webServerManager;            // Webサーバ管理
   TerminalInputManager terminalInputManager;    // 端子入力管理
   SystemManager systemManager;                  // システム管理
-  JsonCommandProcessor commandProcessor;        // JSONコマンド処理
-  RealMonitorDeviseIo realMonitorDeviseIo; // シリアルコマンド処理
-  SerialCommandProcessor serialCommandProcessor; // シリアルコマンド処理
+  JsonCommandProcessor jsonCommandProcessor;        // JSONコマンド処理
+  RealMonitorDeviseIo realMonitorDeviseIo;        // シリアルコマンド処理
+  SerialCommandProcessor serialCommandProcessor;  // シリアルコマンド処理
 
-  unsigned long lastReadTime = 0;  // 最後の読み込み時間
+  unsigned long lastReadTime = 0;           // 最後の読み込み時間
   const unsigned long readInterval = 1000;  // 読み込み間隔（ミリ秒）
   
-  void updateClockDisplay();                   // OLEDに時刻表示
+  void updateClockDisplay();                // OLEDに時刻表示
 };

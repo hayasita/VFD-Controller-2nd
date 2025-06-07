@@ -24,6 +24,7 @@
 #include <sstream>
 #include "I2CBusManager.h"
 #include "EepromManager.h"
+#include "WiFiManager.h"
 
 //class SerialMonitorIO{
 class MonitorDeviseIo{
@@ -52,7 +53,7 @@ class SerialCommandProcessor{
      */
 //    SerialMonitor(SerialMonitorIO* pSerialMonitorIo);   // コンストラクタ
 //    SerialCommandProcessor(MonitorDeviseIo* pMonitorDeviseIo, I2CBusManager& busManager, EepromManager& eeprom);   // コンストラクタ
-    SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, EepromManager& eeprom);   // コンストラクタ
+    SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, EepromManager& eeprom, WiFiManager& wifiManager);   // コンストラクタ
     bool exec(void);                                    // シリアルモニタ実行
     bool commandExec(std::vector<std::string> command);     // コマンド実行
     std::vector<std::string> splitCommand(const std::string &commandBuf);  // コマンド分割
@@ -67,11 +68,13 @@ class SerialCommandProcessor{
     bool opecodeVer(std::vector<std::string> command);        // バージョン表示
     bool opecodeEepromDump(std::vector<std::string> command);   // EEPROMダンプ
     bool opecodeI2CScan(std::vector<std::string> command);   // I2Cスキャン
+    bool opecodeWiFiScan(std::vector<std::string> command);   // WiFiスキャン
 
 
     MonitorDeviseIo *monitorIo_ = nullptr;    // シリアル入出力処理ポインタ
     I2CBusManager* i2cBus = nullptr;  // I2Cバスマネージャ
     EepromManager* eeprom = nullptr;  // EepromManagerの参照
+    WiFiManager* wiFiManager = nullptr; // WiFiManagerの参照
 
     std::vector<std::string> command;         // シリアルモニタコマンド
     std::vector<codeTbl> codeArray;           // コードテーブル

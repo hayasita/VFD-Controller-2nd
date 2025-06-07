@@ -162,6 +162,18 @@ std::string WiFi_real::_staSSID(void)
 
   return stdSsid;
 }
+std::string WiFi_real::_staSSID(int8_t index)
+{
+  String ssidStr = WiFi.SSID(index);
+  std::string stdSsid = ssidStr.c_str();
+  Serial.printf("WiFi_real::_staSSID(%d) : %s\n", index, stdSsid.c_str());
+  if (stdSsid.empty()) {
+    Serial.println("SSID not found or index out of range.");
+    return ""; // SSIDが見つからない場合は空文字列を返す
+  }
+
+  return stdSsid;
+}
 
 /**
  * @brief MDNS起動
@@ -260,3 +272,23 @@ void WiFi_real::_startWebserver(void)
 //  startWebserver();     //WebServer Start
   return;
 }
+
+int16_t WiFi_real::_scanNetworks(bool async)
+{
+  return WiFi.scanNetworks(async);
+}
+int16_t WiFi_real::_scanComplete(void) 
+{
+  return WiFi.scanComplete();
+}
+
+int32_t WiFi_real::_staRSSI(int8_t networkItem)
+{
+  return WiFi.RSSI(networkItem);
+} // WiFi.RSSI呼び出し
+
+int8_t WiFi_real::_encryptionType(int8_t networkItem)
+{
+  return WiFi.encryptionType(networkItem);
+} // WiFi.encryptionType呼び出し
+  

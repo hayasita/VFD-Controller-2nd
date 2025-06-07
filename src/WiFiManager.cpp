@@ -15,6 +15,13 @@
 #include "WiFiManager.h"
 //#include "dotserver.h"
 
+#ifndef WIFI_SCAN_RUNNING
+#define WIFI_SCAN_RUNNING -1
+#endif
+#ifndef WIFI_AUTH_OPEN
+#define WIFI_AUTH_OPEN 0
+#endif
+
 #define WL_NO_SSID_AVAIL  1
 #define WL_CONNECTED      3
 #define WL_DISCONNECTED   6
@@ -39,6 +46,8 @@ WiFiManager::WiFiManager(WiFi_* pWiFi){
   pWiFi_ = pWiFi;
   init();
   wifiManuReqf = false;
+  wifiScanInProgress = false; // スキャン要求フラグをクリア
+  wifiScanCallback = nullptr; // スキャン完了時コールバック
 }
 
 /**
@@ -934,12 +943,22 @@ void WiFiManager::apStopCollBack(void)
   return;
 }
 
-
+/**
+ * @brief WiFi接続状態取得
+ * この関数は、WiFiManagerの接続状態を確認するために使用される。
+ * WiFiManagerの内部状態をロックし、接続状態を取得する。
+ */
 bool WiFiManager::isConnected() const {
   std::lock_guard<std::mutex> lock(mutex);
   return pWiFi_->_status() == WL_CONNECTED;
 }
 
+/**
+ * @brief WiFiManager 切断処理
+ * WiFiManagerの切断処理を行う。
+ * WiFi接続を切断し、接続状態を更新する。
+ * 切断時コールバック関数を呼び出す。
+ */
 void WiFiManager::disconnect() {
   std::lock_guard<std::mutex> lock(mutex);
   pWiFi_->_disconnect(true);
@@ -947,10 +966,16 @@ void WiFiManager::disconnect() {
   if (disconnectedCallback) disconnectedCallback();
 }
 
+/**
+ * @brief WiFiManager 更新処理
+ * WiFiManagerの更新処理を行う。
+ * タイマー接続要求処理とWiFi接続マネージャを呼び出す。
+ * 接続状態の変化があった場合は、コールバック関数を呼び出す。
+ */
 void WiFiManager::update() {
   std::lock_guard<std::mutex> lock(mutex);
 
-  withTimer();  // タイマー更新
+  withTimer();  // 接続要求：タイマー
   manager();    // WiFi接続マネージャ
 
   bool nowConnected = pWiFi_->_status() == WL_CONNECTED;
@@ -961,12 +986,221 @@ void WiFiManager::update() {
     wasConnected = false;
     if (disconnectedCallback) disconnectedCallback();
   }
+
+  // WiFiスキャン結果がある場合はコールバックを呼び出す
+  if(wifiScanResult()) {
+    wifiScanCallback(resultScanSsid); // スキャン結果をコールバック
+    wifiScanCallback = nullptr;       // 一度だけ呼ぶ場合は解除
+  }
+
 }
 
+/**
+ * @brief WiFi接続時コールバック関数設定
+ * @param callback  接続時コールバック関数
+ */
 void WiFiManager::onConnected(std::function<void()> callback) {
+//  std::lock_guard<std::mutex> lock(mutex);
   connectedCallback = callback;
 }
 
+/**
+ * @brief WiFi切断時コールバック関数設定
+ * @param callback  切断時コールバック関数
+ */
 void WiFiManager::onDisconnected(std::function<void()> callback) {
+//  std::lock_guard<std::mutex> lock(mutex);
   disconnectedCallback = callback;
+}
+
+#ifdef DELETE
+/**
+ * @brief WiFi STAモードの接続先検索
+ * WiFiネットワークのスキャンを行う
+ * 
+ */
+void WiFiManager::wifiScanSta(void)
+{
+  static uint8_t getwifiListsqf = 0;      // WiFiリスト取得シーケンスフラグ
+  uint8_t getwifiStaListreq = 1;         // WiFiリスト取得要求フラグ  TestTest
+
+  pWiFi_->_print("wifiScanSta\r\n");
+
+  if(getwifiStaListreq == 1){             // WiFiリスト取得要求
+    int16_t ssidNum;                      // WiFiリスト取得数
+//    if(getwifiListsqf == 0){    
+//        vfdevent.setEventlogLoop(EVENT_WiFi_SSIDSCAN_START);
+      getwifiListsqf = 1;                 // WiFiリスト取得シーケンスフラグ：スキャン開始
+//    }
+//    else if(getwifiListsqf == 1){         // WiFiリスト取得シーケンスフラグ：スキャン開始
+      pWiFi_->_print("scan done\r\n");
+      pWiFi_->_mode(WIFI_MODE_APSTA);  // WiFiモードをAPSTAに設定
+      ssidNum = pWiFi_->_scanNetworks(true);  // WiFiスキャン開始
+      getwifiListsqf = 2;                 // WiFiリスト取得シーケンスフラグ：スキャン結果取得
+//    }
+//    else if(getwifiListsqf == 2){         // WiFiリスト取得シーケンスフラグ：スキャン結果取得
+    do{
+      ssidNum = pWiFi_->_scanComplete();      // WiFiスキャン完了確認
+      if(ssidNum == WIFI_SCAN_RUNNING){   // WiFiスキャン中
+        pWiFi_->_print("WIFI_SCAN_RUNNING\n");
+      }
+    }while(ssidNum == WIFI_SCAN_RUNNING);  // WiFiスキャン完了まで待機
+//    else if(ssidNum == WiFi_SCAN_FAILED){
+          // 失敗
+//    }
+//      else{                                // WiFiスキャン完了  
+//          vfdevent.setEventlogLoop(EVENT_WiFi_SSIDSCAN_COMP);     // WiFi SSID 検索完了
+        #define SSIDLIMIT 30              // SSIDリスト取得数制限 最大30
+        std::string ssid_rssi_str[SSIDLIMIT];
+        std::string ssid_str[SSIDLIMIT];
+//        String str = "\"stationList\":[\n";
+        std::string str = "{\"stationList\":[\n";
+        if (ssidNum == 0) {
+          pWiFi_->_print("no networks found\n");
+        } else {
+//          pWiFi_->_print("%d networks found\r\n\r\n", ssidNum);
+          std::string ssidNumStr = std::to_string(ssidNum);
+          pWiFi_->_print(ssidNumStr.c_str());
+          pWiFi_->_print("networks found\r\n\r\n");
+          if (ssidNum > SSIDLIMIT) ssidNum = SSIDLIMIT;   // SSIDリスト取得数制限
+          for (int8_t i = 0; i < ssidNum; ++i) {             // WiFiリスト取得Loop
+//          for (int8_t i = 0; i < 2; ++i) {             // WiFiリスト取得Loop
+//            ssid_str[i] = WiFi.SSID(i);
+            ssid_str[i] = pWiFi_->_staSSID(i);
+//            std::string wifi_auth_open = ((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+            std::string wifi_auth_open = ((pWiFi_->_encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+//            ssid_rssi_str[i] = ssid_str[i] + " (" + WiFi.RSSI(i) + "dBm)" + wifi_auth_open;
+            ssid_rssi_str[i] = ssid_str[i] /*+ " (" + WiFi.RSSI(i) + "dBm)"*/ + wifi_auth_open;
+            if(i != 0){   // 2件目以降はカンマを付加
+              str = str + ",\n";
+            }
+            str = str + "{\"ID\":\"" + ssid_str[i] + "\",\"TITLE\":\"" + ssid_rssi_str[i] + "\"}";
+
+            std::string numStr = std::to_string(i);
+            pWiFi_->_print(numStr.c_str());
+            pWiFi_->_print(":");
+            pWiFi_->_print(ssid_str[i]);
+            pWiFi_->_print(ssid_rssi_str[i].c_str());
+            pWiFi_->_print("\r\n");
+          }
+//          str = str + "\n]";
+          str = str + "\n]}";
+//            websocketDataSend.wifiStaList = str;
+//            websocketDataSend.wifiStaListSend = ON;
+          pWiFi_->_print(str);
+          pWiFi_->_print("\n\n");
+//          websocketSend(str);     //************** */
+          getwifiStaListreq = 0;
+        }
+//      }
+    }
+//  }
+//  else{
+//    getwifiListsqf = 0;
+//  }
+
+  return;
+}
+#endif
+/**
+ * @brief WiFiスキャンコールバック関数設定
+ * WiFiスキャン結果を受け取るコールバック関数を設定する。
+ */
+void WiFiManager::setWifiScanCallback(std::function<void(std::string)> callback) {
+  std::lock_guard<std::mutex> lock(mutex);
+  wifiScanCallback = callback;
+}
+
+bool WiFiManager::checkWifiScanCallback(void) const
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  return (wifiScanCallback != nullptr);
+}
+
+/**
+ * @brief WiFiスキャン要求
+ * WiFiネットワークのスキャンを要求する。
+ */
+void WiFiManager::wifiScanRequest(void)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  if (pWiFi_ && (wifiScanCallback != nullptr)) {
+    pWiFi_->_scanNetworks(true); // WiFiスキャン要求
+    wifiScanInProgress = true; // スキャン要求フラグを立てる
+    pWiFi_->_print("WiFiスキャン要求\n");
+  }
+  else{
+    std::cout << "pWiFiManager is nullptr" << std::endl;
+  }
+}
+
+/**
+ * @brief WiFiスキャン結果取得
+ * WiFiスキャンが完了したかどうかを確認し、結果を取得する。
+ */
+bool WiFiManager::wifiScanResult(void)
+{
+//  std::lock_guard<std::mutex> lock(mutex);
+  if (pWiFi_ && wifiScanInProgress) {
+    int16_t ssidNum = pWiFi_->_scanComplete(); // スキャン完了確認
+    if (ssidNum != WIFI_SCAN_RUNNING) {
+      WifiScanResultData resultData; // スキャン結果データ構造体
+      resultScanSsid = "Scan Results:" + std::to_string(ssidNum) + ":\n";
+      wifiScanInProgress = false; // スキャン要求フラグをクリア
+      wifiScanResultData.clear(); // スキャン結果データをクリア
+      
+      // スキャン結果を保存
+      for (int i = 0; i < ssidNum; ++i) {
+        resultData.ssid = pWiFi_->_staSSID(i); // SSIDを保存
+        resultData.rssi = pWiFi_->_staRSSI(i); // RSSIを保存
+        resultData.encryptionType = pWiFi_->_encryptionType(i); // 暗号化タイプを保存
+//        resultData.channel = pWiFi_->_staChannel(i); // チャンネルを保存
+        wifiScanResultData.push_back(resultData); // スキャン結果データに追加
+
+        resultScanSsid += resultData.ssid + "(" + std::to_string(resultData.rssi) + "dBm):" + ((resultData.encryptionType == WIFI_AUTH_OPEN)?" ":"*") +"\n";
+      }
+
+      return true; // スキャンが完了した
+    }
+  }
+  return false; // スキャンがまだ完了していない
+}
+
+/**
+ * @brief WiFiスキャン結果を文字列形式で取得
+ * スキャン結果を文字列形式で取得する。
+ * 
+ * @return std::string スキャン結果の文字列
+ */
+std::string WiFiManager::getWiFiScanResultString(void)
+{
+  std::string result;
+  for (const auto& data : wifiScanResultData) {
+    result += "SSID: " + data.ssid
+           + ", Encryption: " + std::to_string(static_cast<int>(data.encryptionType))
+           + ", RSSI: " + std::to_string(data.rssi) + "\n";
+  }
+
+  return result;
+}
+
+/**
+ * @brief WiFiスキャン結果をJSON形式で取得
+ * スキャン結果をJSON形式の文字列として取得する。
+ * 
+ * @return std::string スキャン結果のJSON文字列
+ */
+std::string WiFiManager::getWiFiScanResultJson(void)
+{
+  std::string result = "{\"stationList\":[\n";
+  for (size_t i = 0; i < wifiScanResultData.size(); ++i) {
+    const auto& data = wifiScanResultData[i]; 
+    std::string ssid_rssi_str = data.ssid + " (" +std::to_string(data.rssi) + "dBm)" + ((data.encryptionType == WIFI_AUTH_OPEN)?" ":"*");
+    if (i != 0){   // 2件目以降はカンマを付加
+      result = result + ",\n";
+    }
+    result = result + "{\"ID\":\"" + data.ssid + "\",\"TITLE\":\"" + ssid_rssi_str + "\"}";
+  }
+  result = result + "\n]}";
+  return result;
 }
