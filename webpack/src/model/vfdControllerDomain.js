@@ -68,11 +68,16 @@ export class vfdControllerDomain{
             this._callbackFuncWiFiStationList(objData.stationList);
           }
         };
-        this.ws.onclose = function(evt) {
-          console.log("ws: onclose");
-//          let objData = "{\"websocket\" : \"close\"}";
-//          this._callbackFuncWebsocketSend(objData);
-        }
+        this.ws.onclose = (evt) => {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('ja-JP', { hour12: false }) + '.' + now.getMilliseconds().toString().padStart(3, '0');
+          console.log(`[${timeStr}] WebSocket closed:`, evt);
+
+          setTimeout(() => {
+            console.log("WebSocket再接続を試みます");
+            this.websocketInit(); // 
+          }, 3000);
+        };
         this.ws.onerror = function(evt) {
           console.log("ws: onerror");
           console.log(evt);

@@ -10,9 +10,13 @@ SystemController::SystemController()
 }
 */
 SystemController::SystemController()
-  : realMonitorDeviseIo(),
-    serialCommandProcessor(realMonitorDeviseIo, i2cBus, eepromManager)
+  : realMonitorDeviseIo(),                                                            // シリアル入出力処理の初期化
+    serialCommandProcessor(realMonitorDeviseIo, i2cBus, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化
+    jsonCommandProcessor(&paramManager, &wiFiManager),                     // JSONコマンド処理の初期化
+    wiFiManager(&wifiReal),                                                           // WiFi接続管理の初期化
+    webServerManager(&paramManager, &jsonCommandProcessor, &wiFiManager)              // Webサーバ管理の初期化
 {
+  return;
 }
 
 void SystemController::begin() {
@@ -56,14 +60,26 @@ void SystemController::begin() {
   unsigned char swList[] = {BUTTON_0,BUTTON_1};
   terminalInputManager.begin(swList,sizeof(swList));
 
-
+  // WiFi接続時のコールバック設定
   wiFiManager.onConnected([this](){
-    webServerManager.begin(&paramManager, &commandProcessor);  // WiFi接続後に開始
+//    webServerManager.begin(&paramManager, &jsonCommandProcessor, &wiFiManager);  // WiFi接続後に開始
+    webServerManager.begin();  // WiFi接続後に開始
     timeManager.configureSNTP();  // SNTP設定
   });
 
+  // WiFi切断時のコールバック設定
   wiFiManager.onDisconnected([this]() {
+    Serial.println("--WiFi disconnected");
     webServerManager.end();    // 切断時にサーバ停止（WebSocket含む）
+  });
+
+  // SNTP同期完了時のコールバック設定
+  timeManager.onSntpSync([this]() {
+    Serial.println("SNTP sync completed");
+//    timeManager.updateRTCFromSystemTime();  // SNTP同期後にRTC更新
+//    updateClockDisplay();  // OLEDに時刻表示
+    wiFiManager.sntpCompleted = true;           // SNTP同期完了フラグ設定
+
   });
 
   /*
@@ -79,14 +95,14 @@ void SystemController::begin() {
 
     // serialMonitor init
 //  serialCommandProcessor = SerialCommandProcessor(&realMonitorDeviseIo);
-
+   Serial.println("SystemController initialized");
 }
 
 void SystemController::update() {
 //  uint8_t itmKeyCode;
 
   wiFiManager.update();
-//  webServerManager.update();  // 必要に応じて
+  webServerManager.update();
 
   // 端子入力
 //  itmKeyCode = terminalInputManager.man();

@@ -1,10 +1,13 @@
 #include <M5Unified.h>
 #include "JsonCommandProcessor.h"
 
-JsonCommandProcessor::JsonCommandProcessor() {}
+JsonCommandProcessor::JsonCommandProcessor(ParameterManager* pm, WiFiManager* wifiManager)
+  : parameterManager(pm), wifiManager(wifiManager)
+{
+  return;
+}
 
-void JsonCommandProcessor::begin(ParameterManager* pm, ResponseCallback callback) {
-  parameterManager = pm;
+void JsonCommandProcessor::begin(ResponseCallback callback) {
   responseCallback = callback;
 }
 
@@ -17,6 +20,16 @@ void JsonCommandProcessor::processCommand(const String& jsonString) {
     responseCallback("{\"error\":\"Invalid JSON\"}");
     return;
   }
+
+  JsonVariant jsondata;
+  jsondata = doc["getWifiStaList"]; // "getWifiStaList" キーを取得
+  if (!jsondata.isNull()) {
+    if(jsondata.as<int>() == 1){
+      Serial.println("getWifiStaList1");
+      handleGetWifiStaListCommand(doc);
+    }
+  }
+  
 
   if (!doc.containsKey("command")) {
     responseCallback("{\"error\":\"Missing command field\"}");
@@ -82,6 +95,37 @@ void JsonCommandProcessor::handleSetCommand(JsonDocument& doc) {
   response["index"] = index;
   response["value"] = value;
   response["result"] = success ? "ok" : "fail";
+
+  String out;
+  serializeJson(response, out);
+  responseCallback(out);
+}
+
+
+void JsonCommandProcessor::handleGetWifiStaListCommand(JsonDocument& doc) {
+  // WiFi STAリストの取得処理を実装
+  StaticJsonDocument<256> response;
+  response["command"] = "getWifiStaList";
+  response["staList"] = JsonArray(); // 空の配列を返す
+
+  if(wifiManager && !(wifiManager->checkWifiScanCallback())) { // WiFiManagerが初期化されていて、スキャンコールバックが設定されていない場合
+    Serial.println("Getting WiFi STA list...");
+    // WiFiManagerのスキャンコールバックを設定
+    wifiManager->setWifiScanCallback([this](/*std::string /*scanResult*/) {
+      std::string result = wifiManager->getWiFiScanResultJson();
+      Serial.println(result.c_str());
+      responseCallback(result.c_str());
+    });
+    // WiFiManagerのスキャン機能を呼び出す
+//    wifiManager->wifiScanRequest();     // WiFiスキャン要求を実行 ** 直接呼び出すと失敗する **
+    wifiManager->wifiScanRequestFlag = true; // スキャンリクエストフラグを立てる
+  }
+  else if(wifiManager && wifiManager->checkWifiScanCallback()) { // スキャンコールバックが設定されている場合
+    Serial.println("WiFiスキャンが既に実行中です。\n");
+  }
+  else {
+    Serial.println("WiFiManagerが初期化されていません。\n");
+  }
 
   String out;
   serializeJson(response, out);
