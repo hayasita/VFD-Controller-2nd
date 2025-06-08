@@ -166,7 +166,7 @@ std::string WiFi_real::_staSSID(int8_t index)
 {
   String ssidStr = WiFi.SSID(index);
   std::string stdSsid = ssidStr.c_str();
-  Serial.printf("WiFi_real::_staSSID(%d) : %s\n", index, stdSsid.c_str());
+//  Serial.printf("WiFi_real::_staSSID(%d) : %s\n", index, stdSsid.c_str());
   if (stdSsid.empty()) {
     Serial.println("SSID not found or index out of range.");
     return ""; // SSIDが見つからない場合は空文字列を返す

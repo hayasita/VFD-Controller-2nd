@@ -973,7 +973,7 @@ void WiFiManager::disconnect() {
  * 接続状態の変化があった場合は、コールバック関数を呼び出す。
  */
 void WiFiManager::update() {
-  std::lock_guard<std::mutex> lock(mutex);
+//  std::lock_guard<std::mutex> lock(mutex);
 
   withTimer();  // 接続要求：タイマー
   manager();    // WiFi接続マネージャ
@@ -987,9 +987,17 @@ void WiFiManager::update() {
     if (disconnectedCallback) disconnectedCallback();
   }
 
+  if(wifiScanRequestFlag){
+    wifiScanRequestFlag = false; // スキャン要求フラグをクリア
+    pWiFi_->_print("WiFiスキャン要求\n");
+//    pWiFi_->_mode(WIFI_MODE_APSTA);  // WiFiモードをAPSTAに設定
+//    pWiFi_->_scanNetworks(true);      // WiFiスキャン開始
+    wifiScanRequest();;      // WiFiスキャン要求
+  }
+
   // WiFiスキャン結果がある場合はコールバックを呼び出す
   if(wifiScanResult()) {
-    wifiScanCallback(resultScanSsid); // スキャン結果をコールバック
+    wifiScanCallback(); // スキャン結果をコールバック
     wifiScanCallback = nullptr;       // 一度だけ呼ぶ場合は解除
   }
 
@@ -1013,100 +1021,11 @@ void WiFiManager::onDisconnected(std::function<void()> callback) {
   disconnectedCallback = callback;
 }
 
-#ifdef DELETE
-/**
- * @brief WiFi STAモードの接続先検索
- * WiFiネットワークのスキャンを行う
- * 
- */
-void WiFiManager::wifiScanSta(void)
-{
-  static uint8_t getwifiListsqf = 0;      // WiFiリスト取得シーケンスフラグ
-  uint8_t getwifiStaListreq = 1;         // WiFiリスト取得要求フラグ  TestTest
-
-  pWiFi_->_print("wifiScanSta\r\n");
-
-  if(getwifiStaListreq == 1){             // WiFiリスト取得要求
-    int16_t ssidNum;                      // WiFiリスト取得数
-//    if(getwifiListsqf == 0){    
-//        vfdevent.setEventlogLoop(EVENT_WiFi_SSIDSCAN_START);
-      getwifiListsqf = 1;                 // WiFiリスト取得シーケンスフラグ：スキャン開始
-//    }
-//    else if(getwifiListsqf == 1){         // WiFiリスト取得シーケンスフラグ：スキャン開始
-      pWiFi_->_print("scan done\r\n");
-      pWiFi_->_mode(WIFI_MODE_APSTA);  // WiFiモードをAPSTAに設定
-      ssidNum = pWiFi_->_scanNetworks(true);  // WiFiスキャン開始
-      getwifiListsqf = 2;                 // WiFiリスト取得シーケンスフラグ：スキャン結果取得
-//    }
-//    else if(getwifiListsqf == 2){         // WiFiリスト取得シーケンスフラグ：スキャン結果取得
-    do{
-      ssidNum = pWiFi_->_scanComplete();      // WiFiスキャン完了確認
-      if(ssidNum == WIFI_SCAN_RUNNING){   // WiFiスキャン中
-        pWiFi_->_print("WIFI_SCAN_RUNNING\n");
-      }
-    }while(ssidNum == WIFI_SCAN_RUNNING);  // WiFiスキャン完了まで待機
-//    else if(ssidNum == WiFi_SCAN_FAILED){
-          // 失敗
-//    }
-//      else{                                // WiFiスキャン完了  
-//          vfdevent.setEventlogLoop(EVENT_WiFi_SSIDSCAN_COMP);     // WiFi SSID 検索完了
-        #define SSIDLIMIT 30              // SSIDリスト取得数制限 最大30
-        std::string ssid_rssi_str[SSIDLIMIT];
-        std::string ssid_str[SSIDLIMIT];
-//        String str = "\"stationList\":[\n";
-        std::string str = "{\"stationList\":[\n";
-        if (ssidNum == 0) {
-          pWiFi_->_print("no networks found\n");
-        } else {
-//          pWiFi_->_print("%d networks found\r\n\r\n", ssidNum);
-          std::string ssidNumStr = std::to_string(ssidNum);
-          pWiFi_->_print(ssidNumStr.c_str());
-          pWiFi_->_print("networks found\r\n\r\n");
-          if (ssidNum > SSIDLIMIT) ssidNum = SSIDLIMIT;   // SSIDリスト取得数制限
-          for (int8_t i = 0; i < ssidNum; ++i) {             // WiFiリスト取得Loop
-//          for (int8_t i = 0; i < 2; ++i) {             // WiFiリスト取得Loop
-//            ssid_str[i] = WiFi.SSID(i);
-            ssid_str[i] = pWiFi_->_staSSID(i);
-//            std::string wifi_auth_open = ((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
-            std::string wifi_auth_open = ((pWiFi_->_encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
-//            ssid_rssi_str[i] = ssid_str[i] + " (" + WiFi.RSSI(i) + "dBm)" + wifi_auth_open;
-            ssid_rssi_str[i] = ssid_str[i] /*+ " (" + WiFi.RSSI(i) + "dBm)"*/ + wifi_auth_open;
-            if(i != 0){   // 2件目以降はカンマを付加
-              str = str + ",\n";
-            }
-            str = str + "{\"ID\":\"" + ssid_str[i] + "\",\"TITLE\":\"" + ssid_rssi_str[i] + "\"}";
-
-            std::string numStr = std::to_string(i);
-            pWiFi_->_print(numStr.c_str());
-            pWiFi_->_print(":");
-            pWiFi_->_print(ssid_str[i]);
-            pWiFi_->_print(ssid_rssi_str[i].c_str());
-            pWiFi_->_print("\r\n");
-          }
-//          str = str + "\n]";
-          str = str + "\n]}";
-//            websocketDataSend.wifiStaList = str;
-//            websocketDataSend.wifiStaListSend = ON;
-          pWiFi_->_print(str);
-          pWiFi_->_print("\n\n");
-//          websocketSend(str);     //************** */
-          getwifiStaListreq = 0;
-        }
-//      }
-    }
-//  }
-//  else{
-//    getwifiListsqf = 0;
-//  }
-
-  return;
-}
-#endif
 /**
  * @brief WiFiスキャンコールバック関数設定
  * WiFiスキャン結果を受け取るコールバック関数を設定する。
  */
-void WiFiManager::setWifiScanCallback(std::function<void(std::string)> callback) {
+void WiFiManager::setWifiScanCallback(std::function<void()> callback) {
   std::lock_guard<std::mutex> lock(mutex);
   wifiScanCallback = callback;
 }
@@ -1123,10 +1042,11 @@ bool WiFiManager::checkWifiScanCallback(void) const
  */
 void WiFiManager::wifiScanRequest(void)
 {
-  std::lock_guard<std::mutex> lock(mutex);
+//  std::lock_guard<std::mutex> lock(mutex);
   if (pWiFi_ && (wifiScanCallback != nullptr)) {
-    pWiFi_->_scanNetworks(true); // WiFiスキャン要求
-    wifiScanInProgress = true; // スキャン要求フラグを立てる
+    wifiScanInProgress = true;        // スキャン要求フラグを立てる
+    pWiFi_->_mode(WIFI_MODE_APSTA);   // WiFiモードをAPSTAに設定
+    pWiFi_->_scanNetworks(true);      // WiFiスキャン要求
     pWiFi_->_print("WiFiスキャン要求\n");
   }
   else{
@@ -1144,11 +1064,13 @@ bool WiFiManager::wifiScanResult(void)
   if (pWiFi_ && wifiScanInProgress) {
     int16_t ssidNum = pWiFi_->_scanComplete(); // スキャン完了確認
     if (ssidNum != WIFI_SCAN_RUNNING) {
-      WifiScanResultData resultData; // スキャン結果データ構造体
+      pWiFi_->_print("WIFI_SCAN_CONPLETE\n"); // スキャン中
       resultScanSsid = "Scan Results:" + std::to_string(ssidNum) + ":\n";
+      pWiFi_->_print(resultScanSsid.c_str()); // スキャン結果のSSID数を表示
       wifiScanInProgress = false; // スキャン要求フラグをクリア
+
+      WifiScanResultData resultData; // スキャン結果データ構造体
       wifiScanResultData.clear(); // スキャン結果データをクリア
-      
       // スキャン結果を保存
       for (int i = 0; i < ssidNum; ++i) {
         resultData.ssid = pWiFi_->_staSSID(i); // SSIDを保存
@@ -1161,6 +1083,14 @@ bool WiFiManager::wifiScanResult(void)
       }
 
       return true; // スキャンが完了した
+    }
+    else {
+      static unsigned long lastPrintTime = 0;
+      unsigned long now = pWiFi_->_millis();
+      if (now - lastPrintTime > 1000) { // 1秒ごとに表示
+          pWiFi_->_print("WIFI_SCAN_RUNNING\n"); // スキャン中
+          lastPrintTime = now;
+      }
     }
   }
   return false; // スキャンがまだ完了していない

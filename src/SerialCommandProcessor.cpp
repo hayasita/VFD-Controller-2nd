@@ -410,9 +410,8 @@ bool SerialCommandProcessor::opecodeWiFiScan(std::vector<std::string> command) {
 //  if(wiFiManager) {
   if(wiFiManager && !(wiFiManager->checkWifiScanCallback())) { // WiFiManagerが初期化されていて、スキャンコールバックが設定されていない場合
     monitorIo_->send("opecodeWiFiScan\n");
-    wiFiManager->setWifiScanCallback([this](std::string /*scanResult*/) {
+    wiFiManager->setWifiScanCallback([this]() {
       std::string result = wiFiManager->getWiFiScanResultString();
-//      std::string result = wiFiManager->getWiFiScanResultJson();
       if(monitorIo_) {
         monitorIo_->send(result);
       }

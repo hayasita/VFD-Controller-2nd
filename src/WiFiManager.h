@@ -147,8 +147,9 @@ class WiFiManager{
     bool wifiScanResult(void);                                  // WiFiスキャン完了
     std::string getWiFiScanResultString(void);                  // スキャン結果をstringで取得
     std::string getWiFiScanResultJson(void);                    // スキャン結果をstring(JSON)で取得
-    void setWifiScanCallback(std::function<void(std::string)> callback); // WiFiスキャンコールバック関数設定
+    void setWifiScanCallback(std::function<void()> callback); // WiFiスキャンコールバック関数設定
     bool checkWifiScanCallback(void) const; // WiFiスキャンコールバック関数が設定されているか確認
+    bool wifiScanRequestFlag = false; // WiFiスキャン要求フラグ
 
   private:
     WiFi_ *pWiFi_  = nullptr;           // WiFi制御用ポインタ
@@ -209,7 +210,7 @@ class WiFiManager{
     std::function<void()> disconnectedCallback; // 切断時のコールバック関数
     bool wasConnected = false;                  // 前回の接続状態を保持するフラグ
 
-    std::function<void(std::string)> wifiScanCallback = nullptr; // スキャン完了時コールバック
+    std::function<void()> wifiScanCallback = nullptr; // スキャン完了時コールバック
     std::string resultScanSsid;                     // スキャンSSID
     bool wifiScanInProgress = false;            // WiFiスキャン進行中フラグ
     struct WifiScanResultData {   // WiFiスキャン結果構造体

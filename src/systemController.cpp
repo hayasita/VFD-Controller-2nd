@@ -12,6 +12,7 @@ SystemController::SystemController()
 SystemController::SystemController()
   : realMonitorDeviseIo(),                                                            // シリアル入出力処理の初期化
     serialCommandProcessor(realMonitorDeviseIo, i2cBus, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化
+    jsonCommandProcessor(&paramManager, &wiFiManager),                     // JSONコマンド処理の初期化
     wiFiManager(&wifiReal),                                                           // WiFi接続管理の初期化
     webServerManager(&paramManager, &jsonCommandProcessor, &wiFiManager)              // Webサーバ管理の初期化
 {
@@ -68,6 +69,7 @@ void SystemController::begin() {
 
   // WiFi切断時のコールバック設定
   wiFiManager.onDisconnected([this]() {
+    Serial.println("--WiFi disconnected");
     webServerManager.end();    // 切断時にサーバ停止（WebSocket含む）
   });
 
@@ -100,7 +102,7 @@ void SystemController::update() {
 //  uint8_t itmKeyCode;
 
   wiFiManager.update();
-//  webServerManager.update();  // 必要に応じて
+  webServerManager.update();
 
   // 端子入力
 //  itmKeyCode = terminalInputManager.man();

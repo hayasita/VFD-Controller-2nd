@@ -9,12 +9,10 @@
 class WebServerManager {
   public:
     WebServerManager(ParameterManager* parameterManager, JsonCommandProcessor* commandProcessor, WiFiManager* wifiManager);
-//    void begin(ParameterManager* parameterManager, JsonCommandProcessor* commandProcessor, WiFiManager* wifiManager);
     void begin();
     void end();
     void update();
     void setupRoutes();
-    void setWiFiManager(WiFiManager* wifi);
     bool isRunning();
 
     bool hasWebSocketClients();  // ← WebSocketの接続状態を確認
@@ -37,6 +35,5 @@ class WebServerManager {
                           AsyncWebSocketClient *client,
                           AwsEventType type, void *arg,
                           uint8_t *data, size_t len);
-    void handleCommand(AsyncWebSocketClient* client, JsonDocument& doc);
 };
   

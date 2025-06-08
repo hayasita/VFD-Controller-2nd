@@ -38,7 +38,7 @@ void WebServerManager::begin() {
   server.addHandler(&ws);
 
     // JSONコマンドプロセッサ初期化
-  jsonCommandProcessor->begin(parameterManager, [this](const String& response) {
+  jsonCommandProcessor->begin([this](const String& response) {
     // WebSocketクライアントに送信
     if (lastClient && lastClient->canSend()) {
       lastClient->text(response);
@@ -49,11 +49,6 @@ void WebServerManager::begin() {
   server.begin();
 
   running = true;
-}
-
-// 外部から WiFiManager のインスタンスを設定
-void WebServerManager::setWiFiManager(WiFiManager* wifi) {
-  this->wifiManager = wifi;
 }
 
 // HTTPリクエストルートの設定
@@ -109,6 +104,14 @@ void WebServerManager::handleNotFound(AsyncWebServerRequest *request) {
 // 必要に応じて WebSocket クライアントの管理を行う処理（未使用だが拡張可）
 void WebServerManager::update() {
   // WebSocketのpingなどをここで処理できる
+  static unsigned long lastPing = 0;
+  if (millis() - lastPing > 10000) {
+//    Serial.println("Sending ping to all WebSocket clients");
+    ws.pingAll();
+    lastPing = millis();
+  }
+
+  return;
 }
 
 // WebSocket のイベントを処理する関数
@@ -132,44 +135,14 @@ void WebServerManager::onWebSocketEvent(AsyncWebSocket *server,
       jsonCommandProcessor->processCommand(jsonString);
     }
   } else if (type == WS_EVT_CONNECT) {
-    Serial.println("WebSocket client connected");
+    Serial.printf("[WS] Client connected: %u\n", client->id());
   } else if (type == WS_EVT_DISCONNECT) {
-    Serial.println("WebSocket client disconnected");
+    Serial.printf("[WS] Client disconnected: %u\n", client->id());
     if (client == lastClient) {
       lastClient = nullptr;  // 応答先が切断されたらクリア
     }
   }
 
-}
-
-// 受け取った JSON コマンドを処理する関数
-void WebServerManager::handleCommand(AsyncWebSocketClient* client, JsonDocument& doc) {
-  // "cmd" キーが存在しない場合はエラー応答
-  if (!doc.containsKey("cmd")) {
-    client->text("{\"error\":\"Missing command\"}");
-    return;
-  }
-
-  String cmd = doc["cmd"].as<String>();
-
-  // WiFi 再接続要求コマンド
-  if (cmd == "wifiReconnect") {
-    if (wifiManager) {
-      // ここでは仮SSID/PASS使用（実際には引数として受け取る方がよい）
-//      bool result = wifiManager->connect("your-ssid", "your-password");
-//      client->text(String("{\"status\":\"") + (result ? "connected" : "failed") + "\"}");
-    } else {
-      client->text("{\"error\":\"WiFiManager not available\"}");
-    }
-  }
-  // WebSocketの接続確認
-  else if (cmd == "ping") {
-    client->text("{\"response\":\"pong\"}");
-  }
-  // 未定義コマンド
-  else {
-    client->text("{\"error\":\"Unknown command\"}");
-  }
 }
 
 void WebServerManager::end() {
