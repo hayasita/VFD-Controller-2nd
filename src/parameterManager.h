@@ -16,9 +16,12 @@
  */
 class ParameterManager {
 public:
+  ParameterManager(EepromManager *eeprom, LogManager *logger);
+  ~ParameterManager();
+
   using CallbackType = std::function<void(uint8_t index, int newValue)>;
 
-  void begin(EepromManager& eeprom, LogManager& logger);  // 初期化
+  void begin(void);                               // パラメータ群の初期設定
   bool setupParameter(uint8_t index, int defaultValue, int minValue, int maxValue, CallbackType callback = nullptr);  // パラメータの設定（EEPROM読み込み）
   bool setParameter(uint8_t index, int value);    // パラメータの設定（EEPROM書き込み）
   bool getParameter(uint8_t index, int& value);   // パラメータの取得（EEPROM読み込み）
@@ -34,11 +37,11 @@ private:
     CallbackType onChanged; // 値変更イベントコールバック
   };
 
-  EepromManager* eeprom = nullptr;          // EepromManagerの参照
-  LogManager* logger = nullptr;             // LogManagerの参照
+  EepromManager *eeprom = nullptr;          // EepromManagerの参照
+  LogManager *logger = nullptr;             // LogManagerの参照
   ParameterStorage storage;                 // パラメータストレージ
   std::vector<Parameter> params;            // パラメータのリスト
-  static constexpr uint8_t MAX_PARAMS = 10; // 最大パラメータ数
+//  static constexpr uint8_t MAX_PARAMS = 10; // 最大パラメータ数
 
   void logError(const char* message);
   void logInfo(const char* message);

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <iostream>
 #include "./mock/DummyLogManager.h"
 #include "./mock/DummyEepromManager.h"
 //#include "./mock/I2CBusManager.h"  // モックのI2CBusManagerをインクルード
@@ -10,9 +11,12 @@ protected:
   DummyLogManager logManager;
   ParameterManager paramManager;
   
+  ParameterManagerTest() : paramManager(&eepromManager, &logManager) {
+    // コンストラクタで初期化
+  }
   void SetUp() override {
     logManager.begin(eepromManager);
-    paramManager.begin(eepromManager, logManager);
+    paramManager.begin();
     paramManager.setupParameter(0, 10, 0, 100);  // 初期値10, 0〜100
     paramManager.setParameter(0, 5); // 初期値10, 0〜100
   }
@@ -53,12 +57,21 @@ TEST_F(ParameterManagerTest, SetParameterOutOfRangeHigh) {
  * @brief EEPROM読み込み範囲外時、デフォルト値が設定されることを確認する
  */
 TEST_F(ParameterManagerTest, SetupParameter_LoadFails_UseDefault) {
-  static constexpr int PARAM_START_ADDR = 0;  // パラメータの開始アドレス
-  int value = 101;
-  uint8_t index = 0;
-  eepromManager.writeBytes(PARAM_START_ADDR + index * sizeof(int), &value, sizeof(int)); // MockEEPROMに書き込む
-  ASSERT_TRUE(paramManager.setupParameter(0, 42, 0, 100));
-  EXPECT_EQ(paramManager.getParameter(0), 42);
+  static constexpr int PARAM_START_ADDR = 0x0010;  // パラメータの開始アドレス
+  uint8_t value = 101;
+  uint16_t index = 0;
+//  eepromManager.writeBytes(PARAM_START_ADDR + index * sizeof(int), &value, sizeof(int)); // MockEEPROMに書き込む
+//  eepromManager.writeByte(PARAM_START_ADDR + index, value); // MockEEPROMに書き込む
+  std::cout << "* 0 *" << std::endl;
+  eepromManager.writeByte(PARAM_START_ADDR + index, value); // MockEEPROMに書き込む
+  uint8_t valueRead = 0;
+  eepromManager.readByte(index, &valueRead); // MockEEPROMから読み込む
+  std::cout << "EEPROM read value: " << static_cast<int>(valueRead) << std::endl; // 読み込んだ値を表示
+  std::cout << "* 1 *" << std::endl;
+  ASSERT_TRUE(paramManager.setupParameter(0, 42, 0, 100));    // Pr.0, デフォルト値42, 範囲0〜100
+  std::cout << "* 2 *" << std::endl;
+  EXPECT_EQ(paramManager.getParameter(0), 42);  // デフォルト値が使用されることを確認
+  std::cout << "* 3 *" << std::endl;
 }
 
 /**
@@ -66,10 +79,11 @@ TEST_F(ParameterManagerTest, SetupParameter_LoadFails_UseDefault) {
 */
 TEST_F(ParameterManagerTest, SetupParameter_LoadSucceeds_WithinRange) {
   // 事前にMockEEPROMに値を書き込んでおく
-  static constexpr int PARAM_START_ADDR = 0;  // パラメータの開始アドレス
+  static constexpr int PARAM_START_ADDR = 0x0010;  // パラメータの開始アドレス
   int value = 55;
   uint8_t index = 1;
-  eepromManager.writeBytes(PARAM_START_ADDR + index * sizeof(int), &value, sizeof(int)); // MockEEPROMに書き込む
+//  eepromManager.writeBytes(PARAM_START_ADDR + index * sizeof(int), &value, sizeof(int)); // MockEEPROMに書き込む
+  eepromManager.writeByte(PARAM_START_ADDR + index, value); // MockEEPROMに書き込む
   ASSERT_TRUE(paramManager.setupParameter(1, 42, 0, 100));
   EXPECT_EQ(paramManager.getParameter(1), 55);
 }

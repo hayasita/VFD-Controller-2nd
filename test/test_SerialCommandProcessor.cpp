@@ -4,6 +4,7 @@
 #include "../src/SerialCommandProcessor.h"
 #include "../src/I2CBusManager.h"
 #include "./mock/DummyEepromManager.h"
+#include "./mock/MockWiFiManager.h"
 
 namespace
 {
@@ -32,7 +33,9 @@ namespace
       DummyEepromManager eepromManager;
       MockSerialMonitorIO mock;
       DummyI2CBusManager i2cbusManager;  // I2Cバスマネージャのモック
-      SerialCommandProcessor serialMonitor{mock ,i2cbusManager ,eepromManager}; // ← MockSerialMonitorIOのポインタを渡す
+      MockWiFiManager wifiManager;
+
+      SerialCommandProcessor serialMonitor{mock ,i2cbusManager ,eepromManager, wifiManager}; // ← MockSerialMonitorIOのポインタを渡す
   };
   std::vector<std::string> result = {"command","parameta1","parameta2"};
   std::vector<std::string> result2 = {"command"};

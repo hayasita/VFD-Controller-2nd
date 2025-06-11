@@ -5,7 +5,8 @@ void LogStorage::begin(EepromManager& eeprom) {
 }
 
 bool LogStorage::write(int address, const char* message, size_t len) {
-  return eeprom->writeBytes(address, message, len);  // ログの書き込み
+//  return eeprom->writeBytes(address, message, len);  // ログの書き込み
+  return true;
 }
 
 bool LogStorage::read(int address, char* buffer, size_t len) {

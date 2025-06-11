@@ -10,7 +10,9 @@ SystemController::SystemController()
 }
 */
 SystemController::SystemController()
-  : realMonitorDeviseIo(),                                                            // シリアル入出力処理の初期化
+  : paramManager(&eepromManager, &logManager),  // パラメータ管理の初期化
+    i2cBus(),                                         // I2Cバス管理の初期化
+    realMonitorDeviseIo(),                                                            // シリアル入出力処理の初期化
     serialCommandProcessor(realMonitorDeviseIo, i2cBus, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化
     jsonCommandProcessor(&paramManager, &wiFiManager),                     // JSONコマンド処理の初期化
     wiFiManager(&wifiReal),                                                           // WiFi接続管理の初期化
@@ -37,7 +39,7 @@ void SystemController::begin() {
   // 3. 他モジュールの初期化
   eepromManager.begin(i2cBus);            // EEPROMの初期化
   logManager.begin(eepromManager);        // ログ管理の初期化
-  paramManager.begin(eepromManager, logManager);  // パラメータ管理の初期化
+  paramManager.begin();                   // パラメータ管理の初期化
   envSensor.begin(i2cBus);                // 環境センサの初期化
   display.begin(i2cBus);                  // OLED表示の初期化
   rtcManager.begin(i2cBus);               // RTCの初期化

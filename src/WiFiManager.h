@@ -133,22 +133,22 @@ class WiFiManager{
 
     bool staDisconnection(void);        // STA切断
 
-    void update();                                        // 状態確認用
-    bool isConnected() const;                             // 接続状態取得
-    void disconnect();                                    // 切断処理
-    void onConnected(std::function<void()> callback);     // 接続時コールバック関数設定
-    void onDisconnected(std::function<void()> callback);  // 切断時コールバック関数設定
+    virtual void update();                                        // 状態確認用
+    virtual bool isConnected() const;                             // 接続状態取得
+    virtual void disconnect();                                    // 切断処理
+    virtual void onConnected(std::function<void()> callback);     // 接続時コールバック関数設定
+    virtual void onDisconnected(std::function<void()> callback);  // 切断時コールバック関数設定
 
     bool sntpCompleted;                 // SNTP同期完了フラグ
 
 //    void wifiScanSta(void);                                   // WiFiスキャン
 //    void wifiScanRequest(std::function<void(int)> callback);  // WiFiスキャン要求
-    void wifiScanRequest(void);  // WiFiスキャン要求
-    bool wifiScanResult(void);                                  // WiFiスキャン完了
-    std::string getWiFiScanResultString(void);                  // スキャン結果をstringで取得
-    std::string getWiFiScanResultJson(void);                    // スキャン結果をstring(JSON)で取得
-    void setWifiScanCallback(std::function<void()> callback); // WiFiスキャンコールバック関数設定
-    bool checkWifiScanCallback(void) const; // WiFiスキャンコールバック関数が設定されているか確認
+    virtual void wifiScanRequest(void);  // WiFiスキャン要求
+    virtual bool wifiScanResult(void);                                  // WiFiスキャン完了
+    virtual std::string getWiFiScanResultString(void);                  // スキャン結果をstringで取得
+    virtual std::string getWiFiScanResultJson(void);                    // スキャン結果をstring(JSON)で取得
+    virtual void setWifiScanCallback(std::function<void()> callback); // WiFiスキャンコールバック関数設定
+    virtual bool checkWifiScanCallback(void) const; // WiFiスキャンコールバック関数が設定されているか確認
     bool wifiScanRequestFlag = false; // WiFiスキャン要求フラグ
 
   private:
