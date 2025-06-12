@@ -16,10 +16,14 @@ ParameterManager::ParameterManager(EepromManager *eeprom, LogManager *logger)
 ParameterManager::~ParameterManager() {}
 
 void ParameterManager::begin(void) {
-
+  std::cout << "ParameterManager begin\n";
   params.clear();
-  params.reserve(MAX_PARAMS);  // パラメータ数を予約
-  
+  params.resize(MAX_PARAMS);  // パラメータ数を予約
+
+  setupParameter(0, 1, 0,  1, nullptr);   // Pr.0 初期化
+  setupParameter(1, 3, 1, 10, nullptr);   // Pr.1 初期化
+
+/*
   params.emplace_back(Parameter{0, 1, 0,  1, nullptr});   // Pr.0 初期化
   params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.1 初期化
   params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.2 初期化
@@ -74,9 +78,25 @@ void ParameterManager::begin(void) {
   params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.47 初期化
   params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.48 初期化
   params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.49 初期化
-
+*/
 }
 
+/**
+ * @brief パラメータの設定（EEPROM読み込み）
+ * この関数は、指定されたインデックスのパラメータを初期化し、EEPROMから値を読み込む。
+ * 初期値、最小値、最大値、および値変更時のコールバック関数を設定する。
+ * @note
+ * この関数は、パラメータのインデックスが有効であることを確認し、最小値が最大値以下であることを検証する。
+ * もしEEPROMからの読み込みが失敗した場合、または読み込んだ値が範囲外である場合は、初期値を設定し、EEPROMに保存する。
+ * 
+ * @param index         パラメータのインデックス
+ * @param defaultValue  初期値
+ * @param minValue      最小値
+ * @param maxValue      最大値
+ * @param callback      値変更時のコールバック関数
+ * @return true         成功
+ * @return false        失敗
+ */
 bool ParameterManager::setupParameter(uint8_t index, int defaultValue, int minValue, int maxValue, CallbackType callback) {
   if (index >= params.size()) {
     logError("setupParameter: Invalid index");
@@ -87,37 +107,52 @@ bool ParameterManager::setupParameter(uint8_t index, int defaultValue, int minVa
     return false;
   }
 
+  // 設定値の設定
   Parameter& param = params[index];
   param.defaultValue = defaultValue;
   param.minValue = minValue;
   param.maxValue = maxValue;
   param.onChanged = callback;
 
-  std::cout << "setupParameter: defaultValue=" << static_cast<int>(defaultValue) << std::endl;
-  std::cout << "setupParameter: currentValue=" << static_cast<int>(params[index].defaultValue) << std::endl;
-  std::cout << "setupParameter: currentValue=" << static_cast<int>(param.defaultValue) << std::endl;
+//  std::cout << "setupParameter: index=" << static_cast<int>(index) << std::endl;
+//  std::cout << "setupParameter: defaultValue0=" << static_cast<int>(defaultValue) << std::endl;
+//  std::cout << "setupParameter: defaultValue1=" << static_cast<int>(params[index].defaultValue) << std::endl;
+//  std::cout << "setupParameter: defaultValue2=" << static_cast<int>(param.defaultValue) << std::endl;
 
+  // EEPROMから値を読み込む
   uint8_t loadedValue = 0;
   bool loaded = storage.load(index, &loadedValue);
 
-  std::cout << "setupParameter: loadedValue=" << static_cast<int>(loadedValue) << std::endl;
+//  std::cout << "setupParameter: loadedValue=" << static_cast<int>(loadedValue) << std::endl;
 
   if (!loaded || loadedValue < minValue || loadedValue > maxValue) {
     // EEPROM読み込み失敗 または 範囲外 → 初期値で復元
-    param.currentValue = defaultValue;
-    storage.save(index, defaultValue);
+    param.currentValue = defaultValue;  // 初期値を設定
+    storage.save(index, defaultValue);  // 初期値をEEPROMに保存
 
     char buf[80];
     snprintf(buf, sizeof(buf), "Param %u load fail or out of range, set to default", index);
     logError(buf);
+    std::cout << buf << std::endl;
   } else {
-    param.currentValue = loadedValue;
+    param.currentValue = loadedValue;   // 読み込んだ値を設定
   }
+  std::cout << "setupParameter: index=" << static_cast<int>(index) << " : currentValue=" << static_cast<int>(param.currentValue) << std::endl;
 
   return true;
 }
 
-bool ParameterManager::setParameter(uint8_t index, int value) {
+/**
+ * @brief パラメータの設定（EEPROM書き込み）
+ * この関数は、指定されたインデックスのパラメータに新しい値を設定し、EEPROMに保存する。
+ * 値が範囲外の場合はエラーをログに記録し、設定を行わない。
+ * 
+ * @param index  パラメータのインデックス
+ * @param value  設定する値
+ * @return true  成功
+ * @return false 範囲外エラー
+ */
+bool ParameterManager::setParameter(uint8_t index, uint8_t value) {
 //  Serial.printf("setParameter: index=%u, value=%d\n", index, value);
   if (index >= params.size()) {
     logError("setParameter: Invalid index");
@@ -146,20 +181,33 @@ bool ParameterManager::setParameter(uint8_t index, int value) {
   return true; // 成功
 }
 
-int ParameterManager::getParameter(uint8_t index) {
+/**
+ * @brief パラメータの取得（RAM読み込み）
+ * この関数は、指定されたインデックスのパラメータの現在の値を取得する。
+ * 
+ * @param index  パラメータのインデックス
+ * @return uint8_t  現在の値
+ */
+uint8_t ParameterManager::getParameter(uint8_t index) {
+//  Serial.printf("getParameter: index=%u\n", index);
   if (index >= params.size()) return 0;
 
   std::lock_guard<std::recursive_mutex> lock(eeprom->getMutex());
 
-  int value = 0;
+  uint8_t value = 0;
   value = params[index].currentValue;
 
-  std::cout << "getParameter: index=" << static_cast<int>(index) << std::endl;
-  std::cout << "getParameter: currentValue=" << static_cast<int>(params[index].currentValue) << std::endl;
+//  std::cout << "getParameter: index=" << static_cast<int>(index) << std::endl;
+//  std::cout << "getParameter: currentValue=" << static_cast<int>(params[index].currentValue) << std::endl;
 
-  return params[index].currentValue;
+  return value;
 }
 
+/**
+ * @brief パラメータの取得（EEPROM読み込み）
+ * この関数は、指定されたインデックスのパラメータの現在の値をEEPROMから読み込む。
+ * 
+ */
 void ParameterManager::clearAllParameters() {
   std::lock_guard<std::recursive_mutex> lock(eeprom->getMutex());
 

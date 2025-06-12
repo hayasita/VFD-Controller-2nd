@@ -23,10 +23,10 @@ public:
 
   void begin(void);                               // パラメータ群の初期設定
   bool setupParameter(uint8_t index, int defaultValue, int minValue, int maxValue, CallbackType callback = nullptr);  // パラメータの設定（EEPROM読み込み）
-  bool setParameter(uint8_t index, int value);    // パラメータの設定（EEPROM書き込み）
-  bool getParameter(uint8_t index, int& value);   // パラメータの取得（EEPROM読み込み）
-  int getParameter(uint8_t index);                // パラメータの取得（EEPROM読み込み）
-  void clearAllParameters();                      // すべて初期値に戻す（コールバックも発火）
+  bool setParameter(uint8_t index, uint8_t value);    // パラメータの設定（EEPROM書き込み）
+  bool getParameter(uint8_t index, uint8_t& value);   // パラメータの取得（EEPROM読み込み）
+  uint8_t getParameter(uint8_t index);                // パラメータの取得（EEPROM読み込み）
+  void clearAllParameters();                          // すべて初期値に戻す（コールバックも発火）
 
 private:
   struct Parameter {    // パラメータ構造体

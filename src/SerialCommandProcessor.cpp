@@ -46,11 +46,12 @@ MonitorDeviseIo::~MonitorDeviseIo() {}
   init();
 }
 */
-SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, EepromManager& eepromManager, WiFiManager& wifiManager)
-  : monitorIo_(&MonitorDeviseIo),   // シリアル入出力処理ポインタを設定
-    i2cBus(&busManager),            // I2CBusManagerの参照を設定
-    eeprom(&eepromManager),         // EepromManagerの参照を設定
-    wiFiManager(&wifiManager)       // WiFiManagerの参照を設定
+SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, ParameterManager& parameterManager, EepromManager& eepromManager, WiFiManager& wifiManager)
+  : monitorIo_(&MonitorDeviseIo),         // シリアル入出力処理ポインタを設定
+    i2cBus(&busManager),                  // I2CBusManagerの参照を設定
+    parameterManager(&parameterManager),  // ParameterManagerの参照を設定
+    eeprom(&eepromManager),               // EepromManagerの参照を設定
+    wiFiManager(&wifiManager)             // WiFiManagerの参照を設定
 {
   init();
 }
@@ -68,7 +69,10 @@ void SerialCommandProcessor::init(void)
 
   codeArray.push_back({"eepromdump" ,[this](){ return opecodeEepromDump(command); }, "eepromdump\tEEPROM Data dump."});
   codeArray.push_back({"i2cscan"    ,[this](){ return opecodeI2CScan(command); }, "i2cscan\tI2C Bus Device Scan."});
-  codeArray.push_back({"wifiscan"    ,[this](){ return opecodeWiFiScan(command); }, "wifiscan\tWiFi Station SSID Scan."});
+  codeArray.push_back({"wifiscan"   ,[this](){ return opecodeWiFiScan(command); }, "wifiscan\tWiFi Station SSID Scan."});
+
+  codeArray.push_back({"getpr"      ,[this](){ return opecodeGetPr(command); }, "getpr [Pr number]\t"});  // ダミーコマンド
+  codeArray.push_back({"setpr"      ,[this](){ return opecodeSetPr(command); }, "setpr [Pr number] [value]\t"});  // ダミーコマンド
 
   return;
 }
@@ -427,5 +431,81 @@ bool SerialCommandProcessor::opecodeWiFiScan(std::vector<std::string> command) {
   }
   // 仮の実装
   // 必要に応じてWiFiManager等を呼び出してください
+  return true;
+}
+
+/**
+ * @brief Pr設定値取得
+ * 
+ * @param command   コマンド引数：パラメータ番号
+ * @return true 
+ * @return false 
+ */
+bool SerialCommandProcessor::opecodeGetPr(std::vector<std::string> command)      // Pr設定値取得
+{
+  monitorIo_->send("opecodeGetPr\n");
+
+  // 引数チェック
+  if(command.size() == 2) {
+    int tmp = parseStringToInt(command[1]);
+    if(tmp < 0 || tmp > EEPROM_MAX_ADDRESS) {
+      monitorIo_->send("開始アドレスが不正です\n");
+      return false;
+    }
+  }
+  else if(command.size() == 1) {
+    monitorIo_->send("パラメータを指定してください。\n");
+    return false;
+  }
+  else{
+    monitorIo_->send("引数が多すぎます\n");
+    return false;
+  }
+
+  int paramIndex = parseStringToInt(command[1]);
+  uint8_t value = parameterManager->getParameter(paramIndex);
+  std::string prValue = "Get Pr" + command[1] + " : " + std::to_string(static_cast<int>(value)) + "\n";
+  monitorIo_->send(prValue);
+
+  return true;
+}
+
+/**
+ * @brief Pr設定値設定
+ * 
+ * @param command   コマンド引数：パラメータ番号、設定値
+ * @return true 
+ * @return false 
+ */
+bool SerialCommandProcessor::opecodeSetPr(std::vector<std::string> command)      // Pr設定値設定
+{
+  monitorIo_->send("opecodeSetPr\n");
+
+  // 引数チェック
+  if(command.size() == 3) {
+    int tmp = parseStringToInt(command[1]);
+    if(tmp < 0 || tmp > EEPROM_MAX_ADDRESS) {
+      monitorIo_->send("開始アドレスが不正です\n");
+      return false;
+    }
+  }
+  else if(command.size() < 3) {
+    monitorIo_->send("パラメータを指定してください。\n");
+    return false;
+  }
+  else{
+    monitorIo_->send("引数が多すぎます\n");
+    return false;
+  }
+  
+  monitorIo_->send("Set Pr" + command[1] + " : " + command[2] + "\n");
+
+  uint8_t paramIndex = (uint8_t)parseStringToInt(command[1]);
+  uint8_t value = (uint8_t)parseStringToInt(command[2]);
+  if(!parameterManager->setParameter(paramIndex, value)) {
+    monitorIo_->send("Pr設定値の設定に失敗しました。\n");
+    return false;
+  }
+
   return true;
 }

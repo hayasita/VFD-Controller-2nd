@@ -24,9 +24,9 @@
 #include <sstream>
 #include "I2CBusManager.h"
 #include "EepromManager.h"
+#include "ParameterManager.h"
 #include "WiFiManager.h"
 
-//class SerialMonitorIO{
 class MonitorDeviseIo{
   public:
 //    virtual ~SerialMonitorIO(void) = 0;         // 純粋仮想デストラクタ
@@ -51,9 +51,7 @@ class SerialCommandProcessor{
      * テストのときはmockを渡す。
      * 実処理の場合は、実処理の派生classのポインタを渡す。
      */
-//    SerialMonitor(SerialMonitorIO* pSerialMonitorIo);   // コンストラクタ
-//    SerialCommandProcessor(MonitorDeviseIo* pMonitorDeviseIo, I2CBusManager& busManager, EepromManager& eeprom);   // コンストラクタ
-    SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, EepromManager& eeprom, WiFiManager& wifiManager);   // コンストラクタ
+    SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, ParameterManager& parameterManager, EepromManager& eeprom, WiFiManager& wifiManager);   // コンストラクタ
     bool exec(void);                                    // シリアルモニタ実行
     bool commandExec(std::vector<std::string> command);     // コマンド実行
     std::vector<std::string> splitCommand(const std::string &commandBuf);  // コマンド分割
@@ -69,10 +67,13 @@ class SerialCommandProcessor{
     bool opecodeEepromDump(std::vector<std::string> command);   // EEPROMダンプ
     bool opecodeI2CScan(std::vector<std::string> command);   // I2Cスキャン
     bool opecodeWiFiScan(std::vector<std::string> command);   // WiFiスキャン
+    bool opecodeGetPr(std::vector<std::string> command);      // Pr設定値取得
+    bool opecodeSetPr(std::vector<std::string> command);      // Pr設定値設定
 
 
     MonitorDeviseIo *monitorIo_ = nullptr;    // シリアル入出力処理ポインタ
     I2CBusManager* i2cBus = nullptr;  // I2Cバスマネージャ
+    ParameterManager* parameterManager = nullptr; // ParameterManagerの参照
     EepromManager* eeprom = nullptr;  // EepromManagerの参照
     WiFiManager* wiFiManager = nullptr; // WiFiManagerの参照
 
