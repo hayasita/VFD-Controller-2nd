@@ -4,10 +4,25 @@
  */
 #pragma once
 
-#include <M5Unified.h>
+//#include <M5Unified.h>
 #include <time.h>
-#include "RTCManager.h"
+#include <functional>
+#include <sys/time.h> // struct timezoneを使用するために必要
 
+#ifdef UNIT_TEST
+// ...モック定義...
+class RTCManager{}; // RTCManagerの前方宣言（実際のRTCManagerクラスは別ファイルに定義されていると仮定）
+#else
+// ...本来の定義...
+#include "RTCManager.h"
+#endif
+
+/**
+ * @brief 時間管理クラス
+ * 
+ * TimeManagerは、RTC（リアルタイムクロック）を使用してシステム時刻を管理するクラスである。
+ * システム時刻の取得、設定、RTCとの同期、SNTP同期などの機能を提供する。
+ */
 class TimeManager {
 public:
   bool begin(RTCManager* rtcManager);         // RTCManagerの初期化

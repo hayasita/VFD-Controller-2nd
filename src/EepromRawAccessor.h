@@ -13,8 +13,12 @@ public:
   // バイト単位でデータを書き込む
   bool writeBytes(int address, const void* data, size_t len);
 
+  bool writeByte(uint16_t address, uint8_t data);               // データを1バイト書き込む
+
   // バイト単位でデータを読み込む
   bool readBytes(int address, void* data, size_t len);
+
+  bool readByte(uint16_t address, uint8_t *data);               // データを1バイト読み込む
 
   bool sequentialRead(uint8_t i2cADR, uint16_t eeADR ,uint8_t *data,uint8_t dataNum);
 

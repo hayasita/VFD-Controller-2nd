@@ -42,6 +42,20 @@ bool EepromManager::writeBytes(int address, const void* data, size_t len) {
 }
 
 /**
+ * @brief データを1バイト書き込む
+ * @param address 書き込みアドレス
+ * @param data 書き込むデータ
+ * @return true 成功、false 失敗
+ */
+bool EepromManager::writeByte(uint16_t address, const uint8_t data) {
+  std::lock_guard<std::recursive_mutex> lock(getMutex());
+  if (address < 0 || address >= EEPROM_MAX_ADDRESS) {
+    return false;  // 範囲外アクセスを防止
+  }
+  return rawAccessor.writeByte(address, data);  // 単一バイトのデータ書き込み
+}
+
+/**
  * @brief バイト単位でデータを読み込む
  * @param address 読み込み開始アドレス
  * @param data 読み込んだデータを格納するバッファ
@@ -54,6 +68,21 @@ bool EepromManager::readBytes(int address, void* data, size_t len) {
     return false;  // 範囲外アクセスを防止
   }
   return rawAccessor.readBytes(address, data, len);  // データ読み込み
+}
+
+/**
+ * @brief データを1バイト読み出す
+ * @param address 読み出しアドレス
+ * @param data 読み出したデータを格納するポインタ
+ * @return true 成功、false 失敗
+ */
+bool EepromManager::readByte(uint16_t address, uint8_t *data) {
+  std::lock_guard<std::recursive_mutex> lock(getMutex());
+  if (address < 0 || address >= EEPROM_MAX_ADDRESS) {
+    return false;  // 範囲外アクセスを防止
+  }
+  
+  return rawAccessor.readByte(address, data);
 }
 
 /**

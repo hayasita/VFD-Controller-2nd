@@ -22,6 +22,7 @@ void JsonCommandProcessor::processCommand(const String& jsonString) {
   }
 
   JsonVariant jsondata;
+  // WiFi Station 設定：WiFi SSID 検索
   jsondata = doc["getWifiStaList"]; // "getWifiStaList" キーを取得
   if (!jsondata.isNull()) {
     if(jsondata.as<int>() == 1){
@@ -30,6 +31,19 @@ void JsonCommandProcessor::processCommand(const String& jsonString) {
     }
   }
   
+  // WiFi Station 設定：STA 自動接続有効
+  jsondata = doc["staAutoConnect"]; // "wifiAutoConnect" キーを取得
+  if (!jsondata.isNull()) {
+    uint8_t value = jsondata.as<uint8_t>();
+    if(value == 1){
+      Serial.println("staAutoConnect = 1");
+    }
+    else{
+      Serial.println("staAutoConnect = 0");
+    }
+//    bool success = parameterManager->setParameter(45, value);
+    bool success = parameterManager->setParameter(0, value);
+  }
 
   if (!doc.containsKey("command")) {
     responseCallback("{\"error\":\"Missing command field\"}");
