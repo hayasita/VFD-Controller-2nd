@@ -10,7 +10,7 @@ SystemController::SystemController()
 }
 */
 SystemController::SystemController()
-  : paramManager(&eepromManager, &logManager),  // パラメータ管理の初期化
+  : paramManager(&eepromManager, &logManager, &systemManager),  // パラメータ管理の初期化
     i2cBus(),                                         // I2Cバス管理の初期化
     realMonitorDeviseIo(),                                                            // シリアル入出力処理の初期化
     serialCommandProcessor(realMonitorDeviseIo, i2cBus, paramManager, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化

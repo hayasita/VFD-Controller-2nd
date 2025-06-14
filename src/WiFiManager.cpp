@@ -1134,3 +1134,13 @@ std::string WiFiManager::getWiFiScanResultJson(void)
   result = result + "\n]}";
   return result;
 }
+
+/**
+ * @brief WiFiManager 自動接続有効設定
+ * WiFiManagerの自動接続を有効にする。
+ */
+void WiFiManager::setAutoConnect(bool enable) {
+  std::lock_guard<std::mutex> lock(mutex);
+  autoConnectEnabled = enable;
+  return;
+}

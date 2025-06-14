@@ -5,10 +5,11 @@
 
 #define MAX_PARAMS 50  // 最大パラメータ数
 
-ParameterManager::ParameterManager(EepromManager *eeprom, LogManager *logger)
+ParameterManager::ParameterManager(EepromManager *eeprom, LogManager *logger, SystemManager *systemManager)
   : eeprom(eeprom),     // EepromManagerの参照を初期化
-    storage(eeprom),    // パラメータストレージを初期化
-    logger(logger)      // LogManagerの参照を初期化
+    logger(logger),      // LogManagerの参照を初期化
+    systemManager(systemManager), // SystemManagerの参照を初期化
+    storage(eeprom)      // パラメータストレージを初期化
 {
   // コンストラクタで初期化は行わない
 }
@@ -18,67 +19,17 @@ ParameterManager::~ParameterManager() {}
 void ParameterManager::begin(void) {
   std::cout << "ParameterManager begin\n";
   params.clear();
-  params.resize(MAX_PARAMS);  // パラメータ数を予約
 
-  setupParameter(0, 1, 0,  1, nullptr);   // Pr.0 初期化
-  setupParameter(1, 3, 1, 10, nullptr);   // Pr.1 初期化
+  Parameter defaultParam = {0, 0, 0, 0, nullptr}; // 任意の初期値
+  params.resize(MAX_PARAMS, defaultParam);        // パラメータ数を予約 すべてこの値で埋める
 
-/*
-  params.emplace_back(Parameter{0, 1, 0,  1, nullptr});   // Pr.0 初期化
-  params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.1 初期化
-  params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.2 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.3 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.4 初期化
-  params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.5 初期化
-  params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.6 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.7 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.8 初期化
-  params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.9 初期化
+  setupParameter( 0, 1, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager,  0, std::placeholders::_2));   // Pr.0 初期化 表示フォーマット：時刻表示12/24
+  setupParameter( 1, 3, 1, 10, std::bind(&SystemManager::onParameterChanged, systemManager,  1, std::placeholders::_2));   // Pr.1 初期化 表示フォーマット：Display Format
 
-  params.emplace_back(Parameter{0, 3, 1, 10, nullptr});   // Pr.10 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.11 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.12 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.13 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.14 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.15 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.16 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.17 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.18 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.19 初期化
+  setupParameter(30, 0, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager, 30, std::placeholders::_2));   // Pr.30 初期化 SNTP設定：SNTP使用
 
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.20 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.21 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.22 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.23 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.24 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.25 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.26 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.27 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.28 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.29 初期化
+  setupParameter(44, 0, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager, 44, std::placeholders::_2));   // Pr.44 初期化 WiFi Station 設定：STA自動接続有効
 
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.30 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.31 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.32 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.33 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.34 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.35 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.36 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.37 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.38 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.39 初期化
-
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.40 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.41 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.42 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.43 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.44 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.45 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.46 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.47 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.48 初期化
-  params.emplace_back(Parameter{0, 0, 0, 10, nullptr});   // Pr.49 初期化
-*/
 }
 
 /**
@@ -210,14 +161,10 @@ uint8_t ParameterManager::getParameter(uint8_t index) {
  */
 void ParameterManager::clearAllParameters() {
   std::lock_guard<std::recursive_mutex> lock(eeprom->getMutex());
+  std::cout << "ParameterManager::clearAllParameters\n";
 
   for (uint8_t i = 0; i < params.size(); ++i) {
-    params[i].currentValue = params[i].defaultValue;
-    storage.save(i, params[i].currentValue);
-
-    if (params[i].onChanged) {
-      params[i].onChanged(i, params[i].currentValue); // 初期化でも通知
-    }
+    setParameter(i, params[i].defaultValue);
   }
 
   logInfo("All parameters reset to default");

@@ -5,6 +5,7 @@
 #include <vector>
 #include "EepromManager.h"
 #include "LogManager.h"
+#include "SystemManager.h"
 #include "ParameterStorage.h"
 
 /**
@@ -16,7 +17,7 @@
  */
 class ParameterManager {
 public:
-  ParameterManager(EepromManager *eeprom, LogManager *logger);
+  ParameterManager(EepromManager *eeprom, LogManager *logger, SystemManager *systemManager = nullptr); // コンストラクタ
   ~ParameterManager();
 
   using CallbackType = std::function<void(uint8_t index, int newValue)>;
@@ -39,6 +40,7 @@ private:
 
   EepromManager *eeprom = nullptr;          // EepromManagerの参照
   LogManager *logger = nullptr;             // LogManagerの参照
+  SystemManager *systemManager = nullptr; // SystemManagerの参照（必要に応じて追加）
   ParameterStorage storage;                 // パラメータストレージ
   std::vector<Parameter> params;            // パラメータのリスト
 //  static constexpr uint8_t MAX_PARAMS = 10; // 最大パラメータ数

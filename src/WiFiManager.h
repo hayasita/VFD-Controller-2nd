@@ -151,6 +151,10 @@ class WiFiManager{
     virtual bool checkWifiScanCallback(void) const; // WiFiスキャンコールバック関数が設定されているか確認
     bool wifiScanRequestFlag = false; // WiFiスキャン要求フラグ
 
+    void setAutoConnect(bool enable);                                   // WiFi自動接続設定
+    bool isAutoConnectEnabled() const { return autoConnectEnabled; }    // WiFi自動接続設定取得
+    void setAutoConnectInterval(unsigned long interval) { reConnectInterval = interval; } // WiFi自動接続間隔設定
+
   private:
     WiFi_ *pWiFi_  = nullptr;           // WiFi制御用ポインタ
     unsigned long timetmp;              // 処理経過時間tmp
@@ -219,6 +223,9 @@ class WiFiManager{
       int32_t rssi;                 // RSSI
     } ; 
     std::vector<WifiScanResultData> wifiScanResultData; // WiFiスキャン結果
+
+    bool autoConnectEnabled = false;        // WiFi自動接続設定
+    unsigned long lastAutoConnectTime = 0;  // 最後の自動接続時間
 };
 
 #undef GLOBAL

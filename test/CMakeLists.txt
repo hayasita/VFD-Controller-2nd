@@ -27,7 +27,8 @@ add_library(ParameterManLib
     ../src/ParameterManager.cpp
     ../src/ParameterStorage.cpp
     ../src/SerialCommandProcessor.cpp
-    ../src/SerialCommandProcessor.cpp     # 追加
+#    ../src/SerialCommandProcessor.cpp     # 追加
+    ../src/systemManager.cpp
     ../src/WiFiManager.cpp
     ./mock/EepromRawAccessor.cpp
     ./mock/I2CBusManager.cpp

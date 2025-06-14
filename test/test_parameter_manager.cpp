@@ -29,9 +29,10 @@ TEST_F(ParameterManagerTest, FirstTest) {
 }
 
 TEST_F(ParameterManagerTest, LoadDefaultValues) {
+  paramManager.begin();
   paramManager.clearAllParameters();
-  int value = paramManager.getParameter(0);
-  EXPECT_EQ(value, 10);  // 初期値ロード確認
+  int value = paramManager.getParameter(1);
+  EXPECT_EQ(value, 3);  // 初期値ロード確認
 }
 
 /**
@@ -85,8 +86,8 @@ TEST_F(ParameterManagerTest, SetupParameter_LoadSucceeds_WithinRange) {
   int value = 55;
   uint8_t index = 1;
   eepromManager.writeByte(PARAM_START_ADDR + index, value); // MockEEPROMに書き込む
-  ASSERT_TRUE(paramManager.setupParameter(1, 42, 0, 100));
-  EXPECT_EQ(paramManager.getParameter(1), 55);
+  ASSERT_TRUE(paramManager.setupParameter(1, 42, 0, 100));  // Pr.1, デフォルト値42, 範囲0〜100 設定
+  EXPECT_EQ(paramManager.getParameter(1), 55);              // MockEEPROMから読み込んだ値が使用されることを確認
 }
 
 /**
