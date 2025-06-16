@@ -1,8 +1,20 @@
 #include "LedController.h"
 
 LedController::LedController(CRGB* leds, int numLeds)
-  : leds_(leds), numLeds_(numLeds) {
-  states_ = new LedState[numLeds_];
+  : leds_(leds), numLeds_(numLeds)
+{
+  if(numLeds_ <= 0 || leds_ == nullptr) {
+    numLeds_ = 0;
+    leds_ = nullptr;
+    return;
+  }
+
+  LedState defaultState;                  // デフォルトのLED状態
+  defaultState.mode = LedMode::Off;       // 初期状態は全てオフ
+  defaultState.color = CRGB::Black;       // 初期色は黒
+  defaultState.lastToggle = 0;            // 最後のトグル時間は0
+  defaultState.state = false;             // 初期状態は消灯
+  states_.resize(numLeds_, defaultState); // 初期状態を設定
 }
 
 void LedController::setMode(int idx, LedMode mode, CRGB color) {
@@ -11,7 +23,8 @@ void LedController::setMode(int idx, LedMode mode, CRGB color) {
   states_[idx].color = color;
 }
 
-void LedController::update() {
+void LedController::update(void)
+{
   uint32_t now = millis();
   for(int i = 0; i < numLeds_; ++i) {
     switch(states_[i].mode) {
@@ -22,40 +35,26 @@ void LedController::update() {
         leds_[i] = states_[i].color;
         break;
       case LedMode::Blink:
-        if(now - states_[i].lastToggle > 500) {
-          states_[i].state = !states_[i].state;
-          states_[i].lastToggle = now;
-        }
-        leds_[i] = states_[i].state ? states_[i].color : CRGB::Black;
+        handleBlink(leds_[i], states_[i]);
         break;
-      }
+    }
   }
+  show();
+
+  return;
+}
+
+void LedController::show(void) {
   FastLED.show();
 }
 
-#ifdef DELETE
-void LedController::handleBlink() {
-    uint32_t now = millis();
-    if(now - lastUpdate_ > 500) {
-        state_ = !state_;
-        fill_solid(leds_.data(), numLeds_, state_ ? color_ : CRGB::Black);
-        show();
-        lastUpdate_ = now;
-    }
-}
+void LedController::handleBlink(CRGB& led, LedState& state) {
+  uint32_t now = millis();
+  if(now - state.lastToggle > 500) {
+    state.state = !state.state;
+    state.lastToggle = now;
+  }
+  led = state.state ? state.color : CRGB::Black;
 
-void LedController::handleRainbow() {
-    static uint8_t hue = 0;
-    fill_rainbow(leds_.data(), numLeds_, hue++);
-    show();
+  return;
 }
-
-void LedController::show() {
-    FastLED.show();
-}
-
-void LedController::setCustomPattern(void (*patternFunc)(CRGB*, int, uint32_t)) {
-    customPattern_ = patternFunc;
-    mode_ = Mode::Custom;
-}
-#endif

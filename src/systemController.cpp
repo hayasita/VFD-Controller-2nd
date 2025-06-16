@@ -49,10 +49,15 @@ void SystemController::begin() {
   TimeManager::setInstance(&timeManager); // シングルトンインスタンス設定
 //  timeManager.setSystemTimeManually(2023, 10, 1, 12, 0, 0); // 手動で時刻設定
 
-  FastLED.addLeds<WS2812, BUILTIN_LED_DATA_PIN, GRB>(builtInLeds, NUM_BUILTIN_LEDS);
+  // 4. LEDの初期化
+  FastLED.setBrightness(LED_MAX_BRIGHTNESS);                                            // 明るさを設定
+  FastLED.addLeds<WS2812, BUILTIN_LED_DATA_PIN, GRB>(builtInLeds, NUM_BUILTIN_LEDS);    // 内蔵LEDの初期化
   FastLED.addLeds<WS2812, EXTERNAL_LED_DATA_PIN, GRB>(externalLeds, NUM_EXTERNAL_LEDS); // 外部LEDの初期化
-  FastLED.setBrightness(LED_MAX_BRIGHTNESS);                                      // 明るさを設定（20以上は熱で壊れる可能性あり。）
+//LED点灯テスト
   builtInLedCtrl.setMode(0, LedMode::Blink, CRGB::Red);
+  externalLedCtrl.setMode(0, LedMode::On, CRGB::Green);
+  externalLedCtrl.setMode(1, LedMode::Blink, CRGB::Blue);
+  externalLedCtrl.setMode(2, LedMode::On, CRGB::Orange);
 
   if (!rtcManager.isRunning()) {
 //    logManager.writeLog("RTC not running!");
