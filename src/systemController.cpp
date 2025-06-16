@@ -12,6 +12,8 @@ SystemController::SystemController()
 SystemController::SystemController()
   : paramManager(&eepromManager, &logManager, &systemManager),  // パラメータ管理の初期化
     i2cBus(),                                         // I2Cバス管理の初期化
+    builtInLedCtrl(builtInLeds, NUM_BUILTIN_LEDS),    // 内蔵LED制御の初期化
+    externalLedCtrl(externalLeds, NUM_EXTERNAL_LEDS), // 外部LED制御の初期化
     realMonitorDeviseIo(),                                                            // シリアル入出力処理の初期化
     serialCommandProcessor(realMonitorDeviseIo, i2cBus, paramManager, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化
     jsonCommandProcessor(&paramManager, &wiFiManager),                     // JSONコマンド処理の初期化
@@ -46,6 +48,16 @@ void SystemController::begin() {
   timeManager.begin(&rtcManager);         // 時間管理の初期化
   TimeManager::setInstance(&timeManager); // シングルトンインスタンス設定
 //  timeManager.setSystemTimeManually(2023, 10, 1, 12, 0, 0); // 手動で時刻設定
+
+  // 4. LEDの初期化
+  FastLED.setBrightness(LED_MAX_BRIGHTNESS);                                            // 明るさを設定
+  FastLED.addLeds<WS2812, BUILTIN_LED_DATA_PIN, GRB>(builtInLeds, NUM_BUILTIN_LEDS);    // 内蔵LEDの初期化
+  FastLED.addLeds<WS2812, EXTERNAL_LED_DATA_PIN, GRB>(externalLeds, NUM_EXTERNAL_LEDS); // 外部LEDの初期化
+//LED点灯テスト
+  builtInLedCtrl.setMode(0, LedMode::Blink, CRGB::Red);
+  externalLedCtrl.setMode(0, LedMode::On, CRGB::Green);
+  externalLedCtrl.setMode(1, LedMode::Blink, CRGB::Blue);
+  externalLedCtrl.setMode(2, LedMode::On, CRGB::Orange);
 
   if (!rtcManager.isRunning()) {
 //    logManager.writeLog("RTC not running!");
@@ -116,6 +128,9 @@ void SystemController::update() {
 
   // シリアルモニタ処理
   serialCommandProcessor.exec();
+
+  builtInLedCtrl.update();    // 内蔵LEDの更新処理
+  externalLedCtrl.update();   // 外部LEDの更新処理
 
   if (millis() - lastReadTime >= readInterval) {  // 一定間隔でセンサデータを読み取る
 /*

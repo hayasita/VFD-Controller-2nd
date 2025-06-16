@@ -8,6 +8,7 @@
 #include "LogManager.h"
 #include "EnvironmentSensor.h"
 #include "DisplayManager.h"       // OLED表示クラス
+#include "LedController.h"        // LED制御クラス
 #include "RTCManager.h"
 #include "TimeManager.h"        // 時間管理クラス
 #include "WiFiManagerReal.h"          // WiFi接続管理クラス（実機用）
@@ -47,6 +48,11 @@ private:
   JsonCommandProcessor jsonCommandProcessor;        // JSONコマンド処理
   RealMonitorDeviseIo realMonitorDeviseIo;        // シリアルコマンド処理
   SerialCommandProcessor serialCommandProcessor;  // シリアルコマンド処理
+
+  CRGB builtInLeds[NUM_BUILTIN_LEDS];
+  CRGB externalLeds[NUM_EXTERNAL_LEDS];
+  LedController builtInLedCtrl;
+  LedController externalLedCtrl;
 
   unsigned long lastReadTime = 0;           // 最後の読み込み時間
   const unsigned long readInterval = 1000;  // 読み込み間隔（ミリ秒）
