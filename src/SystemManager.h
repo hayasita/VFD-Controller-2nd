@@ -4,6 +4,8 @@
 #include "WiFiManager.h"
 #include "TimeManager.h"
 
+class ParameterManager; // 前方参照
+
 enum class SystemMode {
   Clock,
   WiFiConnected,
@@ -13,17 +15,19 @@ enum class SystemMode {
 
 class SystemManager {
 public:
-  void begin(WiFiManager& wifi, TimeManager& time);
+  void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter);  // WiFiManagerとTimeManagerの初期化
   void update(SystemEvent event);
 
   // パラメータ変更通知
   void onParameterChanged(uint8_t index, uint8_t newValue);
+  bool setParameterByKey(const std::string& key, int value);
 
 private:
   SystemMode currentMode = SystemMode::Clock;
   SystemMode currentWifiMode = SystemMode::WiFiDisconnected;
   WiFiManager* wifiManager = nullptr;
   TimeManager* timeManager = nullptr;
+  ParameterManager* parameterManager = nullptr;  // パラメータ管理クラスへのポインタ
 
   bool format12h = false;       // 12時間表示フラグ Pr.1と連動
 
