@@ -11,7 +11,9 @@
  */
 class DisplayManager {
 public:
-  void begin(I2CBusManager& busManager);
+  DisplayManager(I2CBusManager* busManager);
+  ~DisplayManager() = default;
+  void begin(void);
 
   void showClock(const DateTime& now);
   void showMessage(const char* message);
