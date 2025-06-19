@@ -1,7 +1,11 @@
 #include "EnvironmentSensor.h"
 
-void EnvironmentSensor::begin(I2CBusManager& i2cBus) {
-    this->i2cBus = &i2cBus;
+EnvironmentSensor::EnvironmentSensor(I2CBusManager* busManager)
+ : i2cBus(busManager)
+{}
+
+void EnvironmentSensor::begin(void) {
+  return;
 }
 
 bool EnvironmentSensor::readSensorData() {
