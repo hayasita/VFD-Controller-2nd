@@ -90,6 +90,13 @@ bool ParameterManager::setupParameter(uint8_t index, int defaultValue, int minVa
   }
   std::cout << "setupParameter: index=" << static_cast<int>(index) << " : currentValue=" << static_cast<int>(param.currentValue) << std::endl;
 
+  if (param.onChanged) {
+    param.onChanged(index, param.currentValue); // コールバック発火
+    std::cout << "setupParameter: Callback called for index=" << static_cast<int>(index) << std::endl;
+  } else {
+    std::cout << "setupParameter: No callback for index=" << static_cast<int>(index) << std::endl;
+  }
+
   return true;
 }
 
