@@ -30,7 +30,9 @@ enum class RTCType {
  */
 class RTCManager {
 public:
-  bool begin(I2CBusManager& busManager);        // RTCの初期化（I2CBusManager経由でI2Cを使用）
+  RTCManager(I2CBusManager* busManager);        // コンストラクタ
+  ~RTCManager() = default;
+  bool begin(void);                             // RTCの初期化（I2CBusManager経由でI2Cを使用）
   bool isRunning();                             // RTCが動作しているか確認
   DateTime now();                               // 現在時刻を取得
   void adjust(const DateTime& dt);              // RTCの時刻を設定

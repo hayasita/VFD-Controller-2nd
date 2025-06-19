@@ -15,6 +15,11 @@
 #include <RTClib.h>
 #include "RTCManager.h"
 
+RTCManager::RTCManager(I2CBusManager* busManager)
+  : i2cBus(busManager), rtc1307(), rtc3231()  // I2CBusManagerの参照を設定
+{
+  return;
+}
 /**
  * @brief RTCManagerの初期化
  * @details
@@ -23,8 +28,8 @@
  * RTCデバイスの種類は、DS1307、DS3231、M5RTCのいずれかとなる。
  * 
  */
-bool RTCManager::begin(I2CBusManager& busManager) {
-  i2cBus = &busManager;
+bool RTCManager::begin(void)
+{
   std::lock_guard<std::recursive_mutex> lock(i2cBus->getMutex());
 
   bool found = false;

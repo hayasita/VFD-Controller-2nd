@@ -13,6 +13,7 @@ SystemController::SystemController()
   : paramManager(&eepromManager, &logManager, &systemManager),  // パラメータ管理の初期化
     i2cBus(),                                         // I2Cバス管理の初期化
     display(&i2cBus),                                 // OLED表示の初期化
+    rtcManager(&i2cBus),                              // RTC管理の初期化
     builtInLedCtrl(builtInLeds, NUM_BUILTIN_LEDS),    // 内蔵LED制御の初期化
     externalLedCtrl(externalLeds, NUM_EXTERNAL_LEDS), // 外部LED制御の初期化
     envSensor(&i2cBus),                               // 環境センサの初期化
@@ -43,7 +44,6 @@ void SystemController::begin() {
   // 3. 他モジュールの初期化
   eepromManager.begin(i2cBus);            // EEPROMの初期化
   logManager.begin(eepromManager);        // ログ管理の初期化
-  rtcManager.begin(i2cBus);               // RTCの初期化
   timeManager.begin(&rtcManager);         // 時間管理の初期化
   TimeManager::setInstance(&timeManager); // シングルトンインスタンス設定
 //  timeManager.setSystemTimeManually(2023, 10, 1, 12, 0, 0); // 手動で時刻設定
