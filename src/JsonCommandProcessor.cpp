@@ -1,8 +1,8 @@
 #include <M5Unified.h>
 #include "JsonCommandProcessor.h"
 
-JsonCommandProcessor::JsonCommandProcessor(ParameterManager* pm, WiFiManager* wifiManager)
-  : parameterManager(pm), wifiManager(wifiManager)
+JsonCommandProcessor::JsonCommandProcessor(ParameterManager* pm, WiFiManager* wifiManager, SystemManager* systemManager)
+  : parameterManager(pm), wifiManager(wifiManager), systemManager(systemManager)
 {
   return;
 }
@@ -41,8 +41,8 @@ void JsonCommandProcessor::processCommand(const String& jsonString) {
     else{
       Serial.println("staAutoConnect = 0");
     }
-//    bool success = parameterManager->setParameter(45, value);
-    bool success = parameterManager->setParameter(0, value);
+
+    bool success = systemManager->setParameterByKey("staAutoConnect", value); // SystemManagerを経由してパラメータ設定する
   }
 
   if (!doc.containsKey("command")) {
@@ -60,7 +60,7 @@ void JsonCommandProcessor::processCommand(const String& jsonString) {
   } else if (command == "ping") {
     handlePingCommand(doc);
   } else {
-    handleUnknownCommand(command);
+//    handleUnknownCommand(command);
   }
 }
 

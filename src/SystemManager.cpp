@@ -1,9 +1,12 @@
 #include <iostream>
+#include <map>
 #include "SystemManager.h"
+#include "parameterManager.h"
 
-void SystemManager::begin(WiFiManager& wifi, TimeManager& time) {
+void SystemManager::begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter) {
   wifiManager = &wifi;
   timeManager = &time;
+  parameterManager = &parameter;
 }
 
 void SystemManager::update(SystemEvent event) {
@@ -75,6 +78,8 @@ void SystemManager::onParameterChanged(uint8_t index, uint8_t newValue) {
  * それ以外の場合は無効にする。
  */
 void SystemManager::updateWiFiAutoConnect(void) {
+  std::cout << "ntpSet : " << ntpSet << "\n";
+  std::cout << "staAutoConnect : " << staAutoConnect << "\n";
   if(ntpSet && staAutoConnect) {
     wifiManager->setAutoConnect(true); // WiFiManagerに自作のON/OFFメソッドを用意
     std::cout << "WiFi起動時自動接続: ON\n";
@@ -87,3 +92,18 @@ void SystemManager::updateWiFiAutoConnect(void) {
   return;
 }
 
+bool SystemManager::setParameterByKey(const std::string& key, int value) {
+  // キー名とパラメータ番号の対応表
+  static const std::map<std::string, uint8_t> keyToParam = {
+  //  {"staAutoConnect",0},
+    {"ntp_enable", 30},
+    {"staAutoConnect", 44},
+    // 必要に応じて追加
+  };
+
+  auto it = keyToParam.find(key);
+  if (it != keyToParam.end()) {
+    return parameterManager->setParameter(it->second, value); // 既存のsetParameter(番号, 値)を呼ぶ
+  }
+  return false; // 未対応のキー
+}
