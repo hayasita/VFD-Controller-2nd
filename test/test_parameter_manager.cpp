@@ -2,38 +2,11 @@
 #include <iostream>
 #include "./mock/DummyLogManager.h"
 #include "./mock/DummyEepromManager.h"
-//#include "./mock/I2CBusManager.h"  // モックのI2CBusManagerをインクルード
-#include "../src/ParameterManager.h"  // ←実際のヘッダに合わせてパスを調整してね！
+#include "./mock/DummyI2CBusManager.h"  // モックのI2CBusManagerをインクルード
+#include "./mock/DummySystemManager.h"  // モックのSystemManagerをインクルード
+#include "../src/ParameterManager.h"    // テスト対象のParameterManagerをインクルード
 
-class DummyI2CBusManager : public I2CBusManager {
-  public:
-    void begin() override {}
-    std::recursive_mutex& getMutex() override { return dummyMutex; }
-    TwoWire& getWire() override { return wire; }
-    std::vector<uint8_t> scanI2CBus(uint8_t address = 0x00, uint8_t count = 127) override {
-      return {}; // モックなので空のリストを返す
-    }
-  private:
-    std::recursive_mutex dummyMutex;
-    TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）
-};
-
-class DummySystemManager : public SystemManager {
-public:
-  void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter) override {
-    // モックの初期化処理
-  }
-  void update(SystemEvent event) override {
-    // モックの更新処理
-  }
-  void onParameterChanged(uint8_t index, uint8_t newValue) override {
-  }
-  bool setParameterByKey(const std::string& key, int value) override {
-    // モックのパラメータ設定処理
-    return true;  // 成功を返す
-  }
-};
-
+// テスト用のモッククラスを使用してParameterManagerのテストを行う
 class ParameterManagerTest : public ::testing::Test {
 protected:
   DummyI2CBusManager dummyBusManager;  // I2CBusManagerのモック
