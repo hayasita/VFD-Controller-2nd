@@ -20,7 +20,9 @@
  */
 class DummyEepromManager : public EepromManager {
 public:
-  DummyEepromManager() {
+    DummyEepromManager(I2CBusManager* busManager)
+        : EepromManager(busManager)  // 親クラスのコンストラクタを呼び出す（I2CBusManagerを渡す）
+   {
     // コンストラクタで初期化は行わない
     // メモリ配列のサイズを定義
     memset(memory, 0, SIZE);  // メモリを初期化

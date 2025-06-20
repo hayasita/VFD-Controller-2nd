@@ -5,19 +5,57 @@
 //#include "./mock/I2CBusManager.h"  // モックのI2CBusManagerをインクルード
 #include "../src/ParameterManager.h"  // ←実際のヘッダに合わせてパスを調整してね！
 
+class DummyI2CBusManager : public I2CBusManager {
+  public:
+    void begin() override {}
+    std::recursive_mutex& getMutex() override { return dummyMutex; }
+    TwoWire& getWire() override { return wire; }
+    std::vector<uint8_t> scanI2CBus(uint8_t address = 0x00, uint8_t count = 127) override {
+      return {}; // モックなので空のリストを返す
+    }
+  private:
+    std::recursive_mutex dummyMutex;
+    TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）
+};
+
+class DummySystemManager : public SystemManager {
+public:
+  void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter) override {
+    // モックの初期化処理
+  }
+  void update(SystemEvent event) override {
+    // モックの更新処理
+  }
+  void onParameterChanged(uint8_t index, uint8_t newValue) override {
+  }
+  bool setParameterByKey(const std::string& key, int value) override {
+    // モックのパラメータ設定処理
+    return true;  // 成功を返す
+  }
+};
+
 class ParameterManagerTest : public ::testing::Test {
 protected:
-  DummyEepromManager eepromManager;
-  DummyLogManager logManager;
+  DummyI2CBusManager dummyBusManager;  // I2CBusManagerのモック
+  DummyEepromManager dummyEepromManager;
+  DummyLogManager dummyLogManager;
   ParameterManager paramManager;
-  
-  ParameterManagerTest() : paramManager(&eepromManager, &logManager) {
+  DummySystemManager dummySystemManager;
+
+  ParameterManagerTest()
+  : dummyBusManager(),
+    dummyEepromManager(&dummyBusManager),  // I2CBusManagerのモックを渡す
+    dummyLogManager(),
+    paramManager(&dummyEepromManager, &dummyLogManager, &dummySystemManager),  // ParameterManagerのコンストラクタにモックを渡す
+    dummySystemManager()
+  {
     // コンストラクタで初期化
   }
+
   void SetUp() override {
-    logManager.begin(eepromManager);
+    dummyLogManager.begin(dummyEepromManager);
     paramManager.begin();
-    paramManager.setupParameter(0, 10, 5, 100);  // 初期値10, 5〜100
+    paramManager.setupParameter(0, 10, 5, 100, nullptr);  // 初期値10, 5〜100
     paramManager.setParameter(0, 15); // 初期値15, 5〜100
   }
 
@@ -53,13 +91,13 @@ TEST_F(ParameterManagerTest, SetParameterWithinRange) {
 TEST_F(ParameterManagerTest, SetParameterOutOfRangeLow) {
   bool result = paramManager.setParameter(0, 0);    // 0番パラメータに0を設定（範囲外）
   EXPECT_FALSE(result);                             // 失敗することを確認
-  EXPECT_NE(std::string::npos, logManager.lastMessage.find("out of range")); // ログに"範囲外"が記録されること
+  EXPECT_NE(std::string::npos, dummyLogManager.lastMessage.find("out of range")); // ログに"範囲外"が記録されること
 }
 
 TEST_F(ParameterManagerTest, SetParameterOutOfRangeHigh) {
   bool result = paramManager.setParameter(0, 200);  // 0番パラメータに200を設定（範囲外）
   EXPECT_FALSE(result);                             // 失敗することを確認
-  EXPECT_NE(std::string::npos, logManager.lastMessage.find("out of range")); // ログに"範囲外"が記録されること
+  EXPECT_NE(std::string::npos, dummyLogManager.lastMessage.find("out of range")); // ログに"範囲外"が記録されること
 }
 
 /**
@@ -69,9 +107,9 @@ TEST_F(ParameterManagerTest, SetupParameter_LoadFails_UseDefault) {
   static constexpr int PARAM_START_ADDR = 0x0010;  // パラメータの開始アドレス
   uint8_t value = 101;
   uint16_t index = 0;
-  eepromManager.writeByte(PARAM_START_ADDR + index, value);   // MockEEPROMに書き込む
+  dummyEepromManager.writeByte(PARAM_START_ADDR + index, value);   // MockEEPROMに書き込む
   uint8_t valueRead = 0;
-  eepromManager.readByte(index, &valueRead);                  // MockEEPROMから読み込む
+  dummyEepromManager.readByte(index, &valueRead);                  // MockEEPROMから読み込む
   std::cout << "EEPROM read value: " << static_cast<int>(valueRead) << std::endl; // 読み込んだ値を表示
   ASSERT_TRUE(paramManager.setupParameter(0, 42, 0, 100));    // Pr.0, デフォルト値42, 範囲0〜100 設定
   EXPECT_EQ(paramManager.getParameter(0), 42);                // デフォルト値が使用されることを確認
@@ -85,7 +123,7 @@ TEST_F(ParameterManagerTest, SetupParameter_LoadSucceeds_WithinRange) {
   static constexpr int PARAM_START_ADDR = 0x0010;  // パラメータの開始アドレス
   int value = 55;
   uint8_t index = 1;
-  eepromManager.writeByte(PARAM_START_ADDR + index, value); // MockEEPROMに書き込む
+  dummyEepromManager.writeByte(PARAM_START_ADDR + index, value); // MockEEPROMに書き込む
   ASSERT_TRUE(paramManager.setupParameter(1, 42, 0, 100));  // Pr.1, デフォルト値42, 範囲0〜100 設定
   EXPECT_EQ(paramManager.getParameter(1), 55);              // MockEEPROMから読み込んだ値が使用されることを確認
 }

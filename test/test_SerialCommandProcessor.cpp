@@ -39,7 +39,12 @@ namespace
       ParameterManager paramManager;
 
     SerialMonitorTest()
-      : paramManager(&eepromManager, &logManager),
+      : 
+        i2cbusManager(),
+        eepromManager(&i2cbusManager),  // I2CBusManagerを渡す
+        logManager(),
+        wifiManager(),
+        paramManager(&eepromManager, &logManager),
         serialMonitor(mock, i2cbusManager, paramManager, eepromManager, wifiManager)
     {}
 
