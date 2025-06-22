@@ -9,7 +9,9 @@
 class EepromManager {
 public:
   // 初期化
-  virtual void begin(I2CBusManager& busManager);
+  EepromManager(I2CBusManager *busManager);  // デフォルトコンストラクタ
+
+  virtual void begin(void);
 
   // EEPROMアクセス用のミューテックスを取得
   virtual std::recursive_mutex& getMutex();

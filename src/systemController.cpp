@@ -10,12 +10,17 @@ SystemController::SystemController()
 }
 */
 SystemController::SystemController()
-  : paramManager(&eepromManager, &logManager, &systemManager),  // パラメータ管理の初期化
-    i2cBus(),                                         // I2Cバス管理の初期化
+  : 
+    realMonitorDeviseIo(),                            // シリアル入出力処理の初期化
+    serialCommandProcessor(realMonitorDeviseIo, i2cBus, paramManager, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化
+    paramManager(&eepromManager, &logManager, &systemManager),  // パラメータ管理の初期化
+    i2cBus(),        // I2Cバス管理の初期化
+    display(&i2cBus),                                 // OLED表示の初期化
+    eepromManager(&i2cBus),                           // EEPROM管理の初期化
+    envSensor(&i2cBus),                               // 環境センサの初期化
+    rtcManager(&i2cBus),                              // RTC管理の初期化
     builtInLedCtrl(builtInLeds, NUM_BUILTIN_LEDS),    // 内蔵LED制御の初期化
     externalLedCtrl(externalLeds, NUM_EXTERNAL_LEDS), // 外部LED制御の初期化
-    realMonitorDeviseIo(),                                                            // シリアル入出力処理の初期化
-    serialCommandProcessor(realMonitorDeviseIo, i2cBus, paramManager, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化
     jsonCommandProcessor(&paramManager, &wiFiManager, &systemManager),                // JSONコマンド処理の初期化
     wiFiManager(&wifiReal),                                                           // WiFi接続管理の初期化
     webServerManager(&paramManager, &jsonCommandProcessor, &wiFiManager)              // Webサーバ管理の初期化
@@ -39,11 +44,10 @@ void SystemController::begin() {
   }
 
   // 3. 他モジュールの初期化
-  eepromManager.begin(i2cBus);            // EEPROMの初期化
+  display.begin();                        // OLED表示の初期化
+  eepromManager.begin();            // EEPROMの初期化
   logManager.begin(eepromManager);        // ログ管理の初期化
-  envSensor.begin(i2cBus);                // 環境センサの初期化
-  display.begin(i2cBus);                  // OLED表示の初期化
-  rtcManager.begin(i2cBus);               // RTCの初期化
+  rtcManager.begin();                     // RTCの初期化
   timeManager.begin(&rtcManager);         // 時間管理の初期化
   TimeManager::setInstance(&timeManager); // シングルトンインスタンス設定
 //  timeManager.setSystemTimeManually(2023, 10, 1, 12, 0, 0); // 手動で時刻設定

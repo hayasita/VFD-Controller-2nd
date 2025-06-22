@@ -7,7 +7,8 @@
  */
 class EnvironmentSensor {
 public:
-  void begin(I2CBusManager& i2cBus);
+  EnvironmentSensor(I2CBusManager* busManager);
+  void begin(void);
   bool readSensorData();
   float getTemperature() const;
   float getHumidity() const;

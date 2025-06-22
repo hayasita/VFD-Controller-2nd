@@ -8,7 +8,9 @@
 class EepromRawAccessor {
 public:
   // EEPROMの初期化
-  void begin(I2CBusManager& busManager);
+  EepromRawAccessor(I2CBusManager *busManager);  // デフォルトコンストラクタ
+
+  void begin(void);
 
   // バイト単位でデータを書き込む
   bool writeBytes(int address, const void* data, size_t len);

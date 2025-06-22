@@ -6,25 +6,13 @@
 #include "./mock/DummyEepromManager.h"
 #include "./mock/DummyLogManager.h"
 #include "./mock/MockWiFiManager.h"
+#include "./mock/DummyI2CBusManager.h"
 
 namespace
 {
   using ::testing::AtLeast;
   using ::testing::Return;
   using ::testing::Test;
-
-  class DummyI2CBusManager : public I2CBusManager {
-    public:
-      void begin() override {}
-      std::recursive_mutex& getMutex() override { return dummyMutex; }
-      TwoWire& getWire() override { return wire; }
-      std::vector<uint8_t> scanI2CBus(uint8_t address = 0x00, uint8_t count = 127) override {
-        return {}; // モックなので空のリストを返す
-      }
-    private:
-      std::recursive_mutex dummyMutex;
-      TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）
-  };
 
   class SerialMonitorTest : public Test {
     protected:
@@ -39,7 +27,12 @@ namespace
       ParameterManager paramManager;
 
     SerialMonitorTest()
-      : paramManager(&eepromManager, &logManager),
+      : 
+        i2cbusManager(),
+        eepromManager(&i2cbusManager),  // I2CBusManagerを渡す
+        logManager(),
+        wifiManager(),
+        paramManager(&eepromManager, &logManager),
         serialMonitor(mock, i2cbusManager, paramManager, eepromManager, wifiManager)
     {}
 

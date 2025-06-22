@@ -15,12 +15,12 @@ enum class SystemMode {
 
 class SystemManager {
 public:
-  void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter);  // WiFiManagerとTimeManagerの初期化
-  void update(SystemEvent event);
+  virtual void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter);  // WiFiManagerとTimeManagerの初期化
+  virtual void update(SystemEvent event);
 
   // パラメータ変更通知
-  void onParameterChanged(uint8_t index, uint8_t newValue);
-  bool setParameterByKey(const std::string& key, int value);
+  virtual void onParameterChanged(uint8_t index, uint8_t newValue);
+  virtual bool setParameterByKey(const std::string& key, int value);
 
 private:
   SystemMode currentMode = SystemMode::Clock;
@@ -33,6 +33,9 @@ private:
 
   bool ntpSet = false;          // NTP設定フラグ  Pr.30と連動
   bool staAutoConnect = false;  // WiFi Station自動接続フラグ Pr.44と連動
+  uint8_t timeZoneAreaId = 0;   // タイムゾーンエリアID Pr.33と連動
+  uint8_t timeZoneId = 0;       // タイムゾーンID Pr.34と連動
+  uint8_t timeZoneData = 0;     // タイムゾーンデータ Pr.35と連動
 
   void updateWiFiAutoConnect(void);
 

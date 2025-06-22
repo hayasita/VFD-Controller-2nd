@@ -1,8 +1,12 @@
 #include "../../src/EepromRawAccessor.h"
 #include <cstring>  // 追加
 
-void EepromRawAccessor::begin(I2CBusManager& busManager) {
-  i2cBus = &busManager;
+EepromRawAccessor::EepromRawAccessor(I2CBusManager *busManager)
+  : i2cBus(busManager)  // I2CBusManagerの参照を設定
+{
+}
+
+void EepromRawAccessor::begin(void) {
   std::lock_guard<std::recursive_mutex> lock(i2cBus->getMutex());
 
   EEPROM.begin(EEPROM_SIZE);

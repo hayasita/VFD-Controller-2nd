@@ -4,6 +4,12 @@
 #include "Config.h"
 #include "EepromManager.h"
 
+EepromManager::EepromManager(I2CBusManager *busManager)
+  : i2cBus(busManager)  // I2CBusManagerの参照を設定
+  , rawAccessor(busManager)  // EepromRawAccessorを初期化
+{
+}
+
 /**
  * @brief EEPROM管理クラスの初期化
  * @param busManager I2Cバス管理クラスの参照
@@ -11,11 +17,10 @@
  * i2cBusはI2CBusManagerのインスタンスを参照し、EEPROMへのアクセスを排他制御するためのミューテックスを使用します。
  * この関数は、EEPROMの初期化を行い、I2Cバスの設定を行います。
  */
-void EepromManager::begin(I2CBusManager& busManager) {
-  i2cBus = &busManager;
+void EepromManager::begin(void) {
   std::lock_guard<std::recursive_mutex> lock(i2cBus->getMutex());
 
-  rawAccessor.begin(busManager);  // EepromRawAccessorを初期化
+  rawAccessor.begin();  // EepromRawAccessorを初期化
 }
 
 /**

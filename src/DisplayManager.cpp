@@ -1,8 +1,13 @@
 #include "DisplayManager.h"
 #include "Config.h"
 
-void DisplayManager::begin(I2CBusManager& busManager) {
-  i2cBus = &busManager;
+DisplayManager::DisplayManager(I2CBusManager* busManager)
+  : i2cBus(busManager), oled(M5UnitOLED())  // M5UnitOLEDの初期化
+{
+  return;
+}
+
+void DisplayManager::begin(void) {
   std::lock_guard<std::recursive_mutex> lock(i2cBus->getMutex());
 
   oled.init(SDA_PIN, SCL_PIN, I2C_FREQ);  // SDA,SCL必須
