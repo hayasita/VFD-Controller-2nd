@@ -27,6 +27,9 @@ void ParameterManager::begin(void) {
   setupParameter( 1, 3, 1, 10, std::bind(&SystemManager::onParameterChanged, systemManager,  1, std::placeholders::_2));   // Pr.1 初期化 表示フォーマット：Display Format
 
   setupParameter(30, 0, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager, 30, std::placeholders::_2));   // Pr.30 初期化 SNTP設定：SNTP使用
+  setupParameter(33, 0x04, 0x00, 0xFF, std::bind(&SystemManager::onParameterChanged, systemManager, 33, std::placeholders::_2));   // Pr.33 初期化 SNTP設定：タイムゾーンエリアID
+  setupParameter(34, 0x50, 0x00, 0xFF, std::bind(&SystemManager::onParameterChanged, systemManager, 34, std::placeholders::_2));   // Pr.34 初期化 SNTP設定：タイムゾーンID
+  setupParameter(35, 0x1E, 0x00, 0xFF, std::bind(&SystemManager::setTimezone,        systemManager,     std::placeholders::_2));   // Pr.35 初期化 SNTP設定：タイムゾーン
 
   setupParameter(44, 0, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager, 44, std::placeholders::_2));   // Pr.44 初期化 WiFi Station 設定：STA自動接続有効
 

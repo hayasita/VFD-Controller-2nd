@@ -30,6 +30,25 @@ void JsonCommandProcessor::processCommand(const String& jsonString) {
       handleGetWifiStaListCommand(doc);
     }
   }
+
+  jsondata = doc["timeZoneAreaId"]; // "timeZoneAreaId" キーを取得
+  if (!jsondata.isNull()) {
+    int value = jsondata.as<int>();
+    Serial.println("timeZoneAreaId = " + String(value));
+    bool success = systemManager->setParameterByKey("timeZoneAreaId", value); // SystemManagerを経由してパラメータ設定する
+  }
+  jsondata = doc["timeZoneId"]; // "timeZoneId" キーを取得
+  if (!jsondata.isNull()) {
+    int value = jsondata.as<int>();
+    Serial.println("timeZoneId = " + String(value));
+    bool success = systemManager->setParameterByKey("timeZoneId", value); // SystemManagerを経由してパラメータ設定する
+  }
+  jsondata = doc["timeZone"]; // "timeZone" キーを取得
+  if (!jsondata.isNull()) {
+    int value = jsondata.as<int>();
+    Serial.println("timeZone = " + String(value));
+    bool success = systemManager->setParameterByKey("timeZone", value); // SystemManagerを経由してパラメータ設定する
+  }
   
   // WiFi Station 設定：STA 自動接続有効
   jsondata = doc["staAutoConnect"]; // "wifiAutoConnect" キーを取得

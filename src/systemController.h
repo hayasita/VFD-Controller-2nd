@@ -55,7 +55,7 @@ private:
   LedController externalLedCtrl;
 
   unsigned long lastReadTime = 0;           // 最後の読み込み時間
-  const unsigned long readInterval = 1000;  // 読み込み間隔（ミリ秒）
+  const unsigned long readInterval = 100;   // 読み込み間隔（ミリ秒）
   
   void updateClockDisplay();                // OLEDに時刻表示
 };

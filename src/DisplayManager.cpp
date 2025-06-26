@@ -19,18 +19,6 @@ void DisplayManager::begin(void) {
   oled.endWrite();
 }
 
-void DisplayManager::showClock(const DateTime& now) {
-  std::lock_guard<std::recursive_mutex> lock(i2cBus->getMutex());
-
-  char timeStr[16];
-  snprintf(timeStr, sizeof(timeStr), "%02d:%02d:%02d", now.hour(), now.minute(), now.second());
-
-  oled.setCursor(0, 20);
-  oled.print(timeStr);
-  oled.endWrite();
-
-}
-
 void DisplayManager::showMessage(const char* message) {
 
   oled.setCursor(0, 10);
@@ -39,12 +27,13 @@ void DisplayManager::showMessage(const char* message) {
 
 }
 
-void DisplayManager::showTime(int hour, int minute, int second) {
+void DisplayManager::showTime(int hour, int minute, int second, int position, const char* header) {
   char timeStr[16];
-  snprintf(timeStr, sizeof(timeStr), "%02d:%02d:%02d", hour, minute, second);
+  snprintf(timeStr, sizeof(timeStr), "%s:%02d:%02d:%02d", header, hour, minute, second);
 
-  oled.setCursor(0, 20);
+  oled.setCursor(0, position);
   oled.print(timeStr);
   oled.endWrite();
 
 }
+

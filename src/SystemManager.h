@@ -21,6 +21,7 @@ public:
   // パラメータ変更通知
   virtual void onParameterChanged(uint8_t index, uint8_t newValue);
   virtual bool setParameterByKey(const std::string& key, int value);
+  virtual bool setTimezone(uint8_t zoneData);
 
 private:
   SystemMode currentMode = SystemMode::Clock;

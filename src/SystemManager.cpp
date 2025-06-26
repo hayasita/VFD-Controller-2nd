@@ -65,6 +65,9 @@ void SystemManager::onParameterChanged(uint8_t index, uint8_t newValue) {
 
   if(index == 30) ntpSet = (bool)newValue;
   if(index == 44) staAutoConnect = (bool)newValue;
+  if(index == 33){ timeZoneAreaId = newValue;}  // Pr.33: SNTP設定：タイムゾーンエリアID
+  if(index == 34){ timeZoneId = newValue;}      // Pr.34: SNTP設定：タイムゾーンID
+  if(index == 35){ timeZoneData = newValue;}    // Pr.35: SNTP設定：タイムゾーン
 
   updateWiFiAutoConnect();
 
@@ -97,6 +100,9 @@ bool SystemManager::setParameterByKey(const std::string& key, int value) {
   static const std::map<std::string, uint8_t> keyToParam = {
   //  {"staAutoConnect",0},
     {"ntp_enable", 30},
+    {"timeZoneAreaId", 33},
+    {"timeZoneId", 34},
+    {"timeZone", 35},
     {"staAutoConnect", 44},
     // 必要に応じて追加
   };
@@ -106,4 +112,30 @@ bool SystemManager::setParameterByKey(const std::string& key, int value) {
     return parameterManager->setParameter(it->second, value); // 既存のsetParameter(番号, 値)を呼ぶ
   }
   return false; // 未対応のキー
+}
+
+bool SystemManager::setTimezone(uint8_t zoneData) {
+  const char* gmt[] = {
+  "GMT+12:00","GMT+11:00","GMT+10:00","GMT+09:30",
+  "GMT+09:00","GMT+08:00","GMT+07:00","GMT+06:00",
+  "GMT+05:00","GMT+04:00","GMT+03:30","GMT+03:00",
+  "GMT+02:00","GMT+01:00","GMT-00:00","GMT-01:00",
+  "GMT-02:00","GMT-03:00","GMT-03:30","GMT-04:00",
+  "GMT-04:30","GMT-05:00","GMT-05:30","GMT-05:45",
+  "GMT-06:00","GMT-06:30","GMT-07:00","GMT-08:00",
+  "GMT-08:30","GMT-08:45","GMT-09:00","GMT-09:30",
+  "GMT-10:00","GMT-10:30","GMT-11:00","GMT-12:00",
+  "GMT-12:45","GMT-13:00","GMT-14:00"
+  };
+
+  if (zoneData < sizeof(gmt) / sizeof(gmt[0])) {
+    std::cout << "Setting timezone to: " << gmt[zoneData] << "\n";
+
+    const char* tz = gmt[zoneData];
+    const std::string& tzStr = std::string(tz);
+    timeManager->updateTimeZone(tzStr); // TimeManagerのupdateTimeZoneを呼び出す
+    return true;
+  }
+  std::cout << "Invalid timezone data: " << static_cast<int>(zoneData) << "\n";
+  return false;
 }
