@@ -15,9 +15,8 @@ public:
   ~DisplayManager() = default;
   void begin(void);
 
-  void showClock(const DateTime& now);
   void showMessage(const char* message);
-  void showTime(int hour, int minute, int second);
+  void showTime(int hour, int minute, int second, int position = 0, const char* header = "");
 
 private:
   I2CBusManager* i2cBus = nullptr;

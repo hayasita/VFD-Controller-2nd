@@ -164,7 +164,16 @@ void SystemController::update() {
 
 void SystemController::updateClockDisplay() {
   struct tm timeinfo;
-  timeinfo = timeManager.getSystemTimeStruct();
-  display.showTime(timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);  
+
+  timeinfo = timeManager.getLocalTimeStruct();
+  display.showTime(timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec, 20, "LOC");  // ローカル時刻を表示
+
+  timeinfo = timeManager.getRtcTimeStruct();  // RTC時刻を取得
+  display.showTime(timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec, 30, "RTC");  // RTC時刻を表示
+
+  time_t now = timeManager.getSystemTime();  // システム時刻を取得
+  DateTime dt(now);
+  display.showTime(dt.hour(), dt.minute(), dt.second(), 40, "SYS");  // システム時刻を表示
+
   return;   
 }
