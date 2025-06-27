@@ -8,6 +8,7 @@
 #include <time.h>
 #include <functional>
 #include <sys/time.h> // struct timezoneを使用するために必要
+#include <string>
 
 #ifdef UNIT_TEST
 // ...モック定義...
@@ -17,13 +18,20 @@ class RTCManager{}; // RTCManagerの前方宣言（実際のRTCManagerクラス�
 #include "RTCManager.h"
 #endif
 
+class AbstractTimeManager {
+public:
+  virtual ~AbstractTimeManager() = default;
+  virtual void updateTimeZone(const std::string& tzParam) = 0;
+  // 必要なら他の純粋仮想関数もここに追加
+};
+
 /**
  * @brief 時間管理クラス
  * 
  * TimeManagerは、RTC（リアルタイムクロック）を使用してシステム時刻を管理するクラスである。
  * システム時刻の取得、設定、RTCとの同期、SNTP同期などの機能を提供する。
  */
-class TimeManager {
+class TimeManager : public AbstractTimeManager {
 public:
   bool begin(RTCManager* rtcManager);         // RTCManagerの初期化
   time_t getSystemTime();                     // システム時刻を取得（UNIX時間）
@@ -34,7 +42,7 @@ public:
   void setSystemTimeFromRtc(struct timezone* tz);     // RTCからシステム時刻を設定
   void setSystemTimeFromManually(int year, int month, int day, int hour, int minute, int second); // 手動でシステム時刻を設定
   void updateRTCFromSystemTime();             // システム時刻をRTCに保存
-  void updateTimeZone(const std::string& tzParam); // タイムゾーンを更新
+  virtual void updateTimeZone(const std::string& tzParam) override;    // タイムゾーンを更新
 
   void configureSNTP(void);                   // SNTP同期設定
   static void setInstance(TimeManager* inst); // インスタンス設定

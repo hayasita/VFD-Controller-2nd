@@ -4,6 +4,7 @@
 #include "./mock/DummyEepromManager.h"
 #include "./mock/DummyI2CBusManager.h"  // モックのI2CBusManagerをインクルード
 #include "./mock/DummySystemManager.h"  // モックのSystemManagerをインクルード
+#include "./mock/DummyTimeManager.h"    // モックのTimeManagerをインクルード
 #include "../src/ParameterManager.h"    // テスト対象のParameterManagerをインクルード
 
 // テスト用のモッククラスを使用してParameterManagerのテストを行う
@@ -14,12 +15,14 @@ protected:
   DummyLogManager dummyLogManager;
   ParameterManager paramManager;
   DummySystemManager dummySystemManager;
+  DummyTimeManager dummyTimeManager;        // モックのTimeManager
 
   ParameterManagerTest()
   : dummyBusManager(),
     dummyEepromManager(&dummyBusManager),  // I2CBusManagerのモックを渡す
     dummyLogManager(),
     paramManager(&dummyEepromManager, &dummyLogManager, &dummySystemManager),  // ParameterManagerのコンストラクタにモックを渡す
+    dummyTimeManager(),                     // TimeManagerのモックを渡す
     dummySystemManager()
   {
     // コンストラクタで初期化

@@ -16,4 +16,8 @@ public:
     // モックのパラメータ設定処理
     return true;  // 成功を返す
   }
+  bool setTimezone(uint8_t zoneData) override {
+    // モックのタイムゾーン設定処理
+    return true;  // 成功を返す
+  }
 };
