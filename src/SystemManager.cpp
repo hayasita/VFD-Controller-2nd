@@ -139,3 +139,24 @@ bool SystemManager::setTimezone(uint8_t zoneData) {
   std::cout << "Invalid timezone data: " << static_cast<int>(zoneData) << "\n";
   return false;
 }
+
+std::string SystemManager::makeSettingJs(void) {
+  std::string js = "var _initial_setting_ = \'{\\\n";
+  
+  js += "\"ntpSet\" : \"" + std::string(ntpSet ? "1" : "0") + "\",\\\n";
+  js += "\"timeZoneAreaId\" : \"" + std::to_string(timeZoneAreaId) + "\",\\\n";
+  js += "\"timeZoneId\" : \"" + std::to_string(timeZoneId) + "\",\\\n";
+
+//  js += "  timeZone: " + std::to_string(timeZoneData) + "\",\\\n";
+//  js += "  format12h: " + std::string(format12h ? "true" : "false") + ",\n";
+//  js += "  display_format: " + std::to_string(display_format) + ",\n";
+//  js += "  ntp_enable: " + std::string(ntpSet ? "true" : "false") + ",\n";
+//  js += "  timeZoneAreaId: " + std::to_string(timeZoneAreaId) + ",\n";
+//  js += "  timeZoneId: " + std::to_string(timeZoneId) + ",\n";
+//  js += "  timeZone: " + std::to_string(timeZoneData) + ",\n";
+//  js += "  staAutoConnect: " + std::string(staAutoConnect ? "true" : "false") + "\n";
+
+  js += "\"end\" : \"\"\\\n";
+  js += "}\';";
+  return js;
+}

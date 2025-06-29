@@ -14,6 +14,7 @@ SystemController::SystemController()
     realMonitorDeviseIo(),                            // シリアル入出力処理の初期化
     serialCommandProcessor(realMonitorDeviseIo, i2cBus, paramManager, eepromManager, wiFiManager),  // シリアルコマンド処理の初期化
     paramManager(&eepromManager, &logManager, &systemManager),  // パラメータ管理の初期化
+    systemManager(),                                  // システム管理の初期化
     i2cBus(),        // I2Cバス管理の初期化
     display(&i2cBus),                                 // OLED表示の初期化
     eepromManager(&i2cBus),                           // EEPROM管理の初期化
@@ -97,6 +98,12 @@ void SystemController::begin() {
 //    updateClockDisplay();  // OLEDに時刻表示
     wiFiManager.sntpCompleted = true;           // SNTP同期完了フラグ設定
 
+  });
+
+  // setting.js 生成コールバックの設定
+  webServerManager.onMakeSettingJs([this]() -> std::string {
+    Serial.println("./setting.js generated");
+    return systemManager.makeSettingJs();  // システムマネージャからsetting.jsを生成
   });
 
   /*

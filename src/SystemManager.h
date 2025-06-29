@@ -15,6 +15,8 @@ enum class SystemMode {
 
 class SystemManager {
 public:
+  SystemManager() = default;        // コンストラクタ
+  ~SystemManager() = default;
   virtual void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter);  // WiFiManagerとTimeManagerの初期化
   virtual void update(SystemEvent event);
 
@@ -22,6 +24,8 @@ public:
   virtual void onParameterChanged(uint8_t index, uint8_t newValue);
   virtual bool setParameterByKey(const std::string& key, int value);
   virtual bool setTimezone(uint8_t zoneData);
+
+  std::string makeSettingJs(void);  // ./setting.jsを生成する
 
 private:
   SystemMode currentMode = SystemMode::Clock;
