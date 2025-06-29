@@ -63,13 +63,12 @@ void SystemManager::onParameterChanged(uint8_t index, uint8_t newValue) {
 
   if(index == 0) format12h = (bool)newValue; // Pr.0: 12時間表示フォーマット
 
-  if(index == 30) ntpSet = (bool)newValue;
-  if(index == 44) staAutoConnect = (bool)newValue;
+  if(index == 32){ ntpSet = (bool)newValue;}    // Pr.32: SNTP設定：SNTP使用
   if(index == 33){ timeZoneAreaId = newValue;}  // Pr.33: SNTP設定：タイムゾーンエリアID
   if(index == 34){ timeZoneId = newValue;}      // Pr.34: SNTP設定：タイムゾーンID
   if(index == 35){ timeZoneData = newValue;}    // Pr.35: SNTP設定：タイムゾーン
 
-  updateWiFiAutoConnect();
+  if(index == 44){ staAutoConnect = (bool)newValue;}  // Pr.44: WiFi Station 設定：STA自動接続有効
 
   return;
 }
@@ -99,7 +98,9 @@ bool SystemManager::setParameterByKey(const std::string& key, int value) {
   // キー名とパラメータ番号の対応表
   static const std::map<std::string, uint8_t> keyToParam = {
   //  {"staAutoConnect",0},
-    {"ntp_enable", 30},
+    {"format12h", 0},         // Pr.0: 12時間表示フォーマット
+    {"display_format", 1},    // Pr.1: 表示フォーマット
+    {"ntp_enable", 32},
     {"timeZoneAreaId", 33},
     {"timeZoneId", 34},
     {"timeZone", 35},

@@ -8,6 +8,13 @@
 #include "SystemManager.h"
 #include "ParameterStorage.h"
 
+#define BR_DEF        9   // 輝度初期値
+#define BR_MAX        15  // 最大輝度
+#define BR_MIN        1   // 最小輝度
+#define ADJ_BR1       0
+
+#define FADETIME_DEF  2   // クロスフェード時間初期値
+
 /**
  * @brief パラメータ管理クラス
  * - パラメータごとに「初期値」「最小値」「最大値」を設定可能

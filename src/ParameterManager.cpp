@@ -23,15 +23,33 @@ void ParameterManager::begin(void) {
   Parameter defaultParam = {0, 0, 0, 0, nullptr}; // 任意の初期値
   params.resize(MAX_PARAMS, defaultParam);        // パラメータ数を予約 すべてこの値で埋める
 
-  setupParameter( 0, 1, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager,  0, std::placeholders::_2));   // Pr.0 初期化 表示フォーマット：時刻表示12/24
-  setupParameter( 1, 3, 1, 10, std::bind(&SystemManager::onParameterChanged, systemManager,  1, std::placeholders::_2));   // Pr.1 初期化 表示フォーマット：Display Format
+  setupParameter( 0, 0x01, 0x00, 0x01, nullptr);          // Pr.0 初期化 表示フォーマット：時刻表示12/24
+  setupParameter( 1, 0x03, 0x01, 0x0A, nullptr);          // Pr.1 初期化 表示フォーマット：Display Format
+  setupParameter( 2, 0x00, 0x00, 0x0A, nullptr);          // Pr.2 初期化 表示フォーマット：timeDisplayFormat
+  setupParameter( 3, 0x00, 0x00, 0x0A, nullptr);          // Pr.3 初期化 表示フォーマット：dateDisplayFormat
+  setupParameter( 4, 0x00, 0x00, 0x0A, nullptr);          // Pr.4 初期化 表示効果：アニメーション動作
+  setupParameter( 5, FADETIME_DEF, 0x00, 0x09, nullptr);  // Pr.5 初期化 表示効果：クロスフェード時間
+  setupParameter( 6, 0x55, 0x32, 0x64, nullptr);          // Pr.6 初期化 表示輝度設定：明
+  setupParameter( 7, 0x40, 0x32, 0x64, nullptr);          // Pr.7 初期化 表示輝度設定：暗
+  setupParameter( 8, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.8 初期化 輝度 0桁
+  setupParameter( 9, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.9 初期化 輝度 1桁
+  setupParameter(10, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.10 初期化 輝度 2桁
+  setupParameter(11, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.11 初期化 輝度 3桁
+  setupParameter(12, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.12 初期化 輝度 4桁
+  setupParameter(13, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.13 初期化 輝度 5桁
+  setupParameter(14, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.14 初期化 輝度 6桁
+  setupParameter(15, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.15 初期化 輝度 7桁
+  setupParameter(16, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.16 初期化 輝度 8桁
 
-  setupParameter(30, 0, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager, 30, std::placeholders::_2));   // Pr.30 初期化 SNTP設定：SNTP使用
-  setupParameter(33, 0x04, 0x00, 0xFF, std::bind(&SystemManager::onParameterChanged, systemManager, 33, std::placeholders::_2));   // Pr.33 初期化 SNTP設定：タイムゾーンエリアID
-  setupParameter(34, 0x50, 0x00, 0xFF, std::bind(&SystemManager::onParameterChanged, systemManager, 34, std::placeholders::_2));   // Pr.34 初期化 SNTP設定：タイムゾーンID
-  setupParameter(35, 0x1E, 0x00, 0xFF, std::bind(&SystemManager::setTimezone,        systemManager,     std::placeholders::_2));   // Pr.35 初期化 SNTP設定：タイムゾーン
+  setupParameter(32, 0x00, 0x00, 0x01, std::bind(&SystemManager::updateWiFiAutoConnect, systemManager));   // Pr.32 初期化 SNTP設定：WiFi自動接続
+  setupParameter(33, 0x04, 0x00, 0xFF, nullptr);          // Pr.33 初期化 SNTP設定：タイムゾーンエリアID
+  setupParameter(34, 0x50, 0x00, 0xFF, nullptr);          // Pr.34 初期化 SNTP設定：タイムゾーンID
+  setupParameter(35, 0x1E, 0x00, 0xFF, std::bind(&SystemManager::setTimezone, systemManager,  std::placeholders::_2));   // Pr.35 初期化 SNTP設定：タイムゾーン
+  setupParameter(36, 0x00, 0x00, 0x17, nullptr);          // Pr.36 初期化 SNTP設定：SNTP auto update time　時
+  setupParameter(37, 0x00, 0x00, 0x3B, nullptr);          // Pr.37 初期化 SNTP設定：SNTP設定：SNTP auto update time　分
 
-  setupParameter(44, 0, 0,  1, std::bind(&SystemManager::onParameterChanged, systemManager, 44, std::placeholders::_2));   // Pr.44 初期化 WiFi Station 設定：STA自動接続有効
+  setupParameter(43, 0x00, 0x00, 0x03, nullptr);          // Pr.43 初期化 言語設定：Language
+  setupParameter(44, 0x00, 0x00, 0x01, std::bind(&SystemManager::updateWiFiAutoConnect, systemManager));   // Pr.44 初期化 WiFi Station 設定：STA自動接続有効
 
 }
 
@@ -93,6 +111,7 @@ bool ParameterManager::setupParameter(uint8_t index, int defaultValue, int minVa
   }
   std::cout << "setupParameter: index=" << static_cast<int>(index) << " : currentValue=" << static_cast<int>(param.currentValue) << std::endl;
 
+  systemManager->onParameterChanged(index, param.currentValue); // データ設定
   if (param.onChanged) {
     param.onChanged(index, param.currentValue); // コールバック発火
     std::cout << "setupParameter: Callback called for index=" << static_cast<int>(index) << std::endl;
@@ -134,11 +153,12 @@ bool ParameterManager::setParameter(uint8_t index, uint8_t value) {
   if (param.currentValue != value) {
     param.currentValue = value;
     storage.save(index, value);
-
-    if (param.onChanged) {
-      param.onChanged(index, value); // コールバック発火
-    }
   }
+  systemManager->onParameterChanged(index, value); // データ設定
+  if (param.onChanged) {
+    param.onChanged(index, value); // コールバック発火
+  }
+
   return true; // 成功
 }
 

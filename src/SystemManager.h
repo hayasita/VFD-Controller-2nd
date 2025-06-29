@@ -23,9 +23,11 @@ public:
   // パラメータ変更通知
   virtual void onParameterChanged(uint8_t index, uint8_t newValue);
   virtual bool setParameterByKey(const std::string& key, int value);
-  virtual bool setTimezone(uint8_t zoneData);
+  virtual bool setTimezone(uint8_t zoneData); // タイムゾーン設定
 
-  std::string makeSettingJs(void);  // ./setting.jsを生成する
+  virtual void updateWiFiAutoConnect(void); // WiFi自動接続の更新
+
+  virtual std::string makeSettingJs(void);  // ./setting.jsを生成する
 
 private:
   SystemMode currentMode = SystemMode::Clock;
@@ -41,8 +43,6 @@ private:
   uint8_t timeZoneAreaId = 0;   // タイムゾーンエリアID Pr.33と連動
   uint8_t timeZoneId = 0;       // タイムゾーンID Pr.34と連動
   uint8_t timeZoneData = 0;     // タイムゾーンデータ Pr.35と連動
-
-  void updateWiFiAutoConnect(void);
 
   bool isFormat12h() const { return format12h; }            // 12時間表示フォーマットフラグ
   bool isNtpAutoSet() const { return ntpSet; }              // NTP自動設定フラグ
