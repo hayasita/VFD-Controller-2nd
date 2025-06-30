@@ -75,26 +75,26 @@ target_link_libraries(SerialCommandProcessorTest
 
 #target_compile_definitions(EepromManTest PRIVATE UNIT_TEST)
 
-#
-#set(EEPROMTEST_SOURCES
-#    test_eeprom_manager.cpp
-#)
-#add_executable(EepromManTest
-#    ${EEPROMTEST_SOURCES}
-#)
-#target_include_directories(EepromManTest PRIVATE
-#    ${CMAKE_SOURCE_DIR}/test/mock
-#)
 
-#target_link_libraries(EepromManTest
-#    ParameterManLib
-#    gtest
-#    gtest_main
-#)
+set(EEPROMTEST_SOURCES
+    test_eeprom_manager.cpp
+)
+add_executable(EepromManTest
+    ${EEPROMTEST_SOURCES}
+)
+target_include_directories(EepromManTest PRIVATE
+    ${CMAKE_SOURCE_DIR}/test/mock
+)
 
-#target_compile_definitions(EepromManTest PRIVATE UNIT_TEST)
+target_link_libraries(EepromManTest
+    ParameterManLib
+    gtest
+    gtest_main
+)
+
+target_compile_definitions(EepromManTest PRIVATE UNIT_TEST)
 
 # テスト有効化
 enable_testing()
 add_test(NAME ParameterManTest COMMAND ParameterManTest)
-#add_test(NAME EepromManTest COMMAND EepromManTest)
+add_test(NAME EepromManTest COMMAND EepromManTest)
