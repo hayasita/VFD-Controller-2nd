@@ -311,8 +311,9 @@
         this.glowDark = vmUI.getDisplaySetting("glowInTheDark");
         // 表示輝度設定スライダー値設定処理
         this.glowChange = (item,e) =>{   // このタイミングでeerom書き込み
-          vmUI.setDisplaySetting(item, 1);
-          vmUI.submitDisplaySetting(item, 1);
+          const value = e.target.value;
+          vmUI.setDisplaySetting(item, value);
+          vmUI.submitDisplaySetting(item, value);
         }
 
         // 各桁表示輝度初期値取得
