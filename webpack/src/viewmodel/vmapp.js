@@ -237,20 +237,18 @@ export class vfdControllerUI{
 
         return getLastUpdateTime
     }
-
+    // 時刻設定:SNTP設定:SNTP 使用情報送信
     timeConfNtpUsesubmit(data) {
-        console.log("timeConfNtpUsesubmit()");
-        let jsondat
-        if(data == true){
-//            jsondat = "true"
-            jsondat = 1;
-        }
-        else{
-//            jsondat = "false"
-            jsondat = 0;
-        }
-        this.model.jsonPost(this.makeWebsocketData("ntpSet",jsondat))
-        return;
+      console.log("timeConfNtpUsesubmit()");
+      let jsondat
+      if(data == true){
+        jsondat = 1;
+      }
+      else{
+        jsondat = 0;
+      }
+      this.model.websocketSend(this.makeWebsocketData("ntpSet",jsondat));
+      return;
     }
 
     ntpdiffSubmit(hour, min){
