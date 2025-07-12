@@ -42,13 +42,13 @@ void ParameterManager::begin(void) {
   setupParameter(16, BR_DEF, BR_MIN, BR_MAX, nullptr);    // Pr.16 初期化 輝度 8桁
 
   setupParameter(32, 0x00, 0x00, 0x01, std::bind(&SystemManager::updateWiFiAutoConnect, systemManager));   // Pr.32 初期化 SNTP設定：WiFi自動接続
-  setupParameter(33, 0x04, 0x00, 0xFF, nullptr);          // Pr.33 初期化 SNTP設定：タイムゾーンエリアID
-  setupParameter(34, 0x50, 0x00, 0xFF, nullptr);          // Pr.34 初期化 SNTP設定：タイムゾーンID
-  setupParameter(35, 0x1E, 0x00, 0xFF, std::bind(&SystemManager::setTimezone, systemManager,  std::placeholders::_2));   // Pr.35 初期化 SNTP設定：タイムゾーン
+  setupParameter(33, 0x04, 0x00, 0xFE, nullptr);          // Pr.33 初期化 SNTP設定：タイムゾーンエリアID
+  setupParameter(34, 0x50, 0x00, 0xFE, nullptr);          // Pr.34 初期化 SNTP設定：タイムゾーンID
+  setupParameter(35, 0x1E, 0x00, 0xFE, std::bind(&SystemManager::setTimezone, systemManager,  std::placeholders::_2));   // Pr.35 初期化 SNTP設定：タイムゾーン
   setupParameter(36, 0x00, 0x00, 0x17, nullptr);          // Pr.36 初期化 SNTP設定：SNTP auto update time　時
-  setupParameter(37, 0x00, 0x00, 0x3B, nullptr);          // Pr.37 初期化 SNTP設定：SNTP設定：SNTP auto update time　分
+  setupParameter(37, 0x00, 0x00, 0x3B, nullptr);          // Pr.37 初期化 SNTP設定：SNTP auto update time　分
 
-  setupParameter(43, 0x00, 0x00, 0x03, nullptr);          // Pr.43 初期化 言語設定：Language
+  setupParameter(43, 0x00, 0x00, 0x03, nullptr);          // Pr.43 初期化 地域設定
   setupParameter(44, 0x00, 0x00, 0x01, std::bind(&SystemManager::updateWiFiAutoConnect, systemManager));   // Pr.44 初期化 WiFi Station 設定：STA自動接続有効
 
 }
@@ -178,8 +178,8 @@ uint8_t ParameterManager::getParameter(uint8_t index) {
   uint8_t value = 0;
   value = params[index].currentValue;
 
-//  std::cout << "getParameter: index=" << static_cast<int>(index) << std::endl;
-//  std::cout << "getParameter: currentValue=" << static_cast<int>(params[index].currentValue) << std::endl;
+  std::cout << "getParameter: index=" << static_cast<int>(index) << std::endl;
+  std::cout << "getParameter: currentValue=" << static_cast<int>(params[index].currentValue) << std::endl;
 
   return value;
 }
