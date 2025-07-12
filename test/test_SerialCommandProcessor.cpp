@@ -7,6 +7,7 @@
 #include "./mock/DummyLogManager.h"
 #include "./mock/MockWiFiManager.h"
 #include "./mock/DummyI2CBusManager.h"
+#include "./mock/DummySystemManager.h"  // モックのSystemManagerをインクルード
 
 namespace
 {
@@ -22,6 +23,7 @@ namespace
       DummyEepromManager eepromManager;
       DummyLogManager logManager;
       MockSerialMonitorIO mock;
+      DummySystemManager dummySystemManager;
       DummyI2CBusManager i2cbusManager;  // I2Cバスマネージャのモック
       MockWiFiManager wifiManager;
       ParameterManager paramManager;
@@ -33,10 +35,10 @@ namespace
         logManager(),
         wifiManager(),
         paramManager(&eepromManager, &logManager),
-        serialMonitor(mock, i2cbusManager, paramManager, eepromManager, wifiManager)
+        serialMonitor(mock, i2cbusManager, paramManager, eepromManager, wifiManager, &dummySystemManager) // SerialCommandProcessorのインスタンスを作成
     {}
 
-      SerialCommandProcessor serialMonitor{mock ,i2cbusManager ,paramManager ,eepromManager, wifiManager}; // ← MockSerialMonitorIOのポインタを渡す
+      SerialCommandProcessor serialMonitor{mock ,i2cbusManager ,paramManager ,eepromManager, wifiManager, &dummySystemManager}; // ← MockSerialMonitorIOのポインタを渡す
   };
   std::vector<std::string> result = {"command","parameta1","parameta2"};
   std::vector<std::string> result2 = {"command"};

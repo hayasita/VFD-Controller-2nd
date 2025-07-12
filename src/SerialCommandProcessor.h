@@ -51,7 +51,7 @@ class SerialCommandProcessor{
      * テストのときはmockを渡す。
      * 実処理の場合は、実処理の派生classのポインタを渡す。
      */
-    SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, ParameterManager& parameterManager, EepromManager& eeprom, WiFiManager& wifiManager);   // コンストラクタ
+    SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, ParameterManager& parameterManager, EepromManager& eeprom, WiFiManager& wifiManager, SystemManager *systemManager);   // コンストラクタ
     bool exec(void);                                    // シリアルモニタ実行
     bool commandExec(std::vector<std::string> command);     // コマンド実行
     std::vector<std::string> splitCommand(const std::string &commandBuf);  // コマンド分割
@@ -76,6 +76,7 @@ class SerialCommandProcessor{
     ParameterManager* parameterManager = nullptr; // ParameterManagerの参照
     EepromManager* eeprom = nullptr;  // EepromManagerの参照
     WiFiManager* wiFiManager = nullptr; // WiFiManagerの参照
+    SystemManager *systemManager = nullptr; // SystemManagerの参照
 
     std::vector<std::string> command;         // シリアルモニタコマンド
     std::vector<codeTbl> codeArray;           // コードテーブル
