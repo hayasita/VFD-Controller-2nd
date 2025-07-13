@@ -61,15 +61,31 @@ void SystemManager::update(SystemEvent event) {
 void SystemManager::onParameterChanged(uint8_t index, uint8_t newValue) {
   std::cout << "SystemManager::onParameterChanged: index=" << static_cast<int>(index) << ", newValue=" << static_cast<int>(newValue) << "\n";
 
-  if(index == 0) format12h = (bool)newValue; // Pr.0: 12時間表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::Format12h)){ format12h = (bool)newValue;}              // Pr.0: 12時間表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::DispFormat)){ dispFormat = newValue;}                  // Pr.1: 表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::TimeDisplayFormat)){ timeDisplayFormat = newValue;}    // Pr.2: 時刻表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::DateDisplayFormat)){ dateDisplayFormat = newValue;}    // Pr.3: 日付表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::DisplayEffect)){ displayEffect = newValue;}            // Pr.4: 表示効果
+  if(index == static_cast<uint8_t>(ParamIndex::FadeTime)){ fadetimew = newValue;}                     // Pr.5
+  if(index == static_cast<uint8_t>(ParamIndex::GlowInTheBrightTmp)){ glowInTheBrightTmp = newValue;}  // Pr.6: 全体輝度設定値：明
+  if(index == static_cast<uint8_t>(ParamIndex::GlowInTheDarkTmp)){ glowInTheDarkTmp = newValue;}      // Pr.7: 全体輝度設定値：暗
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig0)){ brDig[0] = newValue;}                        // Pr.8: 表示桁0の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig1)){ brDig[1] = newValue;}                        // Pr.9: 表示桁1の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig2)){ brDig[2] = newValue;}                        // Pr.10: 表示桁2の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig3)){ brDig[3] = newValue;}                        // Pr.11: 表示桁3の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig4)){ brDig[4] = newValue;}                        // Pr.12: 表示桁4の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig5)){ brDig[5] = newValue;}                        // Pr.13: 表示桁5の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig6)){ brDig[6] = newValue;}                        // Pr.14: 表示桁6の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig7)){ brDig[7] = newValue;}                        // Pr.15: 表示桁7の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig8)){ brDig[8] = newValue;}                        // Pr.16: 表示桁8の輝度
 
-  if(index == 30) ntpSet = (bool)newValue;
-  if(index == 44) staAutoConnect = (bool)newValue;
-  if(index == 33){ timeZoneAreaId = newValue;}  // Pr.33: SNTP設定：タイムゾーンエリアID
-  if(index == 34){ timeZoneId = newValue;}      // Pr.34: SNTP設定：タイムゾーンID
-  if(index == 35){ timeZoneData = newValue;}    // Pr.35: SNTP設定：タイムゾーン
+  if(index == static_cast<uint8_t>(ParamIndex::NtpSet)){ ntpSet = (bool)newValue;}                    // Pr.32: SNTP設定：SNTP使用
+  if(index == static_cast<uint8_t>(ParamIndex::TimeZoneAreaId)){ timeZoneAreaId = newValue;}          // Pr.33: SNTP設定：タイムゾーンエリアID
+  if(index == static_cast<uint8_t>(ParamIndex::TimeZoneId)){ timeZoneId = newValue;}                  // Pr.34: SNTP設定：タイムゾーンID
+  if(index == static_cast<uint8_t>(ParamIndex::TimeZoneData)){ timeZoneData = newValue;}              // Pr.35: SNTP設定：タイムゾーン
 
-  updateWiFiAutoConnect();
+  if(index == static_cast<uint8_t>(ParamIndex::LocalesId)){ localesId = newValue;}                    // Pr.43: 地域設定
+  if(index == static_cast<uint8_t>(ParamIndex::StaAutoConnect)){ staAutoConnect = (bool)newValue;}    // Pr.44: WiFi Station 設定：STA自動接続有効
 
   return;
 }
@@ -95,11 +111,17 @@ void SystemManager::updateWiFiAutoConnect(void) {
   return;
 }
 
+bool SystemManager::setParameterByPrnum(uint8_t prnum, int value) {
+  return parameterManager->setParameter(prnum, value);
+}
+/*
 bool SystemManager::setParameterByKey(const std::string& key, int value) {
   // キー名とパラメータ番号の対応表
   static const std::map<std::string, uint8_t> keyToParam = {
   //  {"staAutoConnect",0},
-    {"ntp_enable", 30},
+    {"format12h", 0},         // Pr.0: 12時間表示フォーマット
+    {"display_format", 1},    // Pr.1: 表示フォーマット
+    {"ntp_enable", 32},
     {"timeZoneAreaId", 33},
     {"timeZoneId", 34},
     {"timeZone", 35},
@@ -113,7 +135,7 @@ bool SystemManager::setParameterByKey(const std::string& key, int value) {
   }
   return false; // 未対応のキー
 }
-
+*/
 bool SystemManager::setTimezone(uint8_t zoneData) {
   const char* gmt[] = {
   "GMT+12:00","GMT+11:00","GMT+10:00","GMT+09:30",
@@ -138,4 +160,70 @@ bool SystemManager::setTimezone(uint8_t zoneData) {
   }
   std::cout << "Invalid timezone data: " << static_cast<int>(zoneData) << "\n";
   return false;
+}
+
+/**
+ * @brief 輝度情報個別設定
+ * @param adj_point 調整ポイント（桁数）
+ * @param brw 輝度値
+ * この関数は、指定された桁の輝度値を設定する。
+ * パラメータの書き込みは実施しない。RAM値のみ更新する。
+ */
+void SystemManager::setBrDig(uint8_t adj_point,uint8_t brw) // 輝度情報個別設定
+{
+  if((brw >= BR_MIN) && (brw<=BR_MAX)&&(adj_point<DISP_KETAMAX)){
+    brDig[adj_point] = brw;
+  }
+
+  return;
+}
+
+bool SystemManager::setParameterBrDig(void) {
+  for (uint8_t i = 0; i < DISP_KETAMAX; ++i) {
+    if (brDig[i] != 0) {
+      // パラメータの書き込み処理を実施
+      parameterManager->setParameter(8 + i, brDig[i]);
+    }
+  }
+  return true;
+}
+
+bool SystemManager::resetBrDig(void) {
+  for (uint8_t i = 0; i < DISP_KETAMAX; ++i) {
+    brDig[i] = parameterManager->getParameter(8 + i); // 輝度値をリセット
+  }
+  return true;
+}
+
+std::string SystemManager::makeSettingJs(void) {
+  std::string js = "var _initial_setting_ = \'{\\\n";
+  
+  js += "\"localesId\" : \"" + std::to_string(localesId) + "\",\\\n";
+  
+  js += "\"ntpSet\" : \"" + std::string(ntpSet ? "1" : "0") + "\",\\\n";
+  js += "\"timeZoneAreaId\" : \"" + std::to_string(timeZoneAreaId) + "\",\\\n";
+  js += "\"timeZoneId\" : \"" + std::to_string(timeZoneId) + "\",\\\n";
+
+  js += "\"dispFormat\" : \"" + std::to_string(dispFormat) + "\",\\\n";
+  js += "\"timeDisplayFormat\" : \"" + std::to_string(timeDisplayFormat) + "\",\\\n";
+  js += "\"dateDisplayFormat\" : \"" + std::to_string(dateDisplayFormat) + "\",\\\n";
+  js += "\"formatHour\" : \"" + std::string(format12h ? "1" : "0") + "\",\\\n";
+  js += "\"displayEffect\" : \"" + std::to_string(displayEffect) + "\",\\\n";
+  js += "\"fadeTime\" : \"" + std::to_string(fadetimew) + "\",\\\n";
+  js += "\"brDig\" : [";
+  for (size_t i = 0; i < DISP_KETAMAX; ++i) {
+    js += std::to_string(brDig[i]);
+    if (i < DISP_KETAMAX - 1) {
+      js += ",";
+    }
+  }
+  js += "],\\\n";
+  js += "\"glowInTheBright\" : \"" + std::to_string(glowInTheBright) + "\",\\\n";
+  js += "\"glowInTheDark\" : \"" + std::to_string(glowInTheDark) + "\",\\\n";
+
+  js += "\"staAutoConnect\" : \"" + std::string(staAutoConnect ? "1" : "0") + "\",\\\n";
+
+  js += "\"end\" : \"\"\\\n";
+  js += "}\';";
+  return js;
 }

@@ -57,11 +57,17 @@ void WebServerManager::setupRoutes() {
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(LittleFS, "/index.html", String(), false);
   });
-/*
-  server.on("/setting.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    handleSettingjs(request);
+
+  server.on("/setting.js", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    // setting.js の生成をコールバックで処理
+    if (makeSettingJsCallback) {
+      String jsContent = String(makeSettingJsCallback().c_str()); // コールバックからJS内容を取得
+      request->send(200, "application/javascript", jsContent);
+    } else {
+      request->send(500, "text/plain", "Internal Server Error: No callback set for setting.js");
+    }
   });
-*/
+
   // ルート未登録のURLへのアクセス処理（静的ファイル配信）
   server.onNotFound([this](AsyncWebServerRequest *request) {
     handleNotFound(request);
@@ -169,4 +175,14 @@ bool WebServerManager::hasWebSocketClients() {
 
 size_t WebServerManager::getWebSocketClientCount() {
   return ws.count();
+}
+
+/**
+ * 設定JSの生成コールバックを設定する
+ * 
+ * @param callback 設定JSを生成するためのコールバック関数
+ * この関数は、設定JSの生成を外部から制御できるようにするために使用される。
+ */
+void WebServerManager::onMakeSettingJs(std::function<std::string()> callback) {
+  makeSettingJsCallback = callback;
 }

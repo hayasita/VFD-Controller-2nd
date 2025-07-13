@@ -46,12 +46,13 @@ MonitorDeviseIo::~MonitorDeviseIo() {}
   init();
 }
 */
-SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, ParameterManager& parameterManager, EepromManager& eepromManager, WiFiManager& wifiManager)
+SerialCommandProcessor::SerialCommandProcessor(MonitorDeviseIo& MonitorDeviseIo, I2CBusManager& busManager, ParameterManager& parameterManager, EepromManager& eepromManager, WiFiManager& wifiManager, SystemManager *systemManager)
   : monitorIo_(&MonitorDeviseIo),         // シリアル入出力処理ポインタを設定
     i2cBus(&busManager),                  // I2CBusManagerの参照を設定
     parameterManager(&parameterManager),  // ParameterManagerの参照を設定
     eeprom(&eepromManager),               // EepromManagerの参照を設定
-    wiFiManager(&wifiManager)             // WiFiManagerの参照を設定
+    wiFiManager(&wifiManager),             // WiFiManagerの参照を設定
+    systemManager(systemManager) // SystemManagerの参照を初期化
 {
   init();
 }
@@ -270,11 +271,8 @@ bool SerialCommandProcessor::opecodedatalist(std::vector<std::string> command)  
 bool SerialCommandProcessor::opecodeenv(std::vector<std::string> command)
 {
   monitorIo_->send("opecodeenv\n");
-//  Serial.printf("glowInTheBright: %d\n", jsData.glowInTheBright);
-//  Serial.printf("rotatePosition: %d\n", jsData.rotatePosition);
-//  Serial.printf("dotColor: %d\n", jsData.dotColor);
-//  Serial.printf("showSampleData: %d\n", jsData.showSampleData);
-//  Serial.printf("dataNumber: %d\n", jsData.getDataNumber());
+  std::string js = systemManager->makeSettingJs();  // ./setting.jsを生成する
+  monitorIo_->send(js);  // 生成した設定情報を送信
 
   return true;
 }
