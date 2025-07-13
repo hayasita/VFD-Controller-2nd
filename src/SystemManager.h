@@ -7,6 +7,34 @@
 class ParameterManager; // 前方参照
 #define DISP_KETAMAX  9   // VFD表示桁数
 
+enum class ParamIndex : uint8_t {
+  Format12h = 0,          // 12時間表示フォーマット Pr.0
+  DispFormat = 1,         // 表示フォーマット Pr.1
+  TimeDisplayFormat = 2,  // 時刻表示フォーマット Pr.2
+  DateDisplayFormat = 3,  // 日付表示フォーマット Pr.3
+  DisplayEffect = 4,      // 表示効果 Pr.4
+  FadeTime = 5,           // クロスフェード時間 Pr.5
+  GlowInTheBrightTmp = 6, // 全体輝度設定値：明（テンポラリ） Pr.6
+  GlowInTheDarkTmp = 7,   // 全体輝度設定値：暗（テンポラリ） Pr.7
+  BrDig0 = 8,             // 表示桁0の輝度 Pr.8
+  BrDig1 = 9,             // 表示桁1の輝度 Pr.9
+  BrDig2 = 10,            // 表示桁2の輝度 Pr.10
+  BrDig3 = 11,            // 表示桁3の輝度 Pr.11
+  BrDig4 = 12,            // 表示桁4の輝度 Pr.12
+  BrDig5 = 13,            // 表示桁5の輝度 Pr.13
+  BrDig6 = 14,            // 表示桁6の輝度 Pr.14
+  BrDig7 = 15,            // 表示桁7の輝度 Pr.15
+  BrDig8 = 16,            // 表示桁8の輝度 Pr.16
+
+  NtpSet = 32,            // Pr.32: SNTP設定：SNTP使用
+  TimeZoneAreaId = 33,    // Pr.33: SNTP設定：タイムゾーンエリアID
+  TimeZoneId = 34,        // Pr.34: SNTP設定：タイムゾーンID
+  TimeZoneData = 35,      // Pr.35: SNTP設定：タイムゾーン
+
+  LocalesId = 43,         // Pr.43: 地域設定
+  StaAutoConnect = 44     // Pr.44: WiFi Station 設定：STA自動接続有効
+};
+
 enum class SystemMode {
   Clock,
   WiFiConnected,

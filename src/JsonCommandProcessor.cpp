@@ -32,37 +32,37 @@ void JsonCommandProcessor::processCommand(const String& jsonString) {
   }
 
   struct KeyParamMap {
-    const char* key;
-    int paramNum;
+    const char* key;    // JSONのキー名
+    uint8_t paramNum;   // 対応するパラメータ番号
   };
 
   static const KeyParamMap keyParamTable[] = {
-    {"formatHour",        0},
-    {"dispFormat",        1},
-    {"timeDisplayFormat", 2},
-    {"dateDisplayFormat", 3},
-    {"displayEffect",     4},
-    {"fadeTime",          5},
-    {"glowInTheBrightSet",6},
-    {"glowInTheDarkSet",  7},
-    {"br_dig0",           8},
-    {"br_dig1",           9},
-    {"br_dig2",           10},
-    {"br_dig3",           11},
-    {"br_dig4",           12},
-    {"br_dig5",           13},
-    {"br_dig6",           14},
-    {"br_dig7",           15},
-    {"br_dig8",           16},
-    {"br_dig9",           17},
+    {"formatHour",        static_cast<uint8_t>(ParamIndex::Format12h)},         // 12時間表示フォーマット Pr.0
+    {"dispFormat",        static_cast<uint8_t>(ParamIndex::DispFormat)},        // 表示フォーマット Pr.1
+    {"timeDisplayFormat", static_cast<uint8_t>(ParamIndex::TimeDisplayFormat)}, // 時刻表示フォーマット Pr.2
+    {"dateDisplayFormat", static_cast<uint8_t>(ParamIndex::DateDisplayFormat)}, // 日付表示フォーマット Pr.3
+    {"displayEffect",     static_cast<uint8_t>(ParamIndex::DisplayEffect)},     // 表示効果 Pr.4
+    {"fadeTime",          static_cast<uint8_t>(ParamIndex::FadeTime)},          // クロスフェード時間 Pr.5
+    {"glowInTheBrightSet",static_cast<uint8_t>(ParamIndex::GlowInTheBrightTmp)},// 全体輝度設定値：明（テンポラリ） Pr.6
+    {"glowInTheDarkSet",  static_cast<uint8_t>(ParamIndex::GlowInTheDarkTmp)},  // 全体輝度設定値：暗（テンポラリ） Pr.7
+    {"glowInTheDarkSet",  static_cast<uint8_t>(ParamIndex::GlowInTheDarkTmp)},  // 全体輝度設定値：暗（テンポラリ） Pr.7
+    {"br_dig0",           static_cast<uint8_t>(ParamIndex::BrDig0)},            // 表示桁0の輝度 Pr.8
+    {"br_dig1",           static_cast<uint8_t>(ParamIndex::BrDig1)},            // 表示桁1の輝度 Pr.9
+    {"br_dig2",           static_cast<uint8_t>(ParamIndex::BrDig2)},            // 表示桁2の輝度 Pr.10
+    {"br_dig3",           static_cast<uint8_t>(ParamIndex::BrDig3)},            // 表示桁3の輝度 Pr.11
+    {"br_dig4",           static_cast<uint8_t>(ParamIndex::BrDig4)},            // 表示桁4の輝度 Pr.12
+    {"br_dig5",           static_cast<uint8_t>(ParamIndex::BrDig5)},            // 表示桁5の輝度 Pr.13
+    {"br_dig6",           static_cast<uint8_t>(ParamIndex::BrDig6)},            // 表示桁6の輝度 Pr.14
+    {"br_dig7",           static_cast<uint8_t>(ParamIndex::BrDig7)},            // 表示桁7の輝度 Pr.15
+    {"br_dig8",           static_cast<uint8_t>(ParamIndex::BrDig8)},            // 表示桁8の輝度 Pr.16
 
-    {"ntpSet",            32},
-    {"timeZoneAreaId",    33},
-    {"timeZoneId",        34},
-    {"timeZone",          35},
+    {"ntpSet",            static_cast<uint8_t>(ParamIndex::NtpSet)},            // SNTP設定：SNTP使用 Pr.32
+    {"timeZoneAreaId",    static_cast<uint8_t>(ParamIndex::TimeZoneAreaId)},    // SNTP設定：タイムゾーンエリアID Pr.33
+    {"timeZoneId",        static_cast<uint8_t>(ParamIndex::TimeZoneId)},        // SNTP設定：タイムゾーンID Pr.34
+    {"timeZone",          static_cast<uint8_t>(ParamIndex::TimeZoneData)},      // SNTP設定：タイムゾーン Pr.35
 
-    {"localesId",         43},
-    {"staAutoConnect",    44},
+    {"localesId",         static_cast<uint8_t>(ParamIndex::LocalesId)},         // 地域設定 Pr.43
+    {"staAutoConnect",    static_cast<uint8_t>(ParamIndex::StaAutoConnect)},    // WiFi Station自動接続フラグ Pr.44
     // 必要に応じて追加
   };
 

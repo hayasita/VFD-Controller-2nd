@@ -61,31 +61,31 @@ void SystemManager::update(SystemEvent event) {
 void SystemManager::onParameterChanged(uint8_t index, uint8_t newValue) {
   std::cout << "SystemManager::onParameterChanged: index=" << static_cast<int>(index) << ", newValue=" << static_cast<int>(newValue) << "\n";
 
-  if(index == 0){ format12h = (bool)newValue;}    // Pr.0: 12時間表示フォーマット
-  if(index == 1){ dispFormat = newValue;}         // Pr.1: 表示フォーマット
-  if(index == 2){ timeDisplayFormat = newValue;}  // Pr.2: 時刻表示フォーマット
-  if(index == 3){ dateDisplayFormat = newValue;}  // Pr.3: 日付表示フォーマット
-  if(index == 4){ displayEffect = newValue;}      // Pr.4: 表示効果
-  if(index == 5){ fadetimew = newValue;}          // Pr.5
-  if(index == 6){ glowInTheBrightTmp = newValue;} // Pr.6: 全体輝度設定値：明
-  if(index == 7){ glowInTheDarkTmp = newValue;}   // Pr.7: 全体輝度設定値：暗
-  if(index == 8){ brDig[0] = newValue;}           // Pr.8: 表示桁0の輝度
-  if(index == 9){ brDig[1] = newValue;}           // Pr.9: 表示桁1の輝度
-  if(index == 10){ brDig[2] = newValue;}          // Pr.10: 表示桁2の輝度
-  if(index == 11){ brDig[3] = newValue;}          // Pr.11: 表示桁3の輝度
-  if(index == 12){ brDig[4] = newValue;}          // Pr.12: 表示桁4の輝度
-  if(index == 13){ brDig[5] = newValue;}          // Pr.13: 表示桁5の輝度
-  if(index == 14){ brDig[6] = newValue;}          // Pr.14: 表示桁6の輝度
-  if(index == 15){ brDig[7] = newValue;}          // Pr.15: 表示桁7の輝度
-  if(index == 16){ brDig[8] = newValue;}          // Pr.16: 表示桁8の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::Format12h)){ format12h = (bool)newValue;}              // Pr.0: 12時間表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::DispFormat)){ dispFormat = newValue;}                  // Pr.1: 表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::TimeDisplayFormat)){ timeDisplayFormat = newValue;}    // Pr.2: 時刻表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::DateDisplayFormat)){ dateDisplayFormat = newValue;}    // Pr.3: 日付表示フォーマット
+  if(index == static_cast<uint8_t>(ParamIndex::DisplayEffect)){ displayEffect = newValue;}            // Pr.4: 表示効果
+  if(index == static_cast<uint8_t>(ParamIndex::FadeTime)){ fadetimew = newValue;}                     // Pr.5
+  if(index == static_cast<uint8_t>(ParamIndex::GlowInTheBrightTmp)){ glowInTheBrightTmp = newValue;}  // Pr.6: 全体輝度設定値：明
+  if(index == static_cast<uint8_t>(ParamIndex::GlowInTheDarkTmp)){ glowInTheDarkTmp = newValue;}      // Pr.7: 全体輝度設定値：暗
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig0)){ brDig[0] = newValue;}                        // Pr.8: 表示桁0の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig1)){ brDig[1] = newValue;}                        // Pr.9: 表示桁1の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig2)){ brDig[2] = newValue;}                        // Pr.10: 表示桁2の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig3)){ brDig[3] = newValue;}                        // Pr.11: 表示桁3の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig4)){ brDig[4] = newValue;}                        // Pr.12: 表示桁4の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig5)){ brDig[5] = newValue;}                        // Pr.13: 表示桁5の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig6)){ brDig[6] = newValue;}                        // Pr.14: 表示桁6の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig7)){ brDig[7] = newValue;}                        // Pr.15: 表示桁7の輝度
+  if(index == static_cast<uint8_t>(ParamIndex::BrDig8)){ brDig[8] = newValue;}                        // Pr.16: 表示桁8の輝度
 
-  if(index == 32){ ntpSet = (bool)newValue;}    // Pr.32: SNTP設定：SNTP使用
-  if(index == 33){ timeZoneAreaId = newValue;}  // Pr.33: SNTP設定：タイムゾーンエリアID
-  if(index == 34){ timeZoneId = newValue;}      // Pr.34: SNTP設定：タイムゾーンID
-  if(index == 35){ timeZoneData = newValue;}    // Pr.35: SNTP設定：タイムゾーン
+  if(index == static_cast<uint8_t>(ParamIndex::NtpSet)){ ntpSet = (bool)newValue;}                    // Pr.32: SNTP設定：SNTP使用
+  if(index == static_cast<uint8_t>(ParamIndex::TimeZoneAreaId)){ timeZoneAreaId = newValue;}          // Pr.33: SNTP設定：タイムゾーンエリアID
+  if(index == static_cast<uint8_t>(ParamIndex::TimeZoneId)){ timeZoneId = newValue;}                  // Pr.34: SNTP設定：タイムゾーンID
+  if(index == static_cast<uint8_t>(ParamIndex::TimeZoneData)){ timeZoneData = newValue;}              // Pr.35: SNTP設定：タイムゾーン
 
-  if(index == 43){ localesId = newValue;}       // Pr.43: 地域設定
-  if(index == 44){ staAutoConnect = (bool)newValue;}  // Pr.44: WiFi Station 設定：STA自動接続有効
+  if(index == static_cast<uint8_t>(ParamIndex::LocalesId)){ localesId = newValue;}                    // Pr.43: 地域設定
+  if(index == static_cast<uint8_t>(ParamIndex::StaAutoConnect)){ staAutoConnect = (bool)newValue;}    // Pr.44: WiFi Station 設定：STA自動接続有効
 
   return;
 }
