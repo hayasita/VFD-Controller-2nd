@@ -3,13 +3,16 @@
 #include "SystemManager.h"
 #include "parameterManager.h"
 
-void SystemManager::begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter) {
+void SystemManager::begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal) {
   wifiManager = &wifi;
   timeManager = &time;
   parameterManager = &parameter;
+  terminalInputManager = &terminal;
 }
 
-void SystemManager::update(SystemEvent event) {
+void SystemManager::update(void) {
+
+  SystemEvent event = terminalInputManager->update();
   switch (event) {
     case SystemEvent::ButtonA_Short_Pressed:
       if(currentWifiMode == SystemMode::WiFiDisconnected) {

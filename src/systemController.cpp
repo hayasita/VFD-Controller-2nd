@@ -115,7 +115,7 @@ void SystemController::begin() {
   }
 */
 
-  systemManager.begin(wiFiManager, timeManager, paramManager);      // システム管理の初期化
+  systemManager.begin(wiFiManager, timeManager, paramManager, terminalInputManager);      // システム管理の初期化
   paramManager.begin();                                             // パラメータ管理の初期化 systemManagerの後に呼び出す必要がある
 
     // serialMonitor init
@@ -129,13 +129,8 @@ void SystemController::update() {
   wiFiManager.update();
   webServerManager.update();
 
-  // 端子入力
-//  itmKeyCode = terminalInputManager.man();
-  SystemEvent event = terminalInputManager.update();
-  systemManager.update(event);  // システム管理の更新
-  if (event != SystemEvent::None) {
-    Serial.printf("Event: %d\n", static_cast<int>(event));
-  }
+  // システム管理の更新
+  systemManager.update();
 
   // シリアルモニタ処理
   serialCommandProcessor.exec();
