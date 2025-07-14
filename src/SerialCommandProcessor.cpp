@@ -66,6 +66,7 @@ void SerialCommandProcessor::init(void)
   codeArray.push_back({"datalist"   ,[this](){return opecodedatalist(command);}  ,"datalist\tDisplays Matrix data file list."});
   codeArray.push_back({"env"        ,[this](){return opecodeenv(command);}  ,"env\tconfig data list."});
   codeArray.push_back({"ver"        ,[this](){return opecodeVer(command);}  ,"ver\tVersion."});
+  codeArray.push_back({"timelength" ,[this](){return opecodeGetTimeLength(command);}  ,"timelength\tGet time length."});
   codeArray.push_back({"command2"   ,[this](){return dummyExec(command);}  ,"command Help."});
 
   codeArray.push_back({"eepromdump" ,[this](){ return opecodeEepromDump(command); }, "eepromdump\tEEPROM Data dump."});
@@ -330,6 +331,34 @@ int parseStringToInt(const std::string& str) {
         iss >> std::dec >> value;
     }
     return value;
+}
+
+bool SerialCommandProcessor::opecodeGetTimeLength(std::vector<std::string> command) {
+  monitorIo_->send("> opecodeGetTimeLength\n");
+
+  std::ostringstream oss;
+  oss << "sizeof(time_t): " << sizeof(time_t) << " bytes (" << (sizeof(time_t) * 8) << " bits)\n";
+
+  // time_tの最大値を表示
+  time_t maxTime = std::numeric_limits<time_t>::max();
+  oss << "time_t max: " << maxTime << "\n";
+
+  // 2038年問題の閾値を表示
+  time_t y2038 = 0x7FFFFFFF; // 32bit signed intの最大値
+  struct tm *tm2038 = gmtime(&y2038);
+  if (tm2038) {
+    oss << "2038-01-19 03:14:07(UTC) = " << y2038 << "\n";
+    oss << "time_t max as date: "
+      << (tm2038->tm_year + 1900) << "-"
+      << std::setw(2) << std::setfill('0') << (tm2038->tm_mon + 1) << "-"
+      << std::setw(2) << std::setfill('0') << tm2038->tm_mday << " "
+      << std::setw(2) << std::setfill('0') << tm2038->tm_hour << ":"
+      << std::setw(2) << std::setfill('0') << tm2038->tm_min << ":"
+      << std::setw(2) << std::setfill('0') << tm2038->tm_sec << " (UTC)\n";
+  }
+
+  monitorIo_->send(oss.str());
+  return true;
 }
 
 bool SerialCommandProcessor::opecodeEepromDump(std::vector<std::string> command) {

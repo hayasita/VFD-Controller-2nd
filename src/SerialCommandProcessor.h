@@ -69,6 +69,7 @@ class SerialCommandProcessor{
     bool opecodeWiFiScan(std::vector<std::string> command);   // WiFiスキャン
     bool opecodeGetPr(std::vector<std::string> command);      // Pr設定値取得
     bool opecodeSetPr(std::vector<std::string> command);      // Pr設定値設定
+    bool opecodeGetTimeLength(std::vector<std::string> command); // 時間長取得
 
 
     MonitorDeviseIo *monitorIo_ = nullptr;    // シリアル入出力処理ポインタ
