@@ -16,6 +16,9 @@
 #include <cstdint>
 
 #include "SerialCommandProcessor.h"
+extern "C" {
+  #include "esp_system.h"
+}
 
 #ifdef UNIT_TEST
 #else
@@ -293,10 +296,10 @@ bool SerialCommandProcessor::opecodeVer(std::vector<std::string> command)       
   uint32_t chipId = 0;
 
   #ifndef UNIT_TEST
-  esp_read_mac(mac, ESP_MAC_WIFI_STA);
-
-  for(int i=0; i<17; i=i+8) {
-    chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+  // ESP.getEfuseMac() からMACアドレスを取得
+  uint64_t efuseMac = ESP.getEfuseMac();
+  for (int i = 0; i < 6; ++i) {
+    mac[5 - i] = (efuseMac >> (8 * i)) & 0xFF;
   }
   #endif
 
