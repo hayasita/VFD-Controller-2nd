@@ -446,6 +446,9 @@ bool SerialCommandProcessor::opecodeI2CScan(std::vector<std::string> command) {
   return false;
 }
 
+/**
+ * @brief 1バイトの値を16進数表記の文字列に変換
+ */
 std::string SerialCommandProcessor::toHex(uint8_t value) const {
   std::ostringstream oss;
   oss << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(value);
