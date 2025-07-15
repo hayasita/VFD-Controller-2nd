@@ -85,3 +85,17 @@ std::vector<uint8_t> I2CBusManager::scanI2CBus(uint8_t startAddress, uint8_t cou
   return i2cDevice;
 }
 
+/**
+ * @brief I2Cバスのデバイス名を取得
+ * @param address I2Cアドレス
+ * @return デバイス名
+ * デバイス名は、i2cDeviceNameMapからアドレスに対応する名前を取得する。
+ * アドレスが見つからない場合は "Unknown Device" を返す。
+ */
+std::string I2CBusManager::getDeviceName(uint8_t address) {
+  auto it = i2cDeviceNameMap.find(address);
+  if (it != i2cDeviceNameMap.end()) {
+    return it->second;
+  }
+  return "Unknown Device";
+}    

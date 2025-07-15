@@ -414,13 +414,25 @@ bool SerialCommandProcessor::opecodeEepromDump(std::vector<std::string> command)
   return false;
 }
 
+/**
+ * @brief I2Cスキャンコマンド処理
+ * @param command コマンド引数
+ * @return true コマンド実行成功
+ * @return false コマンド実行失敗
+ * @details
+ * I2Cバス上のデバイスをスキャンし、見つかったデバイスのアドレスと名前を表示する。
+ * I2CBusManagerのscanI2CBusメソッドを使用して、デバイスを検出する。
+ * スキャン結果は、各デバイスのアドレスと名前をシリアルモニタに送信する。
+ * スキャン中に見つかったデバイスがない場合は、その旨を通知する。
+ * i2cBusが初期化されていない場合は、エラーメッセージを表示する。
+ */
 bool SerialCommandProcessor::opecodeI2CScan(std::vector<std::string> command) {
   // SystemControllerなどからI2CBusManagerの参照をもらう必要あり
   if(i2cBus) {
     std::vector<uint8_t> found = i2cBus->scanI2CBus();
     monitorIo_->send("Scanning...\n");
     for(auto addr : found) {
-      monitorIo_->send("Found device at 0x" + toHex(addr) + "\n");
+      monitorIo_->send("Found device at 0x" + toHex(addr) + " : " + i2cBus->getDeviceName(addr) + "\n");
     }
     if(found.empty()) {
       monitorIo_->send("No I2C devices found.\n");

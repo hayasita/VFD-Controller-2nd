@@ -10,6 +10,20 @@
 
 #include <mutex>
 #include <vector>
+#include <map>
+#include <string>
+
+/**
+ * I2Cデバイス名マップ
+ */
+const std::map<uint8_t, std::string> i2cDeviceNameMap = {
+  {0x3c, "M5 OLED Display SH1107"},
+  {0x3d, "SSD1306 OLED Display"},
+  {0x50, "EEPROM 24C32"},
+  {0x68, "RTC"},
+  {0x70, "QMP6988"},
+  {0x77, "BME680"}
+};
 
 /**
  * @brief I2Cバスアクセス排他管理クラス
@@ -21,6 +35,7 @@ public:
   virtual TwoWire& getWire();               // I2CバスのWireオブジェクトを取得
 
   virtual std::vector<uint8_t> scanI2CBus(uint8_t address = 0x00, uint8_t count = 127); // I2Cバスのスキャン
+  virtual std::string getDeviceName(uint8_t address); // デバイス名を取得
 
 private:
   std::recursive_mutex i2cMutex;
