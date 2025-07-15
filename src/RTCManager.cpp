@@ -22,14 +22,21 @@ RTCManager::RTCManager(I2CBusManager* busManager)
 }
 /**
  * @brief RTCManagerの初期化
+ * @return true: 初期化成功, false: 初期化失敗
  * @details
  * RTCManagerは、RTCデバイスの管理を行うクラスである。
  * このクラスは、I2Cバスを使用してRTCデバイスにアクセスする。
  * RTCデバイスの種類は、DS1307、DS3231、M5RTCのいずれかとなる。
+ * i2cBusがnullptrの場合は初期化失敗となる。
  * 
  */
 bool RTCManager::begin(void)
 {
+  if (i2cBus == nullptr) {
+    M5_LOGE("I2CBusManager is not set.");
+    type = RTCType::None;  // I2CBusManagerが設定されていない場合はRTCTypeをNoneに設定
+    return false;
+  }
   std::lock_guard<std::recursive_mutex> lock(i2cBus->getMutex());
 
   bool found = false;
@@ -37,7 +44,6 @@ bool RTCManager::begin(void)
   if (M5.Rtc.isEnabled()) {
     type = RTCType::M5RTC;
     found = true;
-//    M5.Rtc.setDateTime( { { 2021, 12, 31 }, { 12, 34, 56 } } );
   }
   else if (rtc3231.begin(&i2cBus->getWire()) && !rtc3231.lostPower()) {
     type = RTCType::DS3231;
