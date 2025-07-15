@@ -40,4 +40,6 @@ public:
 private:
   std::recursive_mutex i2cMutex;
   TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）
+  std::vector<uint8_t> i2cDevice; // スキャン結果のアドレスリスト
+
 };

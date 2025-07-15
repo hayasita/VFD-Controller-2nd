@@ -52,10 +52,11 @@ TwoWire& I2CBusManager::getWire() {
  * Wireライブラリを使用して、各アドレスに対して通信を試み、応答があったアドレスをリストに追加する。
  */
 std::vector<uint8_t> I2CBusManager::scanI2CBus(uint8_t startAddress, uint8_t count) {
-  std::vector<uint8_t> i2cDevice;
   byte error, address;
   int nDevices;
-
+  i2cDevice.clear();  // スキャン結果のアドレスリストをクリア
+  std::lock_guard<std::recursive_mutex> lock(i2cMutex); // ミューテックスで排他制御
+  
   nDevices = 0;
   for(address = 1; address < 127; address++ )
   {
