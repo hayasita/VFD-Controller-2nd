@@ -20,6 +20,7 @@ const std::map<uint8_t, std::string> i2cDeviceNameMap = {
   {0x3c, "M5 OLED Display SH1107"},
   {0x3d, "SSD1306 OLED Display"},
   {0x50, "EEPROM 24C32"},
+  {0x51, "M5 RTC"},
   {0x68, "RTC"},
   {0x70, "QMP6988"},
   {0x77, "BME680"}
@@ -39,7 +40,8 @@ public:
 
 private:
   std::recursive_mutex i2cMutex;
-  TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）
+//  TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）
   std::vector<uint8_t> i2cDevice; // スキャン結果のアドレスリスト
 
 };
+#define wire Wire

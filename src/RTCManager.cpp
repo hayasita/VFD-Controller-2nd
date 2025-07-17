@@ -59,6 +59,16 @@ bool RTCManager::begin(void)
 }
 
 /**
+ * @brief RTCの種類を表示
+ */
+void RTCManager::dispRtcType(void) { 
+  Serial.printf("RTC Type: %s\n",
+    type == RTCType::M5RTC ? "M5RTC" :
+    type == RTCType::DS1307 ? "DS1307" :
+    type == RTCType::DS3231 ? "DS3231" : "None");
+}
+
+/**
  * @brief RTCが動作しているか確認
  * @return true: 動作中, false: 動作していない
  * @note RTCの種類によって動作確認の方法が異なります。

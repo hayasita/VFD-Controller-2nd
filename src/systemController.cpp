@@ -118,6 +118,7 @@ void SystemController::begin() {
   systemManager.begin(wiFiManager, timeManager, paramManager, terminalInputManager);      // システム管理の初期化
   paramManager.begin();                                             // パラメータ管理の初期化 systemManagerの後に呼び出す必要がある
 
+  rtcManager.dispRtcType();  // RTCの種類を表示
     // serialMonitor init
 //  serialCommandProcessor = SerialCommandProcessor(&realMonitorDeviseIo);
    Serial.println("SystemController initialized");
