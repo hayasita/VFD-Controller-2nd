@@ -101,3 +101,13 @@ std::string I2CBusManager::getDeviceName(uint8_t address) {
   }
   return "Unknown Device";
 }    
+
+/**
+ * @brief EEPROMが接続されているか確認
+ * @return true: 接続されている, false: 接続されていない
+ */
+bool I2CBusManager::isEepromConnected()
+{
+  std::lock_guard<std::recursive_mutex> lock(i2cMutex);
+  return std::find(i2cDevice.begin(), i2cDevice.end(), I2CADR_EEPROM) != i2cDevice.end();
+}

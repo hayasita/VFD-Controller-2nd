@@ -38,6 +38,7 @@ void SystemController::begin() {
 
   // 2. I2Cバス初期化
   i2cBus.begin();              // I2Cバスの初期化
+  i2cBus.scanI2CBus();          // I2Cバスのスキャン
 
   if (!LittleFS.begin()) {
     Serial.println("LittleFS mount failed");

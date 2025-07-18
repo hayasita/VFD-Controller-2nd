@@ -10,5 +10,6 @@ bool LogStorage::write(int address, const char* message, size_t len) {
 }
 
 bool LogStorage::read(int address, char* buffer, size_t len) {
-  return eeprom->readBytes(address, buffer, len);  // ログの読み込み
+//  return eeprom->readBytes(address, buffer, len);  // ログの読み込み
+  return true;
 }

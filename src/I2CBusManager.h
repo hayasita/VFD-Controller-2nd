@@ -13,13 +13,14 @@
 #include <map>
 #include <string>
 
+#define I2CADR_EEPROM 0x50  // EEPROMのI2Cアドレス
 /**
  * I2Cデバイス名マップ
  */
 const std::map<uint8_t, std::string> i2cDeviceNameMap = {
   {0x3c, "M5 OLED Display SH1107"},
   {0x3d, "SSD1306 OLED Display"},
-  {0x50, "EEPROM 24C32"},
+  {I2CADR_EEPROM, "EEPROM 24C32"},
   {0x51, "M5 RTC"},
   {0x68, "RTC"},
   {0x70, "QMP6988"},
@@ -38,6 +39,7 @@ public:
   virtual std::vector<uint8_t> scanI2CBus(uint8_t address = 0x00, uint8_t count = 127); // I2Cバスのスキャン
   virtual std::string getDeviceName(uint8_t address); // デバイス名を取得
 
+  virtual bool isEepromConnected();         // EEPROMが接続されているか確認
 private:
   std::recursive_mutex i2cMutex;
 //  TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）
