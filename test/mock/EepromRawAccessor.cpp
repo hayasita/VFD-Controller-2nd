@@ -13,23 +13,26 @@ void EepromRawAccessor::begin(void) {
   eeprom = (uint8_t*)EEPROM.getDataPtr();  // EEPROMデータポインタを取得
 }
 
+/*
 bool EepromRawAccessor::writeBytes(int address, const void* data, size_t len) {
   if (address + len > EEPROM_SIZE) return false;  // 範囲外アクセスを防止
   memcpy(eeprom + address, data, len);  // データ書き込み
   return EEPROM.commit();  // 書き込みを確定
 }
+*/
 
 bool EepromRawAccessor::writeByte(unsigned short address, unsigned char data) {
     // ダミー実装（必要に応じて本実装）
     return true;
 }
 
-
+/*
 bool EepromRawAccessor::readBytes(int address, void* data, size_t len) {
   if (address + len > EEPROM_SIZE) return false;  // 範囲外アクセスを防止
   memcpy(data, eeprom + address, len);  // データ読み込み
   return true;
 }
+*/
 
 bool EepromRawAccessor::readByte(unsigned short address, unsigned char* data) {
     // ダミー実装（必要に応じて本実装）

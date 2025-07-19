@@ -16,9 +16,12 @@
 #include <cstdint>
 
 #include "SerialCommandProcessor.h"
+
+#ifndef UNIT_TEST
 extern "C" {
   #include "esp_system.h"
 }
+#endif
 
 #ifdef UNIT_TEST
 #else

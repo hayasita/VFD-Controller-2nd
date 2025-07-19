@@ -64,12 +64,13 @@ public:
 //    std::cout << "writeBytes: data=" << static_cast<int>(data) << std::endl;
     return true;
   }
-
+/*
   bool readBytes(int address, void* data, size_t len) override {
     // モックの EEPROM 読み込み処理
     memcpy(data, &memory[address], len);  // memcpy を使用
     return true;
   }
+*/
 
   /**
    * @brief         データを1バイト読み出す

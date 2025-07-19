@@ -1,8 +1,15 @@
 #pragma once
 
+#include "SystemEvent.h"
+
+#ifdef UNIT_TEST
+// ...モック定義...
+class InputTerminal{}; // InputTerminalの前方宣言（実際のInputTerminalクラスは別ファイルに定義されていると仮定）
+#else
+// ...本来の定義...
 #include <M5Unified.h>
 #include "InputTerminal.h"
-#include "SystemEvent.h"
+#endif
 
 /*
 #define BUTTON_0 41
@@ -18,7 +25,7 @@ class TerminalInputManager{
     TerminalInputManager();
     ~TerminalInputManager();
     void begin(unsigned char *,unsigned char);
-    SystemEvent update(void);
+    virtual SystemEvent update(void);
 //    uint8_t man(void);
   private:
     InputTerminal* tm;

@@ -8,9 +8,14 @@ class DummyI2CBusManager : public I2CBusManager {
     void begin() override {}
     std::recursive_mutex& getMutex() override { return dummyMutex; }
     TwoWire& getWire() override { return wire; }
+
     std::vector<uint8_t> scanI2CBus(uint8_t address = 0x00, uint8_t count = 127) override {
       return {}; // モックなので空のリストを返す
     }
+    std::string getDeviceName(uint8_t address) override { return "DummyDevice"; }
+
+    bool isEepromConnected() override { return false; }
+    bool isM5oledConnected() override { return false; }
   private:
     std::recursive_mutex dummyMutex;
     TwoWire wire = TwoWire(0);  // 0番ポートを使用（ESP32）

@@ -4,10 +4,10 @@
 
 class DummySystemManager : public SystemManager {
 public:
-  void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter) override {
+  void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal) override {
     // モックの初期化処理
   }
-  void update(SystemEvent event) override {
+  void update(void) override {
     // モックの更新処理
   }
   void onParameterChanged(uint8_t index, uint8_t newValue) override {

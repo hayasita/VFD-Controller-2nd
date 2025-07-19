@@ -5,6 +5,7 @@
 #include "./mock/DummyI2CBusManager.h"  // モックのI2CBusManagerをインクルード
 #include "./mock/DummySystemManager.h"  // モックのSystemManagerをインクルード
 #include "./mock/DummyTimeManager.h"    // モックのTimeManagerをインクルード
+#include "./mock/DummyTerminalInputManager.h" // モックのTerminalInputManagerをインクルード
 #include "../src/ParameterManager.h"    // テスト対象のParameterManagerをインクルード
 
 // テスト用のモッククラスを使用してParameterManagerのテストを行う

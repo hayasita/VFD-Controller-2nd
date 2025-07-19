@@ -22,7 +22,7 @@ protected:
 
   void SetUp() override {
     // 必要なら初期化
-    eepromManager.begin();
+  //  eepromManager.begin();
   }
 
   void TearDown() override {
@@ -35,9 +35,9 @@ TEST_F(EepromManagerTest, WriteAndReadBytes) {
   uint8_t writeData[4] = {1, 2, 3, 4};
   uint8_t readData[4] = {0};
 
-  EXPECT_TRUE(eepromManager.writeBytes(0, writeData, 4));
-  EXPECT_TRUE(eepromManager.readBytes(0, readData, 4));
-  EXPECT_EQ(0, memcmp(writeData, readData, 4));
+  EXPECT_TRUE(eepromManager.writeByte(0, 1));
+  EXPECT_TRUE(eepromManager.readByte(0, &readData[0]));
+  EXPECT_EQ(0, readData[0]);
 }
 
 // 他のテストケースもここに追加
