@@ -37,7 +37,7 @@ bool EepromRawAccessor::readByte(unsigned short address, unsigned char* data) {
     return true;
 }
 
-bool EepromRawAccessor::sequentialRead(uint8_t i2cADR, uint16_t eeADR ,uint8_t *data,uint8_t dataNum){
+bool EepromRawAccessor::sequentialRead(uint16_t eeADR ,uint8_t *data,uint8_t dataNum){
   uint8_t i=0;
   return true;
 }

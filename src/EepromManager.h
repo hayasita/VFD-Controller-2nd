@@ -17,11 +17,11 @@ public:
   virtual std::recursive_mutex& getMutex();
 
   // バイト単位でデータを書き込む
-  virtual bool writeBytes(int address, const void* data, size_t len);
+//  virtual bool writeBytes(int address, const void* data, size_t len);
   virtual bool writeByte(uint16_t address, const uint8_t data);
 
   // バイト単位でデータを読み込む
-  virtual bool readBytes(int address, void* data, size_t len);
+//  virtual bool readBytes(int address, void* data, size_t len);
   virtual bool readByte(uint16_t address, uint8_t *data);
 
   virtual bool readMultipleBytes(int address, uint8_t *data, size_t len);   // i2c EEPROMから複数バイト読み込み

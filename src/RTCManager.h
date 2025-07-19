@@ -38,6 +38,7 @@ public:
   void adjust(const DateTime& dt);              // RTCの時刻を設定
   float getTemperature();                       // DS3231の温度を取得（摂氏）
   RTCType getRTCType() const { return type; }   // RTCの種類を取得
+  void dispRtcType(void);                       // RTCの種類を表示
 
 private:
   I2CBusManager* i2cBus = nullptr;  // I2Cバスマネージャ

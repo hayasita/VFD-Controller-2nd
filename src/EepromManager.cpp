@@ -31,6 +31,7 @@ std::recursive_mutex& EepromManager::getMutex() {
   return eepromMutex;  // EEPROM専用のミューテックスを返す
 }
 
+#ifdef DELETE
 /**
  * @brief バイト単位でデータを書き込む
  * @param address 書き込み開始アドレス
@@ -45,6 +46,7 @@ bool EepromManager::writeBytes(int address, const void* data, size_t len) {
   }
   return rawAccessor.writeBytes(address, data, len);  // データ書き込み
 }
+#endif
 
 /**
  * @brief データを1バイト書き込む
@@ -60,6 +62,7 @@ bool EepromManager::writeByte(uint16_t address, const uint8_t data) {
   return rawAccessor.writeByte(address, data);  // 単一バイトのデータ書き込み
 }
 
+#ifdef DELETE
 /**
  * @brief バイト単位でデータを読み込む
  * @param address 読み込み開始アドレス
@@ -74,6 +77,7 @@ bool EepromManager::readBytes(int address, void* data, size_t len) {
   }
   return rawAccessor.readBytes(address, data, len);  // データ読み込み
 }
+#endif
 
 /**
  * @brief データを1バイト読み出す
@@ -99,7 +103,7 @@ bool EepromManager::readByte(uint16_t address, uint8_t *data) {
  */
 bool EepromManager::readMultipleBytes(int address, uint8_t *data, size_t len) {
   std::lock_guard<std::recursive_mutex> lock(getMutex());
-  return rawAccessor.sequentialRead(0x50, address, data, len);
+  return rawAccessor.sequentialRead( address, data, len);
 }
 
 /**

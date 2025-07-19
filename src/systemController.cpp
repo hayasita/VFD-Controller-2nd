@@ -38,6 +38,7 @@ void SystemController::begin() {
 
   // 2. I2Cバス初期化
   i2cBus.begin();              // I2Cバスの初期化
+  i2cBus.scanI2CBus();          // I2Cバスのスキャン
 
   if (!LittleFS.begin()) {
     Serial.println("LittleFS mount failed");
@@ -118,6 +119,7 @@ void SystemController::begin() {
   systemManager.begin(wiFiManager, timeManager, paramManager, terminalInputManager);      // システム管理の初期化
   paramManager.begin();                                             // パラメータ管理の初期化 systemManagerの後に呼び出す必要がある
 
+  rtcManager.dispRtcType();  // RTCの種類を表示
     // serialMonitor init
 //  serialCommandProcessor = SerialCommandProcessor(&realMonitorDeviseIo);
    Serial.println("SystemController initialized");
