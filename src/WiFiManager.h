@@ -117,6 +117,7 @@ class WiFiManager{
   public:
     WiFiManager(WiFi_*);            // コンストラクタ
     bool manager(void);             // WiFiシーケンスマネージャ
+    void withBoot(void);            // 接続要求：ブート時
     void withItm(void);             // 接続要求：端子入力
     bool withTimer(void);           // 接続要求：タイマー
     void withStaReconnect(void);    // 接続要求：STA再接続要求
