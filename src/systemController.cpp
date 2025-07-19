@@ -107,17 +107,13 @@ void SystemController::begin() {
     return systemManager.makeSettingJs();  // システムマネージャからsetting.jsを生成
   });
 
-  /*
-  wiFiManager.connect("", "");
-  
-  if (wiFiManager.isConnected()) {
-    Serial.println("wifi.isConnected.");
-//    timeManager.syncWithSNTP("ntp.nict.jp", 9 * 3600);  // JST (UTC+9)
-  }
-*/
-
+  //
+  // システム起動
+  //
   systemManager.begin(wiFiManager, timeManager, paramManager, terminalInputManager);      // システム管理の初期化
   paramManager.begin();                                             // パラメータ管理の初期化 systemManagerの後に呼び出す必要がある
+
+  systemManager.boot();       // システム起動処理：パラメータ設定反映後の初期化処理
 
   rtcManager.dispRtcType();  // RTCの種類を表示
     // serialMonitor init

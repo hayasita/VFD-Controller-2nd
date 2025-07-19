@@ -10,6 +10,20 @@ void SystemManager::begin(WiFiManager& wifi, TimeManager& time, ParameterManager
   terminalInputManager = &terminal;
 }
 
+/**
+ * @brief システム起動処理
+ *  パラメータ初期化後のシステムマネージャの初期化を行う。
+*/
+ void SystemManager::boot(void)    // 初期化処理
+{
+  // 初期化処理の実装
+  std::cout << "SystemManager initialized.\n";
+
+  wifiManager->withBoot();  // ブート時のWiFi接続要求
+
+  return;
+}
+
 void SystemManager::update(void) {
 
   SystemEvent event = terminalInputManager->update();

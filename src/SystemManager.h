@@ -49,6 +49,7 @@ public:
   ~SystemManager() = default;
   virtual void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal);
   virtual void update(void);
+  virtual void boot(void);          // システム起動処理
 
   // パラメータ変更通知
   virtual void onParameterChanged(uint8_t index, uint8_t newValue);

@@ -90,6 +90,18 @@ void WiFiManager::init(void)
 }
 
 /**
+ * @brief 接続要求：ブート時
+ */
+void WiFiManager::withBoot(void)
+{
+  if(autoConnectEnabled){ // 自動接続が有効
+    std::cout << "ブート時のWiFi接続要求\n";
+    ntpAutoSetSqf = SntpAutoSts::SNTPAUTO_CONNECTION; // NTP接続要求
+  }
+  return;
+}
+
+/**
  * @brief 接続要求：端子入力
  * 
  */
