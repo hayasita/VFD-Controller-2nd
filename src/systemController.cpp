@@ -20,6 +20,7 @@ SystemController::SystemController()
     eepromManager(&i2cBus),                           // EEPROM管理の初期化
     envSensor(&i2cBus),                               // 環境センサの初期化
     rtcManager(&i2cBus),                              // RTC管理の初期化
+    irRemoteManager(),                                // IRリモート管理の初期化
     builtInLedCtrl(builtInLeds, NUM_BUILTIN_LEDS),    // 内蔵LED制御の初期化
     externalLedCtrl(externalLeds, NUM_EXTERNAL_LEDS), // 外部LED制御の初期化
     jsonCommandProcessor(&paramManager, &wiFiManager, &systemManager),                // JSONコマンド処理の初期化
@@ -53,6 +54,7 @@ void SystemController::begin() {
   timeManager.begin(&rtcManager);         // 時間管理の初期化
   TimeManager::setInstance(&timeManager); // シングルトンインスタンス設定
 //  timeManager.setSystemTimeManually(2023, 10, 1, 12, 0, 0); // 手動で時刻設定
+  irRemoteManager.begin();                // IRリモートの初期化
 
   // 4. LEDの初期化
   FastLED.setBrightness(LED_MAX_BRIGHTNESS);                                            // 明るさを設定
@@ -135,6 +137,8 @@ void SystemController::update() {
 
   builtInLedCtrl.update();    // 内蔵LEDの更新処理
   externalLedCtrl.update();   // 外部LEDの更新処理
+
+  irRemoteManager.update();   // IRリモートの更新処理
 
   if (millis() - lastReadTime >= readInterval) {  // 一定間隔でセンサデータを読み取る
 /*
