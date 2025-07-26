@@ -14,7 +14,7 @@ IrRemoteManager::IrRemoteManager()
  */
 void IrRemoteManager::begin()
 {
-  IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK); // 受信開始
+  IrReceiver.begin(IR_RECEIVE_PIN); // 受信開始
 
   return;
 }
