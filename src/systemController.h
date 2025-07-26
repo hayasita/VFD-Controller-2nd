@@ -19,6 +19,7 @@
 #include "JsonCommandProcessor.h" // JSONコマンド処理クラス
 #include "SerialCommandProcessorRealDevice.h" // シリアルコマンド処理クラス
 #include "SerialCommandProcessor.h" // シリアルコマンド処理クラス
+#include "IrRemoteManager.h"        // IRリモート管理クラス
 
 // システム全体の管理クラス
 class SystemController {
@@ -48,6 +49,7 @@ private:
   JsonCommandProcessor jsonCommandProcessor;        // JSONコマンド処理
   RealMonitorDeviseIo realMonitorDeviseIo;        // シリアルコマンド処理
   SerialCommandProcessor serialCommandProcessor;  // シリアルコマンド処理
+  IrRemoteManager irRemoteManager;              // IRリモート管理
 
   CRGB builtInLeds[NUM_BUILTIN_LEDS];
   CRGB externalLeds[NUM_EXTERNAL_LEDS];
