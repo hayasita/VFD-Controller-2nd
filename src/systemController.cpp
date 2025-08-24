@@ -112,7 +112,7 @@ void SystemController::begin() {
   //
   // システム起動
   //
-  systemManager.begin(wiFiManager, timeManager, paramManager, terminalInputManager);      // システム管理の初期化
+  systemManager.initDependencies(wiFiManager, timeManager, paramManager, terminalInputManager, builtInLedCtrl, externalLedCtrl);   // 依存関係の初期化
   paramManager.begin();                                             // パラメータ管理の初期化 systemManagerの後に呼び出す必要がある
 
   systemManager.boot();       // システム起動処理：パラメータ設定反映後の初期化処理

@@ -3,11 +3,24 @@
 #include "SystemManager.h"
 #include "parameterManager.h"
 
-void SystemManager::begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal) {
+/**
+ * @brief 依存関係の初期化
+ * @param wifi WiFiManagerの参照
+ * @param time TimeManagerの参照
+ * @param parameter ParameterManagerの参照
+ * @param terminal TerminalInputManagerの参照
+ * @param builtInLed BuiltInLedControllerの参照
+ * @param externalLed ExternalLedControllerの参照
+ */
+void SystemManager::initDependencies(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal, LedController& builtInLed, LedController& externalLed)
+{
   wifiManager = &wifi;
   timeManager = &time;
   parameterManager = &parameter;
   terminalInputManager = &terminal;
+  builtInLedCtrl = &builtInLed;
+  externalLedCtrl = &externalLed;
+  return;
 }
 
 /**
