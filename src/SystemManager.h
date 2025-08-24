@@ -75,6 +75,8 @@ private:
   LedController* builtInLedCtrl = nullptr;      // 内蔵LED制御クラスへのポインタ
   LedController* externalLedCtrl = nullptr;     // 外部LED制御クラスへのポインタ
 
+  bool ledPatternCtrl(void);              // LED表示パターン設定
+
   bool format12h = false;                 // 時刻表示12/24 Pr.0と連動
   uint8_t dispFormat = 0;                 // 表示フォーマット設定 Pr.1と連動
   uint8_t timeDisplayFormat = 0;          // 時刻表示フォーマット設定 Pr.2と連動
