@@ -27,10 +27,16 @@ void SystemManager::initDependencies(WiFiManager& wifi, TimeManager& time, Param
  * @brief システム起動処理
  *  パラメータ初期化後のシステムマネージャの初期化を行う。
 */
- void SystemManager::boot(void)    // 初期化処理
+void SystemManager::begin(void)    // 初期化処理
 {
   // 初期化処理の実装
   std::cout << "SystemManager initialized.\n";
+
+  // LEDの初期設定
+  builtInLedCtrl->setMode(0, LedMode::Blink, CRGB::Green);
+  externalLedCtrl->setMode(0, LedMode::On, CRGB::Green);
+  externalLedCtrl->setMode(1, LedMode::Blink, CRGB::Blue);
+  externalLedCtrl->setMode(2, LedMode::On, CRGB::Orange);
 
   wifiManager->withBoot();  // ブート時のWiFi接続要求
 

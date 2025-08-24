@@ -49,8 +49,8 @@ public:
   SystemManager() = default;        // コンストラクタ
   ~SystemManager() = default;
   virtual void initDependencies(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal, LedController& builtInLed, LedController& externalLed);  // 依存関係の初期化
+  virtual void begin(void);         // システム起動処理
   virtual void update(void);
-  virtual void boot(void);          // システム起動処理
 
   // パラメータ変更通知
   virtual void onParameterChanged(uint8_t index, uint8_t newValue);
