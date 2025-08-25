@@ -332,7 +332,7 @@ void setWiFihandle(WiFiManager *_WiFiManager)
 
       case ARDUINO_EVENT_WIFI_AP_START:             // アクセスポイントモードが開始された。
         Serial.println("== CallBack アクセスポイントモードが開始された。");
-        _WiFiManager->connectedCallback();
+        _WiFiManager->apConnectedCallback();
         break;
       case ARDUINO_EVENT_WIFI_AP_STOP:              // アクセスポイントモードが停止された。
         Serial.println("== CallBack アクセスポイントモードが停止された。");

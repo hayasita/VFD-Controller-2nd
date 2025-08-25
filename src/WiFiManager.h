@@ -138,7 +138,12 @@ class WiFiManager{
     virtual bool isConnected() const;                             // 接続状態取得
     virtual void disconnect();                                    // 切断処理
     virtual void onConnected(std::function<void()> callback);     // 接続時コールバック関数設定
+    virtual void onApConnected(std::function<void()> callback);   // AP接続時コールバック関数設定
     virtual void onDisconnected(std::function<void()> callback);  // 切断時コールバック関数設定
+
+    std::function<void()> connectedCallback;    // 接続時のコールバック関数
+    std::function<void()> apConnectedCallback;  // AP接続時のコールバック関数
+    std::function<void()> disconnectedCallback; // 切断時のコールバック関数
 
     bool sntpCompleted;                 // SNTP同期完了フラグ
 
@@ -155,9 +160,6 @@ class WiFiManager{
     void setAutoConnect(bool enable);                                   // WiFi自動接続設定
     bool isAutoConnectEnabled() const { return autoConnectEnabled; }    // WiFi自動接続設定取得
     void setAutoConnectInterval(unsigned long interval) { reConnectInterval = interval; } // WiFi自動接続間隔設定
-
-    std::function<void()> connectedCallback;    // 接続時のコールバック関数
-    std::function<void()> disconnectedCallback; // 切断時のコールバック関数
 
   private:
     WiFi_ *pWiFi_  = nullptr;           // WiFi制御用ポインタ
