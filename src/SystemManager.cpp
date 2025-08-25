@@ -2,22 +2,42 @@
 #include <map>
 #include "SystemManager.h"
 #include "parameterManager.h"
+#include "WiFiManager.h"
 
-void SystemManager::begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal) {
+/**
+ * @brief 依存関係の初期化
+ * @param wifi WiFiManagerの参照
+ * @param time TimeManagerの参照
+ * @param parameter ParameterManagerの参照
+ * @param terminal TerminalInputManagerの参照
+ * @param builtInLed BuiltInLedControllerの参照
+ * @param externalLed ExternalLedControllerの参照
+ */
+void SystemManager::initDependencies(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal, LedController& builtInLed, LedController& externalLed)
+{
   wifiManager = &wifi;
   timeManager = &time;
   parameterManager = &parameter;
   terminalInputManager = &terminal;
+  builtInLedCtrl = &builtInLed;
+  externalLedCtrl = &externalLed;
+  return;
 }
 
 /**
  * @brief システム起動処理
  *  パラメータ初期化後のシステムマネージャの初期化を行う。
 */
- void SystemManager::boot(void)    // 初期化処理
+void SystemManager::begin(void)    // 初期化処理
 {
   // 初期化処理の実装
   std::cout << "SystemManager initialized.\n";
+
+  // LEDの初期設定
+  builtInLedCtrl->setMode(0, LedMode::Off, CRGB::Red);
+  externalLedCtrl->setMode(0, LedMode::On, CRGB::Green);
+  externalLedCtrl->setMode(1, LedMode::Blink, CRGB::Blue);
+  externalLedCtrl->setMode(2, LedMode::On, CRGB::Orange);
 
   wifiManager->withBoot();  // ブート時のWiFi接続要求
 
@@ -25,6 +45,8 @@ void SystemManager::begin(WiFiManager& wifi, TimeManager& time, ParameterManager
 }
 
 void SystemManager::update(void) {
+
+  ledPatternCtrl();   // LED表示パターン設定
 
   SystemEvent event = terminalInputManager->update();
   switch (event) {
@@ -67,6 +89,31 @@ void SystemManager::update(void) {
     default:
       break;
   }
+}
+
+/**
+ * @brief LED表示パターン設定
+ */
+bool SystemManager::ledPatternCtrl(void)
+{
+  bool ret = true;
+  auto wifiStatus = wifiManager->getWiFiConSts();
+
+  // WiFi接続状態に応じたLEDモードを設定
+  if(wifiStatus == WiFiConSts::NOCONNECTION) {
+    // 切断中の場合：赤点灯
+    builtInLedCtrl->setMode(0, LedMode::On, CRGB::Red);
+  }
+  else if (wifiStatus == WiFiConSts::MAN_CONNECT) {
+    // 接続中の場合：緑点灯
+    builtInLedCtrl->setMode(0, LedMode::On, CRGB::Green);
+  }
+  else{
+    // 接続・切断処理中の場合：LEDを緑点滅
+    builtInLedCtrl->setMode(0, LedMode::Blink, CRGB::Green);
+  }
+
+  return ret;
 }
 
 /**

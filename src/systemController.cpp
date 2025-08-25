@@ -60,11 +60,7 @@ void SystemController::begin() {
   FastLED.setBrightness(LED_MAX_BRIGHTNESS);                                            // 明るさを設定
   FastLED.addLeds<WS2812, BUILTIN_LED_DATA_PIN, GRB>(builtInLeds, NUM_BUILTIN_LEDS);    // 内蔵LEDの初期化
   FastLED.addLeds<WS2812, EXTERNAL_LED_DATA_PIN, GRB>(externalLeds, NUM_EXTERNAL_LEDS); // 外部LEDの初期化
-//LED点灯テスト
-  builtInLedCtrl.setMode(0, LedMode::Blink, CRGB::Red);
-  externalLedCtrl.setMode(0, LedMode::On, CRGB::Green);
-  externalLedCtrl.setMode(1, LedMode::Blink, CRGB::Blue);
-  externalLedCtrl.setMode(2, LedMode::On, CRGB::Orange);
+
 
   if (!rtcManager.isRunning()) {
 //    logManager.writeLog("RTC not running!");
@@ -112,10 +108,10 @@ void SystemController::begin() {
   //
   // システム起動
   //
-  systemManager.begin(wiFiManager, timeManager, paramManager, terminalInputManager);      // システム管理の初期化
+  systemManager.initDependencies(wiFiManager, timeManager, paramManager, terminalInputManager, builtInLedCtrl, externalLedCtrl);   // 依存関係の初期化
   paramManager.begin();                                             // パラメータ管理の初期化 systemManagerの後に呼び出す必要がある
 
-  systemManager.boot();       // システム起動処理：パラメータ設定反映後の初期化処理
+  systemManager.begin();      // システム起動処理：パラメータ設定反映後の初期化処理
 
   rtcManager.dispRtcType();  // RTCの種類を表示
     // serialMonitor init

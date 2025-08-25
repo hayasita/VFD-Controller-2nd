@@ -4,6 +4,7 @@
 #include "WiFiManager.h"
 #include "TimeManager.h"
 #include "TerminalInputManager.h" // 端子入力管理クラス
+#include "LedController.h"        // LED制御クラス
 
 class ParameterManager; // 前方参照
 #define DISP_KETAMAX  9   // VFD表示桁数
@@ -47,9 +48,9 @@ class SystemManager {
 public:
   SystemManager() = default;        // コンストラクタ
   ~SystemManager() = default;
-  virtual void begin(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal);
+  virtual void initDependencies(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal, LedController& builtInLed, LedController& externalLed);  // 依存関係の初期化
+  virtual void begin(void);         // システム起動処理
   virtual void update(void);
-  virtual void boot(void);          // システム起動処理
 
   // パラメータ変更通知
   virtual void onParameterChanged(uint8_t index, uint8_t newValue);
@@ -71,6 +72,10 @@ private:
   TimeManager* timeManager = nullptr;
   ParameterManager* parameterManager = nullptr;  // パラメータ管理クラスへのポインタ
   TerminalInputManager* terminalInputManager = nullptr;    // 端子入力管理
+  LedController* builtInLedCtrl = nullptr;      // 内蔵LED制御クラスへのポインタ
+  LedController* externalLedCtrl = nullptr;     // 外部LED制御クラスへのポインタ
+
+  bool ledPatternCtrl(void);              // LED表示パターン設定
 
   bool format12h = false;                 // 時刻表示12/24 Pr.0と連動
   uint8_t dispFormat = 0;                 // 表示フォーマット設定 Pr.1と連動
