@@ -15,7 +15,7 @@ WebServerManager::WebServerManager(ParameterManager* param, JsonCommandProcessor
 //void WebServerManager::begin(ParameterManager* pm, JsonCommandProcessor* jcp, WiFiManager* wifiManager) {
 void WebServerManager::begin() {
   if (running) return;  // すでに開始していればスキップ
-
+  Serial.println("Starting WebServerManager...");
 //  parameterManager = pm;
 //  jsonCommandProcessor = jcp;
   
@@ -153,6 +153,8 @@ void WebServerManager::onWebSocketEvent(AsyncWebSocket *server,
 
 void WebServerManager::end() {
   if (!running) return;  // 動作していなければスキップ
+
+  Serial.println("Stopping WebServerManager...");
   // WebSocket クライアントのすべての接続を閉じる
   ws.closeAll(); // WebSocket通信を切断
 

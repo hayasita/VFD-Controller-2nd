@@ -313,6 +313,7 @@ void setWiFihandle(WiFiManager *_WiFiManager)
         break;
       case ARDUINO_EVENT_WIFI_STA_STOP:             // ステーションモードが停止された。
         Serial.println("== CallBack ステーションモードが停止された。");
+        _WiFiManager->disconnectedCallback();
         break;
       case ARDUINO_EVENT_WIFI_STA_CONNECTED:        // ステーションがAPに接続した。
         Serial.println("== CallBack ステーションがAPに接続した。");
@@ -336,6 +337,7 @@ void setWiFihandle(WiFiManager *_WiFiManager)
         break;
       case ARDUINO_EVENT_WIFI_AP_STOP:              // アクセスポイントモードが停止された。
         Serial.println("== CallBack アクセスポイントモードが停止された。");
+        _WiFiManager->disconnectedCallback();
         _WiFiManager->apStopCollBack();
         break;
       case ARDUINO_EVENT_WIFI_AP_STACONNECTED:      // クライアントがアクセスポイントに接続した。

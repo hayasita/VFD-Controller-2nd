@@ -990,14 +990,16 @@ void WiFiManager::update() {
   withTimer();  // 接続要求：タイマー
   manager();    // WiFi接続マネージャ
 
+/*
   bool nowConnected = pWiFi_->_status() == WL_CONNECTED;
   if (nowConnected && !wasConnected) {
     wasConnected = true;
 //    if (connectedCallback) connectedCallback();   // setWiFihandle()に移動
   } else if (!nowConnected && wasConnected) {
     wasConnected = false;
-    if (disconnectedCallback) disconnectedCallback();
+//    if (disconnectedCallback) disconnectedCallback();
   }
+*/
 
   if(wifiScanRequestFlag){
     wifiScanRequestFlag = false; // スキャン要求フラグをクリア
