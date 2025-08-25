@@ -156,6 +156,9 @@ class WiFiManager{
     bool isAutoConnectEnabled() const { return autoConnectEnabled; }    // WiFi自動接続設定取得
     void setAutoConnectInterval(unsigned long interval) { reConnectInterval = interval; } // WiFi自動接続間隔設定
 
+    std::function<void()> connectedCallback;    // 接続時のコールバック関数
+    std::function<void()> disconnectedCallback; // 切断時のコールバック関数
+
   private:
     WiFi_ *pWiFi_  = nullptr;           // WiFi制御用ポインタ
     unsigned long timetmp;              // 処理経過時間tmp
@@ -211,8 +214,6 @@ class WiFiManager{
 //    bool staDisconnection(void);        // STA切断
 
     mutable std::mutex mutex;                   // スレッドセーフのためのミューテックス
-    std::function<void()> connectedCallback;    // 接続時のコールバック関数
-    std::function<void()> disconnectedCallback; // 切断時のコールバック関数
     bool wasConnected = false;                  // 前回の接続状態を保持するフラグ
 
     std::function<void()> wifiScanCallback = nullptr; // スキャン完了時コールバック

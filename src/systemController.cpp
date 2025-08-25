@@ -90,6 +90,8 @@ void SystemController::begin() {
     webServerManager.end();    // 切断時にサーバ停止（WebSocket含む）
   });
 
+  setWiFihandle(&wiFiManager);              // WiFiManagerのハンドルを設定
+
   // SNTP同期完了時のコールバック設定
   timeManager.onSntpSync([this]() {
     Serial.println("SNTP sync completed");

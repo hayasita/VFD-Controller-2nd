@@ -292,3 +292,66 @@ int8_t WiFi_real::_encryptionType(int8_t networkItem)
   return WiFi.encryptionType(networkItem);
 } // WiFi.encryptionType呼び出し
   
+/**
+ * @brief WiFiManagerのハンドルを設定
+ * 
+ * @param _WiFiManager
+ */
+void setWiFihandle(WiFiManager *_WiFiManager)
+{
+  WiFi.onEvent([_WiFiManager](WiFiEvent_t event, WiFiEventInfo_t info) {
+    switch (event) {
+      case ARDUINO_EVENT_WIFI_READY:                // ESP32のWiFiが準備完了した。
+        Serial.println("== CallBack ESP32のWiFiが準備完了した。");
+        break;
+      case ARDUINO_EVENT_WIFI_SCAN_DONE:            // WiFiのスキャンが完了した。
+        Serial.println("== CallBack WiFiのスキャンが完了した。");
+        break;
+      case ARDUINO_EVENT_WIFI_STA_START:            // ステーションモードが開始された。
+        Serial.println("== CallBack ステーションモードが開始された。");
+        _WiFiManager->connectedCallback();
+        break;
+      case ARDUINO_EVENT_WIFI_STA_STOP:             // ステーションモードが停止された。
+        Serial.println("== CallBack ステーションモードが停止された。");
+        break;
+      case ARDUINO_EVENT_WIFI_STA_CONNECTED:        // ステーションがAPに接続した。
+        Serial.println("== CallBack ステーションがAPに接続した。");
+        break;
+      case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:     // ステーションがAPから切断された。
+        Serial.println("== CallBack ステーションがAPから切断された。");
+        break;
+      case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:  // 接続中のAPの認証モードが変更された。
+        Serial.println("== CallBack 接続中のAPの認証モードが変更された。");
+        break;
+      case ARDUINO_EVENT_WIFI_STA_GOT_IP:           // ステーションがIPアドレスを取得した。
+        Serial.println("== CallBack ステーションがIPアドレスを取得した。");
+        break;
+      case ARDUINO_EVENT_WIFI_STA_LOST_IP:          // ステーションがIPアドレスを失った。
+        Serial.println("== CallBack ステーションがIPアドレスを失った。");
+        break;
+
+      case ARDUINO_EVENT_WIFI_AP_START:             // アクセスポイントモードが開始された。
+        Serial.println("== CallBack アクセスポイントモードが開始された。");
+        _WiFiManager->connectedCallback();
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STOP:              // アクセスポイントモードが停止された。
+        Serial.println("== CallBack アクセスポイントモードが停止された。");
+        _WiFiManager->apStopCollBack();
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STACONNECTED:      // クライアントがアクセスポイントに接続した。
+        Serial.println("== CallBack クライアントがアクセスポイントに接続した。");
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:   // クライアントがアクセスポイントから切断された。
+        Serial.println("== CallBack クライアントがアクセスポイントから切断された。");
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:     // アクセスポイントに接続しているクライアントにIPアドレスが割り当てられた。
+        Serial.println("== アクセスポイントに接続しているクライアントにIPアドレスが割り当てられた。");
+        break;
+
+      default:
+        break;
+    }
+  });
+
+  return;
+}

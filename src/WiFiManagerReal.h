@@ -46,5 +46,7 @@ class WiFi_real : public WiFi_
 
 };
 
+void setWiFihandle(WiFiManager *_WiFiConnect);  // WiFiManagerのハンドルを設定
+
 #undef GLOBAL
 #endif
