@@ -32,7 +32,7 @@ protected:
 
 // サンプルテスト
 TEST_F(EepromManagerTest, WriteAndReadBytes) {
-  uint8_t writeData[4] = {1, 2, 3, 4};
+//  uint8_t writeData[4] = {1, 2, 3, 4};
   uint8_t readData[4] = {0};
 
   EXPECT_TRUE(eepromManager.writeByte(0, 1));

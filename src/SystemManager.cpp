@@ -34,11 +34,12 @@ void SystemManager::begin(void)    // 初期化処理
   std::cout << "SystemManager initialized.\n";
 
   // LEDの初期設定
+/*
   builtInLedCtrl->setMode(0, LedMode::Off, CRGB::Red);
   externalLedCtrl->setMode(0, LedMode::On, CRGB::Green);
   externalLedCtrl->setMode(1, LedMode::Blink, CRGB::Blue);
   externalLedCtrl->setMode(2, LedMode::On, CRGB::Orange);
-
+*/
   wifiManager->withBoot();  // ブート時のWiFi接続要求
 
   return;
@@ -102,15 +103,15 @@ bool SystemManager::ledPatternCtrl(void)
   // WiFi接続状態に応じたLEDモードを設定
   if(wifiStatus == WiFiConSts::NOCONNECTION) {
     // 切断中の場合：赤点灯
-    builtInLedCtrl->setMode(0, LedMode::On, CRGB::Red);
+//    builtInLedCtrl->setMode(0, LedMode::On, CRGB::Red);
   }
   else if (wifiStatus == WiFiConSts::MAN_CONNECT) {
     // 接続中の場合：緑点灯
-    builtInLedCtrl->setMode(0, LedMode::On, CRGB::Green);
+//    builtInLedCtrl->setMode(0, LedMode::On, CRGB::Green);
   }
   else{
     // 接続・切断処理中の場合：LEDを緑点滅
-    builtInLedCtrl->setMode(0, LedMode::Blink, CRGB::Green);
+//    builtInLedCtrl->setMode(0, LedMode::Blink, CRGB::Green);
   }
 
   return ret;

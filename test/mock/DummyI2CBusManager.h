@@ -9,10 +9,10 @@ class DummyI2CBusManager : public I2CBusManager {
     std::recursive_mutex& getMutex() override { return dummyMutex; }
     TwoWire& getWire() override { return wire; }
 
-    std::vector<uint8_t> scanI2CBus(uint8_t address = 0x00, uint8_t count = 127) override {
+    std::vector<uint8_t> scanI2CBus(uint8_t , uint8_t ) override {
       return {}; // モックなので空のリストを返す
     }
-    std::string getDeviceName(uint8_t address) override { return "DummyDevice"; }
+    std::string getDeviceName(uint8_t ) override { return "DummyDevice"; }
 
     bool isEepromConnected() override { return false; }
     bool isM5oledConnected() override { return false; }

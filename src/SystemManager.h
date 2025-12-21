@@ -4,8 +4,14 @@
 #include "WiFiManager.h"
 #include "TimeManager.h"
 #include "TerminalInputManager.h" // 端子入力管理クラス
-#include "LedController.h"        // LED制御クラス
 
+#ifdef UNIT_TEST
+// ...モック定義...
+class LedController {}; // LedControllerの前方宣言（実際のLedControllerクラスは別ファイルに定義されていると仮定）
+#else
+// ...本来の定義...
+#include "LedController.h"        // LED制御クラス
+#endif
 class ParameterManager; // 前方参照
 #define DISP_KETAMAX  9   // VFD表示桁数
 

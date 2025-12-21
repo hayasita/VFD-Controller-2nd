@@ -7,7 +7,7 @@ class DummyTimeManager : public AbstractTimeManager {
 public:
   DummyTimeManager() : AbstractTimeManager() {}
 
-  void updateTimeZone(const std::string& tzParam) override {
+  void updateTimeZone(const std::string& ) override {
     return;
   }
 };
