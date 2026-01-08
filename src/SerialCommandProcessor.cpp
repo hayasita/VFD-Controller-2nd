@@ -171,7 +171,7 @@ std::vector<std::string> SerialCommandProcessor::splitCommand(const std::string 
 }
 
 
-bool SerialCommandProcessor::dummyExec(std::vector<std::string> command)
+bool SerialCommandProcessor::dummyExec(std::vector<std::string> /*command*/)
 {
   std::cout << "SerialCommandProcessor::dummyExec\n";
   monitorIo_->send("dummyExec\n");
@@ -185,7 +185,7 @@ bool SerialCommandProcessor::dummyExec(std::vector<std::string> command)
  * @return true 
  * @return false 
  */
-bool SerialCommandProcessor::opecodeHelp(std::vector<std::string> command)   // help
+bool SerialCommandProcessor::opecodeHelp(std::vector<std::string> /*command*/)   // help
 {
 //  monitorIo_->send("help\n");
 
@@ -239,14 +239,14 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels)
 }
 #endif
 
-bool SerialCommandProcessor::opecodels(std::vector<std::string> command_)     // ls
+bool SerialCommandProcessor::opecodels(std::vector<std::string> command)     // ls
 {
   monitorIo_->send("opecodels\n");
-#ifndef UNIT_TEST
-
   for (const auto &str : command) {
     std::cout << str << std::endl;
   }
+#ifndef UNIT_TEST
+
   if(command.size() > 1){
     listDir(LittleFS, command[1].c_str(), 0);
   }
@@ -258,7 +258,7 @@ bool SerialCommandProcessor::opecodels(std::vector<std::string> command_)     //
   return true;
 }
 
-bool SerialCommandProcessor::opecodedatalist(std::vector<std::string> command)   // datalist
+bool SerialCommandProcessor::opecodedatalist(std::vector<std::string> /*command*/)   // datalist
 {
 
 //  std::for_each(jsData.dataFilePath.begin(), jsData.dataFilePath.end(), [](std::string x) {
@@ -275,7 +275,7 @@ bool SerialCommandProcessor::opecodedatalist(std::vector<std::string> command)  
  * @return true 
  * @return false 
  */
-bool SerialCommandProcessor::opecodeenv(std::vector<std::string> command)
+bool SerialCommandProcessor::opecodeenv(std::vector<std::string> /*command*/)
 {
   monitorIo_->send("opecodeenv\n");
   std::string js = systemManager->makeSettingJs();  // ./setting.jsを生成する
@@ -284,7 +284,7 @@ bool SerialCommandProcessor::opecodeenv(std::vector<std::string> command)
   return true;
 }
 
-bool SerialCommandProcessor::opecodeVer(std::vector<std::string> command)        // バージョン表示
+bool SerialCommandProcessor::opecodeVer(std::vector<std::string> /*command*/)        // バージョン表示
 {
   monitorIo_->send("opecodeVer\n");
  
@@ -339,7 +339,7 @@ int parseStringToInt(const std::string& str) {
     return value;
 }
 
-bool SerialCommandProcessor::opecodeGetTimeLength(std::vector<std::string> command) {
+bool SerialCommandProcessor::opecodeGetTimeLength(std::vector<std::string> /*command*/) {
   monitorIo_->send("> opecodeGetTimeLength\n");
 
   std::ostringstream oss;
@@ -429,7 +429,7 @@ bool SerialCommandProcessor::opecodeEepromDump(std::vector<std::string> command)
  * スキャン中に見つかったデバイスがない場合は、その旨を通知する。
  * i2cBusが初期化されていない場合は、エラーメッセージを表示する。
  */
-bool SerialCommandProcessor::opecodeI2CScan(std::vector<std::string> command) {
+bool SerialCommandProcessor::opecodeI2CScan(std::vector<std::string> /*command*/) {
   // SystemControllerなどからI2CBusManagerの参照をもらう必要あり
   if(i2cBus) {
     std::vector<uint8_t> found = i2cBus->scanI2CBus();
@@ -458,7 +458,7 @@ std::string SerialCommandProcessor::toHex(uint8_t value) const {
   return oss.str();
 }
 
-bool SerialCommandProcessor::opecodeWiFiScan(std::vector<std::string> command) {
+bool SerialCommandProcessor::opecodeWiFiScan(std::vector<std::string> /*command*/) {
 //  if(wiFiManager) {
   if(wiFiManager && !(wiFiManager->checkWifiScanCallback())) { // WiFiManagerが初期化されていて、スキャンコールバックが設定されていない場合
     monitorIo_->send("opecodeWiFiScan\n");

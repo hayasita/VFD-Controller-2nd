@@ -8,7 +8,7 @@
 #include "LogManager.h"
 #include "EnvironmentSensor.h"
 #include "DisplayManager.h"       // OLED表示クラス
-#include "LedController.h"        // LED制御クラス
+#include "LedManager.h"           // LED管理クラス
 #include "RTCManager.h"
 #include "TimeManager.h"        // 時間管理クラス
 #include "WiFiManagerReal.h"          // WiFi接続管理クラス（実機用）
@@ -51,10 +51,7 @@ private:
   SerialCommandProcessor serialCommandProcessor;  // シリアルコマンド処理
   IrRemoteManager irRemoteManager;              // IRリモート管理
 
-  CRGB builtInLeds[NUM_BUILTIN_LEDS];
-  CRGB externalLeds[NUM_EXTERNAL_LEDS];
-  LedController builtInLedCtrl;
-  LedController externalLedCtrl;
+  LedManager ledManager;        // LED管理クラス
 
   unsigned long lastReadTime = 0;           // 最後の読み込み時間
   const unsigned long readInterval = 100;   // 読み込み間隔（ミリ秒）

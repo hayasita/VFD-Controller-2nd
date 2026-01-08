@@ -14,17 +14,17 @@ protected:
   DummyI2CBusManager dummyBusManager;  // I2CBusManagerのモック
   DummyEepromManager dummyEepromManager;
   DummyLogManager dummyLogManager;
-  ParameterManager paramManager;
   DummySystemManager dummySystemManager;
   DummyTimeManager dummyTimeManager;        // モックのTimeManager
+  ParameterManager paramManager;
 
   ParameterManagerTest()
   : dummyBusManager(),
     dummyEepromManager(&dummyBusManager),  // I2CBusManagerのモックを渡す
     dummyLogManager(),
-    paramManager(&dummyEepromManager, &dummyLogManager, &dummySystemManager),  // ParameterManagerのコンストラクタにモックを渡す
+    dummySystemManager(),
     dummyTimeManager(),                     // TimeManagerのモックを渡す
-    dummySystemManager()
+    paramManager(&dummyEepromManager, &dummyLogManager, &dummySystemManager)  // ParameterManagerのコンストラクタにモックを渡す
   {
     // コンストラクタで初期化
   }

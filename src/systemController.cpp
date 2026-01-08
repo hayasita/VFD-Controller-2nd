@@ -21,8 +21,7 @@ SystemController::SystemController()
     envSensor(&i2cBus),                               // 環境センサの初期化
     rtcManager(&i2cBus),                              // RTC管理の初期化
     irRemoteManager(),                                // IRリモート管理の初期化
-    builtInLedCtrl(builtInLeds, NUM_BUILTIN_LEDS),    // 内蔵LED制御の初期化
-    externalLedCtrl(externalLeds, NUM_EXTERNAL_LEDS), // 外部LED制御の初期化
+    ledManager(),                                     // LED管理クラスの初期化
     jsonCommandProcessor(&paramManager, &wiFiManager, &systemManager),                // JSONコマンド処理の初期化
     wiFiManager(&wifiReal),                                                           // WiFi接続管理の初期化
     webServerManager(&paramManager, &jsonCommandProcessor, &wiFiManager)              // Webサーバ管理の初期化
@@ -55,12 +54,6 @@ void SystemController::begin() {
   TimeManager::setInstance(&timeManager); // シングルトンインスタンス設定
 //  timeManager.setSystemTimeManually(2023, 10, 1, 12, 0, 0); // 手動で時刻設定
   irRemoteManager.begin();                // IRリモートの初期化
-
-  // 4. LEDの初期化
-  FastLED.setBrightness(LED_MAX_BRIGHTNESS);                                            // 明るさを設定
-  FastLED.addLeds<WS2812, BUILTIN_LED_DATA_PIN, GRB>(builtInLeds, NUM_BUILTIN_LEDS);    // 内蔵LEDの初期化
-  FastLED.addLeds<WS2812, EXTERNAL_LED_DATA_PIN, GRB>(externalLeds, NUM_EXTERNAL_LEDS); // 外部LEDの初期化
-
 
   if (!rtcManager.isRunning()) {
 //    logManager.writeLog("RTC not running!");
@@ -115,7 +108,7 @@ void SystemController::begin() {
   //
   // システム起動
   //
-  systemManager.initDependencies(wiFiManager, timeManager, paramManager, terminalInputManager, builtInLedCtrl, externalLedCtrl);   // 依存関係の初期化
+  systemManager.initDependencies(wiFiManager, timeManager, paramManager, terminalInputManager, ledManager);   // 依存関係の初期化
   paramManager.begin();                                             // パラメータ管理の初期化 systemManagerの後に呼び出す必要がある
 
   systemManager.begin();      // システム起動処理：パラメータ設定反映後の初期化処理
@@ -138,8 +131,9 @@ void SystemController::update() {
   // シリアルモニタ処理
   serialCommandProcessor.exec();
 
-  builtInLedCtrl.update();    // 内蔵LEDの更新処理
-  externalLedCtrl.update();   // 外部LEDの更新処理
+  // LED管理の更新
+  ledManager.builtInLedCtrl.update();    // 内蔵LEDの更新処理
+  ledManager.externalLedCtrl.update();   // 外部LEDの更新処理
 
   irRemoteManager.update();   // IRリモートの更新処理
 

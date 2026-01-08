@@ -1,5 +1,24 @@
 #include "LedController.h"
 
+CRGB colorToCRGB(Colorld color)
+{
+  switch (color) {
+    case Colorld::Black:   return CRGB::Black;
+    case Colorld::White:   return CRGB::White;
+    case Colorld::Red:     return CRGB::Red;
+    case Colorld::Green:   return CRGB::Green;
+    case Colorld::Blue:    return CRGB::Blue;
+    case Colorld::Yellow:  return CRGB::Yellow;
+    case Colorld::Cyan:    return CRGB::Cyan;
+    case Colorld::Magenta: return CRGB::Magenta;
+    case Colorld::Orange:  return CRGB(255, 165, 0);    // Orange
+    case Colorld::Purple:  return CRGB(128, 0, 128);    // Purple
+    case Colorld::Pink:    return CRGB(255, 192, 203);  // Pink
+    default:               return CRGB::Black;          // Default to Black
+  }
+}
+
+
 LedController::LedController(CRGB* leds, int numLeds)
   : leds_(leds), numLeds_(numLeds)
 {
@@ -17,10 +36,10 @@ LedController::LedController(CRGB* leds, int numLeds)
   states_.resize(numLeds_, defaultState); // 初期状態を設定
 }
 
-void LedController::setMode(int idx, LedMode mode, CRGB color) {
+void LedController::setMode(int idx, LedMode mode, Colorld color) {
   if(idx < 0 || idx >= numLeds_) return;
   states_[idx].mode = mode;
-  states_[idx].color = color;
+  states_[idx].color = colorToCRGB(color);
 }
 
 void LedController::update(void)

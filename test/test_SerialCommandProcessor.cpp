@@ -20,25 +20,26 @@ namespace
 //      MockSerialMonitorIO mock;
 //      SerialCommandProcessor serialMonitor = SerialMonitor(&mock);
     protected:
+      DummyI2CBusManager i2cbusManager;  // I2Cバスマネージャのモック
       DummyEepromManager eepromManager;
       DummyLogManager logManager;
       MockSerialMonitorIO mock;
       DummySystemManager dummySystemManager;
-      DummyI2CBusManager i2cbusManager;  // I2Cバスマネージャのモック
       MockWiFiManager wifiManager;
       ParameterManager paramManager;
 
     SerialMonitorTest()
-      : 
-        i2cbusManager(),
+      : i2cbusManager(),
         eepromManager(&i2cbusManager),  // I2CBusManagerを渡す
         logManager(),
+        mock(),
+        dummySystemManager(),
         wifiManager(),
         paramManager(&eepromManager, &logManager),
         serialMonitor(mock, i2cbusManager, paramManager, eepromManager, wifiManager, &dummySystemManager) // SerialCommandProcessorのインスタンスを作成
     {}
 
-      SerialCommandProcessor serialMonitor{mock ,i2cbusManager ,paramManager ,eepromManager, wifiManager, &dummySystemManager}; // ← MockSerialMonitorIOのポインタを渡す
+      SerialCommandProcessor serialMonitor;
   };
   std::vector<std::string> result = {"command","parameta1","parameta2"};
   std::vector<std::string> result2 = {"command"};
@@ -62,14 +63,6 @@ namespace
     EXPECT_CALL(mock, rsv()).Times(AtLeast(1)).WillOnce(Return("command2"));           // テスト入力
     EXPECT_CALL(mock, send("dummyExec\n")).Times(AtLeast(1)).WillOnce(Return(1));  // テスト出力
     EXPECT_EQ(true, serialMonitor.exec()); // 期待値：true
-  }
-
-  int main(int argc, char **argv)
-  {
-    // 以下の行は，テスト開始前に Google Mock （と Google Test）
-    // を初期化するために必ず実行する必要があります．
-    ::testing::InitGoogleMock(&argc, argv);
-    return RUN_ALL_TESTS();
   }
 
 } // namespace

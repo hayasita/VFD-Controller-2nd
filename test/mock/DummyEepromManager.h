@@ -55,7 +55,7 @@ public:
    * @return        true 成功、false 失敗
    */
   bool writeByte(uint16_t address, const uint8_t data) override {
-    if(address < 0 || address >= SIZE) {
+    if(address >= SIZE) {
       return false;  // 範囲外アクセスを防止
     }
     memory[address] = data;  // 単一バイトの書き込み
@@ -79,7 +79,7 @@ public:
    * @return        true 成功、false 失敗
    */
   bool readByte(uint16_t address, uint8_t *data) override {
-    if(address < 0 || address >= SIZE) {
+    if(address >= SIZE) {
       return false;  // 範囲外アクセスを防止
     }
     *data = memory[address];  // 単一バイトの読み込み

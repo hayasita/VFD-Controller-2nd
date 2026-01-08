@@ -2,12 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <FastLED.h>
-
-#define NUM_BUILTIN_LEDS 1            // 内蔵LEDの数
-#define NUM_EXTERNAL_LEDS 3 //8       // 外部LEDの数
-#define BUILTIN_LED_DATA_PIN 21       // 内蔵RGBLEDのDATA PIN
-#define EXTERNAL_LED_DATA_PIN 14//43  // 外部RGBLEDのDATA PIN
-#define LED_MAX_BRIGHTNESS 16         // LEDの明るさ（20以上は熱で壊れる可能性あり。）
+#include "LedColor.h"
 
 enum class LedMode { Off, On, Blink };
 
@@ -20,8 +15,8 @@ struct LedState {
 
 class LedController {
 public:
-  LedController(CRGB* leds, int numLeds);
-  void setMode(int idx, LedMode mode, CRGB color = CRGB::White);
+  LedController(CRGB* leds = nullptr, int numLeds = 0);
+  void setMode(int idx, LedMode mode, Colorld color = Colorld::White);
   void update(void);
 
 private:

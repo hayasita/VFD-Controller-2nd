@@ -1,25 +1,4 @@
-# テストソースファイル
-set(PARAMETERTEST_SOURCES
-    test_parameter_manager.cpp
-    mock/EEPROM.cpp  # モックもビルド対象に追加
-)
-
-# CMakeのバージョンを指定
-cmake_minimum_required(VERSION 3.10)
-
-#ParameterManagerのテストを行うための設定
-# テスト実行ファイルを作成
-add_executable(ParameterManTest
-    ${PARAMETERTEST_SOURCES}
-)
-
-# モック用ヘッダをインクルードパスに追加
-target_include_directories(ParameterManTest PRIVATE
-    ${CMAKE_SOURCE_DIR}/test/mock
-    ${CMAKE_SOURCE_DIR}/src
-)
-
-# ソースコードをライブラリとして追加
+# 本体ライブラリ
 add_library(ParameterManLib
     ../src/EepromManager.cpp
     ../src/LogManager.cpp
@@ -27,74 +6,60 @@ add_library(ParameterManLib
     ../src/ParameterManager.cpp
     ../src/ParameterStorage.cpp
     ../src/SerialCommandProcessor.cpp
-#    ../src/SerialCommandProcessor.cpp     # 追加
     ../src/systemManager.cpp
+    ../src/LedManager.cpp
     ../src/WiFiManager.cpp
-    ./mock/EepromRawAccessor.cpp
-    ./mock/I2CBusManager.cpp
-    ./mock/EEPROM.cpp
 )
-
-# ←ここでモックパス追加！！
 target_include_directories(ParameterManLib PUBLIC
-    ${CMAKE_SOURCE_DIR}/test/mock
+    ${CMAKE_SOURCE_DIR}/src
 )
-
-# ライブラリリンク
-target_link_libraries(ParameterManTest
-    ParameterManLib
-    gtest
-    gtest_main
-)
-
-# マクロ定義
-target_compile_definitions(ParameterManTest PRIVATE UNIT_TEST)
 target_compile_definitions(ParameterManLib PRIVATE UNIT_TEST)
 
-# SerialCommandProcessorのテスト
-set(SERIALCOMMANDPROCESSOR_SOURCES
-    test_SerialCommandProcessor.cpp
-)
-add_executable(SerialCommandProcessorTest
-    ${SERIALCOMMANDPROCESSOR_SOURCES}
-)
+# 未使用パラメータだけ警告を許容
+target_compile_options(ParameterManLib PRIVATE -Wno-error=unused-parameter)
 
-target_include_directories(SerialCommandProcessorTest PRIVATE
+# モックライブラリ
+add_library(MockLib
+    mock/EEPROM.cpp
+    mock/EepromRawAccessor.cpp
+    mock/I2CBusManager.cpp
+)
+target_include_directories(MockLib PUBLIC
     ${CMAKE_SOURCE_DIR}/test/mock
 )
+target_compile_definitions(MockLib PRIVATE UNIT_TEST)
 
-target_compile_definitions(SerialCommandProcessorTest PRIVATE UNIT_TEST)
+# モックは全警告を許容
+target_compile_options(MockLib PRIVATE -Wno-error)
 
-target_link_libraries(SerialCommandProcessorTest
-    ParameterManLib
-    gmock
-    gmock_main
-    gtest
-    gtest_main
-)
+# 本体ライブラリにモックをリンク
+target_link_libraries(ParameterManLib PUBLIC MockLib)
 
-#target_compile_definitions(EepromManTest PRIVATE UNIT_TEST)
-
-
-set(EEPROMTEST_SOURCES
-    test_eeprom_manager.cpp
-)
-add_executable(EepromManTest
-    ${EEPROMTEST_SOURCES}
-)
-target_include_directories(EepromManTest PRIVATE
+# 共通関数でテスト追加
+function(add_unit_test name sources use_gmock)
+  add_executable(${name} ${sources})
+  # テストから本体ソースやモックへアクセスできるようにする
+  target_include_directories(${name} PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/test/mock
-)
+  )
 
-target_link_libraries(EepromManTest
-    ParameterManLib
-    gtest
-    gtest_main
-)
+  target_compile_definitions(${name} PRIVATE UNIT_TEST)
+  if(use_gmock)
+    target_link_libraries(${name} PRIVATE GTest::gmock GTest::gmock_main)
+  else()
+    target_link_libraries(${name} PRIVATE GTest::gtest_main GTest::gtest)
+  endif()
 
-target_compile_definitions(EepromManTest PRIVATE UNIT_TEST)
+  # 本体ライブラリとモックもリンク
+  target_link_libraries(${name} PRIVATE ParameterManLib MockLib)
 
-# テスト有効化
-enable_testing()
-add_test(NAME ParameterManTest COMMAND ParameterManTest)
-add_test(NAME EepromManTest COMMAND EepromManTest)
+  add_test(NAME ${name} COMMAND ${name})
+endfunction()
+
+# テスト追加
+add_unit_test(ParameterManTest "test_parameter_manager.cpp" OFF)
+add_unit_test(EepromManTest "test_eeprom_manager.cpp" OFF)
+add_unit_test(SerialCmdProcTest "test_SerialCommandProcessor.cpp" ON)
+#add_unit_test(SystemControlerTest "test_system_controller.cpp" OFF)
+
