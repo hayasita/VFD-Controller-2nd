@@ -84,11 +84,18 @@ void SystemController::begin() {
     timeManager.configureSNTP();  // SNTP設定
   });
 
+  // AP接続時のコールバック設定
+  wiFiManager.onApConnected([this](){
+    webServerManager.begin();  // WiFi接続後に開始
+  });
+
   // WiFi切断時のコールバック設定
   wiFiManager.onDisconnected([this]() {
     Serial.println("--WiFi disconnected");
     webServerManager.end();    // 切断時にサーバ停止（WebSocket含む）
   });
+
+  setWiFihandle(&wiFiManager);              // WiFiManagerのハンドルを設定
 
   // SNTP同期完了時のコールバック設定
   timeManager.onSntpSync([this]() {

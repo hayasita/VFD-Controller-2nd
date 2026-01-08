@@ -990,14 +990,16 @@ void WiFiManager::update() {
   withTimer();  // 接続要求：タイマー
   manager();    // WiFi接続マネージャ
 
+/*
   bool nowConnected = pWiFi_->_status() == WL_CONNECTED;
   if (nowConnected && !wasConnected) {
     wasConnected = true;
-    if (connectedCallback) connectedCallback();
+//    if (connectedCallback) connectedCallback();   // setWiFihandle()に移動
   } else if (!nowConnected && wasConnected) {
     wasConnected = false;
-    if (disconnectedCallback) disconnectedCallback();
+//    if (disconnectedCallback) disconnectedCallback();
   }
+*/
 
   if(wifiScanRequestFlag){
     wifiScanRequestFlag = false; // スキャン要求フラグをクリア
@@ -1022,6 +1024,15 @@ void WiFiManager::update() {
 void WiFiManager::onConnected(std::function<void()> callback) {
 //  std::lock_guard<std::mutex> lock(mutex);
   connectedCallback = callback;
+}
+
+/**
+ * @brief WiFi接続時コールバック関数設定
+ * @param callback  接続時コールバック関数
+ */
+void WiFiManager::onApConnected(std::function<void()> callback) {
+//  std::lock_guard<std::mutex> lock(mutex);
+  apConnectedCallback = callback;
 }
 
 /**

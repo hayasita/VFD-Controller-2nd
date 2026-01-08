@@ -138,7 +138,12 @@ class WiFiManager{
     virtual bool isConnected() const;                             // 接続状態取得
     virtual void disconnect();                                    // 切断処理
     virtual void onConnected(std::function<void()> callback);     // 接続時コールバック関数設定
+    virtual void onApConnected(std::function<void()> callback);   // AP接続時コールバック関数設定
     virtual void onDisconnected(std::function<void()> callback);  // 切断時コールバック関数設定
+
+    std::function<void()> connectedCallback;    // 接続時のコールバック関数
+    std::function<void()> apConnectedCallback;  // AP接続時のコールバック関数
+    std::function<void()> disconnectedCallback; // 切断時のコールバック関数
 
     bool sntpCompleted;                 // SNTP同期完了フラグ
 
@@ -211,8 +216,6 @@ class WiFiManager{
 //    bool staDisconnection(void);        // STA切断
 
     mutable std::mutex mutex;                   // スレッドセーフのためのミューテックス
-    std::function<void()> connectedCallback;    // 接続時のコールバック関数
-    std::function<void()> disconnectedCallback; // 切断時のコールバック関数
     bool wasConnected = false;                  // 前回の接続状態を保持するフラグ
 
     std::function<void()> wifiScanCallback = nullptr; // スキャン完了時コールバック
