@@ -4,15 +4,9 @@
 #include "WiFiManager.h"
 #include "TimeManager.h"
 #include "TerminalInputManager.h" // 端子入力管理クラス
+#include "LedManager.h"           // LED管理クラス
 
-#ifdef UNIT_TEST
-// ...モック定義...
-class LedController {}; // LedControllerの前方宣言（実際のLedControllerクラスは別ファイルに定義されていると仮定）
-#else
-// ...本来の定義...
-#include "LedController.h"        // LED制御クラス
-#endif
-class ParameterManager; // 前方参照
+class ParameterManager; // 前方参照　循環参照の防止用
 #define DISP_KETAMAX  9   // VFD表示桁数
 
 enum class ParamIndex : uint8_t {
@@ -54,7 +48,7 @@ class SystemManager {
 public:
   SystemManager() = default;        // コンストラクタ
   ~SystemManager() = default;
-  virtual void initDependencies(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal, LedController& builtInLed, LedController& externalLed);  // 依存関係の初期化
+  virtual void initDependencies(WiFiManager& wifi, TimeManager& time, ParameterManager& parameter, TerminalInputManager& terminal, LedManager& ledManager);  // 依存関係の初期化
   virtual void begin(void);         // システム起動処理
   virtual void update(void);
 
@@ -78,8 +72,7 @@ private:
   TimeManager* timeManager = nullptr;
   ParameterManager* parameterManager = nullptr;  // パラメータ管理クラスへのポインタ
   TerminalInputManager* terminalInputManager = nullptr;    // 端子入力管理
-  LedController* builtInLedCtrl = nullptr;      // 内蔵LED制御クラスへのポインタ
-  LedController* externalLedCtrl = nullptr;     // 外部LED制御クラスへのポインタ
+  LedManager* ledManager = nullptr;                         // LED管理クラスへのポインタ
 
   bool ledPatternCtrl(void);              // LED表示パターン設定
 

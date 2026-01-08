@@ -7,6 +7,7 @@ add_library(ParameterManLib
     ../src/ParameterStorage.cpp
     ../src/SerialCommandProcessor.cpp
     ../src/systemManager.cpp
+    ../src/LedManager.cpp
     ../src/WiFiManager.cpp
 )
 target_include_directories(ParameterManLib PUBLIC

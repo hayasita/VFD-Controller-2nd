@@ -4,7 +4,7 @@
 
 class DummySystemManager : public SystemManager {
 public:
-  void initDependencies(WiFiManager& , TimeManager& , ParameterManager& , TerminalInputManager& , LedController& , LedController& ) override {
+  void initDependencies(WiFiManager& , TimeManager& , ParameterManager& , TerminalInputManager& , LedManager& ) override {
     // モックの依存関係初期化処理
   }
   void update(void) override {
